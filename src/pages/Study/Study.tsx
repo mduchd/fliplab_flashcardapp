@@ -548,7 +548,7 @@ const Study: React.FC = () => {
                </div>
 
                {!isMatchStarted && !isMatchPlaying ? (
-                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-2xl">
+                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl">
                     <div className="text-center">
                         <Puzzle size={60} className="mx-auto text-purple-600 mb-4 animate-bounce" />
                         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Sẵn sàng chưa?</h3>

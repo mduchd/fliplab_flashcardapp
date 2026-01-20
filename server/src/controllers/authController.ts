@@ -159,3 +159,49 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
     });
   }
 };
+
+// @desc    Update user profile
+// @route   PUT /api/auth/profile
+// @access  Private
+export const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { displayName, avatar } = req.body;
+    
+    const user = await User.findById(req.userId);
+    if (!user) {
+      res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+      return;
+    }
+
+    // Update fields if provided
+    if (displayName) user.displayName = displayName;
+    if (avatar !== undefined) user.avatar = avatar;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          displayName: user.displayName,
+          avatar: user.avatar,
+          totalStudyTime: user.totalStudyTime,
+          totalCardsStudied: user.totalCardsStudied,
+          createdAt: user.createdAt,
+        },
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error updating profile',
+    });
+  }
+};

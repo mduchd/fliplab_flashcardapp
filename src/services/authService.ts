@@ -51,6 +51,12 @@ export const authService = {
     return response.data;
   },
 
+  // Update profile
+  async updateProfile(data: { displayName?: string; avatar?: string }): Promise<{ success: boolean; data: { user: User } }> {
+    const response = await api.put('/auth/profile', data);
+    return response.data;
+  },
+
   // Logout
   logout(): void {
     localStorage.removeItem('token');
