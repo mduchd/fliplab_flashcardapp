@@ -14,7 +14,6 @@ import {
   HiHome as Home,
   HiExclamationCircle as AlertCircle,
   HiSquares2X2 as Layers,
-  HiCommandLine as Keyboard,
   HiArrowsRightLeft as Shuffle,
   HiViewColumns as LayoutGrid,
   HiCreditCard as CreditCard,
@@ -50,7 +49,6 @@ const Study: React.FC = () => {
   const [studiedCards, setStudiedCards] = useState<Set<number>>(new Set());
   const [knownCards, setKnownCards] = useState<Set<number>>(new Set());
   const [isCompleted, setIsCompleted] = useState(false);
-  const [direction, setDirection] = useState<'left' | 'right'>('right');
   
   // Quiz State
   const [studyMode, setStudyMode] = useState<'flashcard' | 'quiz' | 'match'>('flashcard');
@@ -58,6 +56,7 @@ const Study: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [answerStatus, setAnswerStatus] = useState<'correct' | 'wrong' | null>(null);
   const [isShaking, setIsShaking] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
 
 
 
@@ -245,34 +244,44 @@ const Study: React.FC = () => {
 
   const handleNext = () => {
     if (currentIndex < activeCards.length - 1) {
-      setDirection('right');
       setCurrentIndex(currentIndex + 1);
       setIsFlipped(false);
     } else {
       setIsCompleted(true);
       playCompleteSound();
-      const event = new CustomEvent('studyComplete', { 
-        detail: { cardsStudied: studiedCards.size } 
-      });
-      window.dispatchEvent(event);
     }
   };
 
   const handlePrev = () => {
     if (currentIndex > 0) {
-      setDirection('left');
       setCurrentIndex(currentIndex - 1);
       setIsFlipped(false);
     }
   };
 
   const handleKnow = () => {
+    const card = activeCards[currentIndex];
+    if (flashcardSet && card) {
+      // Call API to update progress (Backend)
+      flashcardService.updateStudyProgress(flashcardSet._id, card._id, (card.box || 1) + 1);
+      // Dispatch event for Sidebar Goal (Frontend)
+      window.dispatchEvent(new Event('cardStudied'));
+    }
+
     setKnownCards(new Set(knownCards).add(currentIndex));
     setStudiedCards(new Set(studiedCards).add(currentIndex));
     handleNext();
   };
 
   const handleDontKnow = () => {
+    const card = activeCards[currentIndex];
+    if (flashcardSet && card) {
+      // Call API (reset box to 1)
+      flashcardService.updateStudyProgress(flashcardSet._id, card._id, 1);
+      // Dispatch event
+      window.dispatchEvent(new Event('cardStudied'));
+    }
+
     setStudiedCards(new Set(studiedCards).add(currentIndex));
     handleNext();
   };
@@ -433,32 +442,32 @@ const Study: React.FC = () => {
 
             <div className="grid grid-cols-3 gap-4 mb-8">
               <div className="bg-slate-100 dark:bg-white/10 rounded-xl p-4">
-                <div className="flex justify-center mb-2 text-slate-500 dark:text-slate-400">
+                <div className="flex justify-center mb-2 text-slate-600 dark:text-slate-300">
                   <Layers size={24} />
                 </div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white">{activeCards.length}</div>
-                <div className="text-slate-500 dark:text-slate-400 text-sm">Tổng thẻ</div>
+                <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Tổng thẻ</div>
               </div>
               <div className="bg-green-100 dark:bg-green-500/20 rounded-xl p-4">
                 <div className="flex justify-center mb-2 text-green-600 dark:text-green-400">
                   <Check size={24} />
                 </div>
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400">{knownCards.size}</div>
-                <div className="text-slate-500 dark:text-slate-400 text-sm">Đã biết</div>
+                <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Đã biết</div>
               </div>
-              <div className="bg-purple-100 dark:bg-blue-500/20 rounded-xl p-4">
-                <div className="flex justify-center mb-2 text-blue-600 dark:text-purple-400">
+              <div className="bg-blue-100 dark:bg-blue-500/20 rounded-xl p-4">
+                <div className="flex justify-center mb-2 text-blue-600 dark:text-blue-400">
                   <Trophy size={24} />
                 </div>
-                <div className="text-3xl font-bold text-blue-600 dark:text-purple-400">{accuracy}%</div>
-                <div className="text-slate-500 dark:text-slate-400 text-sm">Độ chính xác</div>
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{accuracy}%</div>
+                <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Độ chính xác</div>
               </div>
             </div>
 
             <div className="flex gap-4 justify-center">
               <button
                 onClick={handleRestart}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all flex items-center gap-2"
               >
                 <RotateCcw size={20} />
                 Học lại
@@ -488,14 +497,14 @@ const Study: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(`/create/${id}`)}
-              className="px-4 py-2 bg-purple-100 dark:bg-blue-500/20 text-blue-600 dark:text-purple-400 rounded-lg hover:bg-purple-200 dark:hover:bg-blue-500/30 transition-all flex items-center gap-2 font-medium"
+              className="px-4 py-2 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
             >
               <Edit2 size={18} />
               Chỉnh sửa bộ thẻ
             </button>
             <button
               onClick={() => navigate('/')}
-              className="px-4 py-2 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center gap-2"
+              className="px-4 py-2 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center gap-2 font-medium cursor-pointer hover:shadow-sm active:scale-95"
             >
               <X size={20} />
               Thoát
@@ -517,33 +526,43 @@ const Study: React.FC = () => {
         <div className="flex justify-center mb-6">
           <div className="bg-slate-100 dark:bg-white/10 p-1 rounded-xl inline-flex">
             <button
-              onClick={() => setStudyMode('flashcard')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all ${
+              onClick={() => {
+                setSlideDirection('left');
+                setStudyMode('flashcard');
+              }}
+              className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all cursor-pointer ${
                 studyMode === 'flashcard'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
               }`}
             >
               <CreditCard size={18} />
               Lật thẻ
             </button>
             <button
-              onClick={() => setStudyMode('quiz')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all ${
+              onClick={() => {
+                if (studyMode === 'flashcard') setSlideDirection('right');
+                else if (studyMode === 'match') setSlideDirection('left');
+                setStudyMode('quiz');
+              }}
+              className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all cursor-pointer ${
                 studyMode === 'quiz'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
               }`}
             >
               <LayoutGrid size={18} />
               Trắc nghiệm
             </button>
             <button
-              onClick={() => setStudyMode('match')}
-              className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all ${
+              onClick={() => {
+                setSlideDirection('right');
+                setStudyMode('match');
+              }}
+              className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all cursor-pointer ${
                 studyMode === 'match'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-sm'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
               }`}
             >
               <Puzzle size={18} />
@@ -553,14 +572,12 @@ const Study: React.FC = () => {
         </div>
 
         {/* Content Area */}
-        <div className="relative w-full max-w-2xl mx-auto min-h-[400px]">
+        <div className="relative w-full max-w-2xl mx-auto mode-content-container">
           {studyMode === 'flashcard' ? (
             <div
-              key={currentIndex}
+              key={`flashcard-${studyMode}-${currentIndex}`}
               onClick={handleFlip}
-              className={`relative w-full h-96 cursor-pointer perspective-1000 group animate-in ${
-                direction === 'right' ? 'slide-in-from-right' : 'slide-in-from-left'
-              }`}
+              className={`relative w-full h-96 cursor-pointer perspective-1000 group ${slideDirection === 'right' ? 'slide-in-from-right-mode' : 'slide-in-from-left-mode'}`}
             >
               <div
                 className={`absolute inset-0 w-full h-full card-flip-transition transform-style-3d ${
@@ -576,14 +593,14 @@ const Study: React.FC = () => {
                   {/* Edit Button - Top Right */}
                   <button
                     onClick={openEditModal}
-                    className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-purple-400 transition-all opacity-0 group-hover:opacity-100 z-10"
+                    className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
                     title="Chỉnh sửa thẻ"
                   >
                     <Edit2 size={16} />
                   </button>
 
                   <div className="text-center w-full max-w-lg mx-auto">
-                    <span className="block text-slate-500 dark:text-slate-400 text-sm mb-4">Thuật ngữ</span>
+                    <span className="block text-blue-600 dark:text-blue-400 text-sm font-semibold mb-4 uppercase tracking-wide">Thuật ngữ</span>
                     
                     {currentCard?.image && (
                       <div className="mb-4 h-40 flex items-center justify-center">
@@ -595,7 +612,7 @@ const Study: React.FC = () => {
                       </div>
                     )}
 
-                    <span className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white block break-words">
+                    <span className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white block break-words leading-tight">
                       {currentCard?.term}
                     </span>
                     
@@ -617,15 +634,15 @@ const Study: React.FC = () => {
                   {/* Edit Button - Top Right (Back) */}
                   <button
                     onClick={openEditModal}
-                    className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-purple-400 transition-all z-10"
+                    className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all z-10 cursor-pointer"
                     title="Chỉnh sửa thẻ"
                   >
                     <Edit2 size={16} />
                   </button>
 
                   <div className="text-center">
-                    <span className="block text-slate-500 dark:text-slate-400 text-sm mb-4">Định nghĩa</span>
-                    <span className="text-2xl md:text-3xl font-medium text-slate-900 dark:text-white">
+                    <span className="block text-green-600 dark:text-green-400 text-sm font-semibold mb-4 uppercase tracking-wide">Định nghĩa</span>
+                    <span className="text-3xl md:text-4xl font-semibold text-slate-900 dark:text-white leading-relaxed">
                       {currentCard?.definition}
                     </span>
                   </div>
@@ -633,7 +650,7 @@ const Study: React.FC = () => {
               </div>
             </div>
           ) : studyMode === 'match' ? (
-            <div className="animate-in fade-in zoom-in duration-300 min-h-[400px]">
+            <div key={`match-${studyMode}`} className={`min-h-[400px] ${slideDirection === 'right' ? 'slide-in-from-right-mode' : 'slide-in-from-left-mode'}`}>
                {/* Match Header */}
                <div className="flex justify-center mb-6">
                  <div className="bg-slate-800 text-white px-6 py-2 rounded-full font-mono text-xl font-bold shadow-lg shadow-blue-500/20 tabular-nums">
@@ -649,7 +666,7 @@ const Study: React.FC = () => {
                         <p className="text-slate-600 dark:text-slate-300 mb-6">Ghép các thẻ tương ứng với nhau trong thời gian ngắn nhất!</p>
                         <button 
                           onClick={startMatchGame}
-                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-105 transition-transform"
+                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-105 transition-transform cursor-pointer active:scale-95 active:shadow-md"
                         >
                           Bắt đầu ngay
                         </button>
@@ -669,10 +686,10 @@ const Study: React.FC = () => {
                         <div key={item.id} className="h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 opacity-0 transition-opacity duration-500"></div>
                     );
 
-                    let itemClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-purple-400 dark:hover:border-blue-500 hover:scale-[1.02] cursor-pointer shadow-sm";
+                    let itemClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-blue-400 dark:hover:border-blue-500 hover:scale-[1.05] cursor-pointer shadow-sm hover:shadow-md active:scale-95";
                     
                     if (isSelected) {
-                        itemClass = "bg-purple-100 dark:bg-purple-900/30 border-blue-500 text-purple-700 dark:text-purple-300 ring-2 ring-purple-500 shadow-md scale-[1.05] z-10";
+                        itemClass = "bg-blue-100 dark:bg-blue-900/30 border-blue-500 text-blue-700 dark:text-blue-300 ring-2 ring-blue-500 shadow-md scale-[1.05] z-10";
                     }
                     if (isWrong) {
                         itemClass = "bg-red-500 border-red-500 text-white shake-animation ring-2 ring-red-500 z-20";
@@ -687,7 +704,7 @@ const Study: React.FC = () => {
                             onClick={() => handleMatchClick(item)}
                             className={`h-32 p-4 rounded-xl border-2 flex items-center justify-center text-center transition-all duration-200 overflow-hidden font-medium ${itemClass}`}
                         >
-                            <span className="line-clamp-4 text-sm md:text-base">{item.content}</span>
+                            <span className="line-clamp-4 text-base md:text-lg font-medium">{item.content}</span>
                         </div>
                     );
                  })}
@@ -696,21 +713,21 @@ const Study: React.FC = () => {
                {!isMatchPlaying && isMatchStarted === false && matchedPairs.size > 0 && (
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl animate-in fade-in">
                       <h3 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4 animate-bounce">Xuất sắc!</h3>
-                      <p className="text-xl text-slate-600 dark:text-slate-300 font-medium mb-8">Thời gian: <span className="text-blue-600 dark:text-purple-400 font-bold text-2xl">{matchTime.toFixed(1)}s</span></p>
-                      <button onClick={startMatchGame} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-500 transition-colors inline-flex items-center gap-2 shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transform">
+                      <p className="text-xl text-slate-600 dark:text-slate-300 font-medium mb-8">Thời gian: <span className="text-blue-600 dark:text-blue-400 font-bold text-2xl">{matchTime.toFixed(1)}s</span></p>
+                      <button onClick={startMatchGame} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-500 transition-colors inline-flex items-center gap-2 shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transform cursor-pointer active:translate-y-0">
                         <RotateCcw size={20} /> Chơi lại
                       </button>
-                      <button onClick={() => setStudyMode('flashcard')} className="mt-6 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-purple-400 font-medium transition-colors">
+                      <button onClick={() => setStudyMode('flashcard')} className="mt-6 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 font-medium transition-colors cursor-pointer">
                         Quay lại học thẻ
                       </button>
                   </div>
                )}
             </div>
           ) : (
-            <div className={`flex flex-col gap-6 animate-in ${direction === 'right' ? 'slide-in-from-right' : 'slide-in-from-left'} ${isShaking ? 'shake-animation' : ''}`}>
+            <div key={`quiz-${studyMode}-${currentIndex}`} className={`flex flex-col gap-6 ${slideDirection === 'right' ? 'slide-in-from-right-mode' : 'slide-in-from-left-mode'} ${isShaking ? 'shake-animation' : ''}`}>
                {/* Question */}
                <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center shadow-sm min-h-[200px] flex flex-col items-center justify-center">
-                  <span className="block text-slate-500 dark:text-slate-400 text-sm mb-4">Chọn định nghĩa đúng cho:</span>
+                  <span className="block text-blue-600 dark:text-blue-400 text-sm font-semibold mb-4 uppercase tracking-wide">Chọn định nghĩa đúng cho:</span>
                   
                   {currentCard?.image && (
                       <div className="mb-4 h-32 flex items-center justify-center">
@@ -722,7 +739,7 @@ const Study: React.FC = () => {
                       </div>
                   )}
                   
-                  <h3 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+                  <h3 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white">
                     {currentCard?.term}
                   </h3>
                </div>
@@ -735,7 +752,7 @@ const Study: React.FC = () => {
                     const showCorrect = answerStatus !== null && isCorrectOption;
                     const showWrong = isSelected && answerStatus === 'wrong';
 
-                    let btnClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-purple-400 dark:hover:border-blue-500 text-slate-700 dark:text-slate-200 border-2";
+                    let btnClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 text-slate-800 dark:text-slate-100 border-2 text-base";
                     
                     if (showCorrect) {
                       btnClass = "bg-green-500 border-green-500 text-white scale-[1.02] font-semibold border-2";
@@ -748,7 +765,7 @@ const Study: React.FC = () => {
                         key={idx}
                         onClick={() => handleQuizAnswer(option)}
                         disabled={selectedAnswer !== null}
-                        className={`p-4 rounded-xl border-2 text-left transition-all font-medium ${btnClass} ${selectedAnswer === null ? 'hover:-translate-y-0.5 hover:shadow-md' : 'cursor-default opacity-90'}`}
+                        className={`p-4 rounded-xl border-2 text-left transition-all font-medium ${btnClass} ${selectedAnswer === null ? 'hover:-translate-y-0.5 hover:shadow-md cursor-pointer active:scale-[0.99]' : 'cursor-default opacity-90'}`}
                       >
                          {option.definition}
                       </button>
@@ -759,69 +776,72 @@ const Study: React.FC = () => {
           )}
         </div>
 
-        {/* Controls */}
-        <div className="mt-8 space-y-6">
-          {/* Navigation Row */}
-          <div className="flex items-center justify-center gap-6">
-            <button
-              onClick={handlePrev}
-              disabled={currentIndex === 0}
-              className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <ArrowLeft size={24} />
-            </button>
-            
-            <span className="text-xl font-bold text-slate-700 dark:text-slate-300 min-w-[3rem] text-center">
-              {currentIndex + 1} / {activeCards.length}
-            </span>
+        {/* Controls - Only show in Flashcard mode */}
+        {studyMode === 'flashcard' && (
+          <>
+            <div className="mt-2 space-y-3">
+              {/* Navigation Row */}
+              <div className="flex items-center justify-center gap-6">
+                <button
+                  onClick={handlePrev}
+                  disabled={currentIndex === 0}
+                  className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  <ArrowLeft size={24} />
+                </button>
+                
+                <span className="text-xl font-bold text-slate-700 dark:text-slate-300 min-w-[3rem] text-center">
+                  {currentIndex + 1} / {activeCards.length}
+                </span>
 
-            <button
-              onClick={handleNext}
-              disabled={currentIndex === activeCards.length - 1}
-              className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <ArrowRight size={24} />
-            </button>
-          </div>
+                <button
+                  onClick={handleNext}
+                  disabled={currentIndex === activeCards.length - 1}
+                  className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  <ArrowRight size={24} />
+                </button>
+              </div>
 
-          {/* Action Row */}
-          <div className="flex items-center justify-center gap-4">
-             <button
-              onClick={handleShuffle}
-              title="Trộn thẻ"
-              className="p-4 bg-purple-100 dark:bg-blue-500/20 text-blue-600 dark:text-purple-300 rounded-xl hover:bg-purple-200 dark:hover:bg-blue-500/30 transition-all"
-            >
-              <Shuffle size={24} />
-            </button>
+              {/* Action Row */}
+              <div className="flex items-center justify-center gap-4">
+                 <button
+                  onClick={handleShuffle}
+                  title="Trộn thẻ"
+                  className="p-4 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 rounded-xl hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all cursor-pointer shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
+                >
+                  <Shuffle size={24} />
+                </button>
 
-            <button
-              onClick={handleDontKnow}
-              className="flex-1 max-w-[200px] py-4 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-semibold hover:bg-red-200 dark:hover:bg-red-500/30 transition-all flex items-center justify-center gap-2"
-            >
-              <X size={24} />
-              <span>Chưa biết</span>
-            </button>
+                <button
+                  onClick={handleDontKnow}
+                  className="flex-1 max-w-[200px] py-4 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-semibold hover:bg-red-200 dark:hover:bg-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+                >
+                  <X size={24} />
+                  <span>Chưa biết</span>
+                </button>
 
-            <button
-              onClick={handleKnow}
-              className="flex-1 max-w-[200px] py-4 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-xl font-semibold hover:bg-green-200 dark:hover:bg-green-500/30 transition-all flex items-center justify-center gap-2"
-            >
-              <Check size={24} />
-              <span>Đã biết</span>
-            </button>
-          </div>
-        </div>
+                <button
+                  onClick={handleKnow}
+                  className="flex-1 max-w-[200px] py-4 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-xl font-semibold hover:bg-green-200 dark:hover:bg-green-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+                >
+                  <Check size={24} />
+                  <span>Đã biết</span>
+                </button>
+              </div>
+            </div>
 
-        {/* Keyboard Hints */}
-        <div className="mt-6 text-center text-slate-500 text-sm flex items-center justify-center gap-2">
-          <Keyboard size={16} />
-          <span className="hidden md:inline">
-            Phím tắt: <kbd className="px-2 py-1 bg-slate-200 dark:bg-white/10 rounded mx-1">Space</kbd> lật,{' '}
-            <kbd className="px-2 py-1 bg-slate-200 dark:bg-white/10 rounded mx-1">← →</kbd> chuyển,{' '}
-            <kbd className="px-2 py-1 bg-slate-200 dark:bg-white/10 rounded mx-1">1</kbd> chưa biết,{' '}
-            <kbd className="px-2 py-1 bg-slate-200 dark:bg-white/10 rounded mx-1">2</kbd> đã biết
-          </span>
-        </div>
+            {/* Keyboard Hints */}
+            <div className="mt-3 text-center text-slate-700 dark:text-slate-200 text-base flex items-center justify-center gap-2">
+              <span className="hidden md:inline font-medium">
+                Phím tắt: <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">Space</kbd> lật,{' '}
+                <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">← →</kbd> chuyển,{' '}
+                <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">1</kbd> chưa biết,{' '}
+                <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">2</kbd> đã biết
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Edit Card Modal */}
@@ -831,7 +851,7 @@ const Study: React.FC = () => {
             {/* Modal Header */}
             <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-700">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Edit2 size={18} className="text-purple-500" />
+                <Edit2 size={18} className="text-blue-500" />
                 Chỉnh sửa thẻ
               </h2>
               <button 
@@ -852,7 +872,7 @@ const Study: React.FC = () => {
                   type="text"
                   value={editTerm}
                   onChange={(e) => setEditTerm(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
                   placeholder="Nhập thuật ngữ"
                   autoFocus
                 />
@@ -866,7 +886,7 @@ const Study: React.FC = () => {
                   value={editDefinition}
                   onChange={(e) => setEditDefinition(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white resize-none"
                   placeholder="Nhập định nghĩa"
                 />
               </div>

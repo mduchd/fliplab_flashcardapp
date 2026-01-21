@@ -56,7 +56,7 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900 p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600/30 rounded-full blur-3xl"></div>
@@ -68,15 +68,15 @@ const Register: React.FC = () => {
         {/* Logo */}
         <div className="text-center mb-6">
           <h1 className="text-5xl font-bold text-white mb-2 tracking-tight flex items-center justify-center gap-3">
-            <HiBolt className="w-12 h-12 text-purple-400" />
+            <HiBolt className="w-12 h-12 text-blue-400" />
             FlipLab
           </h1>
-          <p className="text-xl text-purple-200 font-light">Lật thẻ. Nhớ sâu.</p>
+          <p className="text-xl text-blue-100 font-light">Lật thẻ. Nhớ sâu.</p>
         </div>
 
         {/* Register Form */}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white text-center mb-6">
+          <h2 className="text-3xl font-bold text-white text-center mb-6">
             Đăng ký
           </h2>
 
@@ -88,64 +88,64 @@ const Register: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-purple-200 text-sm mb-2">Tên hiển thị</label>
+              <label className="block text-blue-100 text-sm mb-2">Tên hiển thị</label>
               <input
                 type="text"
                 name="displayName"
                 value={formData.displayName}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="Nguyễn Văn A"
               />
             </div>
 
             <div>
-              <label className="block text-purple-200 text-sm mb-2">Tên đăng nhập *</label>
+              <label className="block text-blue-100 text-sm mb-2">Tên đăng nhập *</label>
               <input
                 type="text"
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="username"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-purple-200 text-sm mb-2">Email *</label>
+              <label className="block text-blue-100 text-sm mb-2">Email *</label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="email@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-purple-200 text-sm mb-2">Mật khẩu *</label>
+              <label className="block text-blue-100 text-sm mb-2">Mật khẩu *</label>
               <input
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-purple-200 text-sm mb-2">Xác nhận mật khẩu *</label>
+              <label className="block text-blue-100 text-sm mb-2">Xác nhận mật khẩu *</label>
               <input
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
                 required
               />
@@ -154,7 +154,7 @@ const Register: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
@@ -168,9 +168,9 @@ const Register: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-purple-200">
+            <p className="text-blue-200">
               Đã có tài khoản?{' '}
-              <Link to="/login" className="text-purple-400 hover:text-purple-300 font-semibold underline underline-offset-2">
+              <Link to="/login" className="text-blue-400 hover:text-blue-300 font-semibold underline underline-offset-2">
                 Đăng nhập
               </Link>
             </p>
@@ -178,7 +178,7 @@ const Register: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-purple-300/60 text-sm mt-6">
+        <p className="text-center text-blue-300/60 text-sm mt-6">
           © 2026 FlipLab. All rights reserved.
         </p>
       </div>

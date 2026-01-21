@@ -69,7 +69,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
           {title}
         </p>
         {description && (
-          <p className="text-sm text-slate-500 dark:text-slate-400">{description}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">{description}</p>
         )}
       </div>
     </div>
@@ -259,7 +259,7 @@ const Settings: React.FC = () => {
               <div className="flex items-center justify-between mb-3">
                 <div>
                   <p className="font-medium text-slate-900 dark:text-white">Mục tiêu hàng ngày</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Số thẻ cần học mỗi ngày</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">Số thẻ cần học mỗi ngày</p>
                 </div>
                 <select
                   value={dailyGoal}

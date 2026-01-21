@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { FlashcardSet } from '../models/FlashcardSet.js';
+import { User } from '../models/User.js';
 import { AuthRequest } from '../middleware/auth.js';
 
 // @desc    Get all flashcard sets for user
@@ -191,7 +192,7 @@ export const updateStudyProgress = async (req: AuthRequest, res: Response): Prom
     }
 
     // Update card box (spaced repetition)
-    const card = flashcardSet.cards.id(cardId);
+    const card = (flashcardSet.cards as any).id(cardId);
     if (card) {
       card.box = box;
       if (box > 1) {
@@ -204,6 +205,14 @@ export const updateStudyProgress = async (req: AuthRequest, res: Response): Prom
     flashcardSet.lastStudied = new Date();
     flashcardSet.totalStudies += 1;
     await flashcardSet.save();
+
+    // Update user stats
+    await User.findByIdAndUpdate(req.userId, {
+      $inc: { 
+        totalCardsStudied: 1,
+        totalStudyTime: 0.5 // Assume ~30 seconds per card
+      }
+    });
 
     res.json({
       success: true,

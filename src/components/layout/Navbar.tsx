@@ -49,7 +49,7 @@ const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center justify-center w-[72px] h-full flex-shrink-0">
           <button 
             onClick={toggleSidebar}
-            className="flex items-center justify-center w-10 h-10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl transition-all"
+            className="flex items-center justify-center w-10 h-10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95"
             title={isCollapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           >
             <HiBars3 className="w-6 h-6" />
@@ -69,7 +69,7 @@ const Navbar: React.FC = () => {
           <div className="p-1.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg group-hover:shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-shadow">
             <HiBolt className="w-6 h-6 text-white" />
           </div>
-          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-600 dark:from-blue-400 dark:via-indigo-300 dark:to-blue-400 group-hover:scale-105 transition-all duration-300">
+          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 group-hover:scale-105 transition-all duration-300">
             FlipLab
           </span>
         </Link>
@@ -93,7 +93,7 @@ const Navbar: React.FC = () => {
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-            className="group/theme p-2.5 bg-white dark:bg-white/5 text-slate-500 dark:text-yellow-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all duration-300 focus:outline-none flex-shrink-0 border border-slate-200 dark:border-white/10 hover:scale-110 active:scale-95"
+            className="group/theme p-2.5 bg-white dark:bg-white/5 text-slate-500 dark:text-yellow-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all duration-300 focus:outline-none flex-shrink-0 border border-slate-200 dark:border-white/10 hover:scale-110 active:scale-95 cursor-pointer"
             title={theme === 'dark' ? 'Chuyển sang chế độ sáng' : 'Chuyển sang chế độ tối'}
           >
             <div className="relative w-5 h-5">
@@ -142,25 +142,25 @@ const Navbar: React.FC = () => {
             {/* Dropdown Content */}
             {isDropdownOpen && (
               <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ring-1 ring-black/5 z-50">
-                <div className="p-2 border-b border-slate-100 dark:border-white/5 sm:hidden">
-                  <p className="text-slate-900 dark:text-white font-medium text-sm px-2">{user?.displayName}</p>
-                  <p className="text-slate-500 text-xs px-2">@{user?.username}</p>
+                <div className="p-3 border-b border-slate-100 dark:border-white/10 sm:hidden">
+                  <p className="text-slate-900 dark:text-white font-semibold text-base px-2">{user?.displayName}</p>
+                  <p className="text-slate-600 dark:text-slate-400 text-sm px-2">@{user?.username}</p>
                 </div>
                 <div className="py-1">
                   <Link
                     to="/profile"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-300 transition-colors mx-1 rounded-lg"
+                    className="flex items-center gap-3 px-4 py-3 text-base text-slate-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mx-1 rounded-lg font-medium"
                   >
-                    <HiUser className="w-4 h-4" />
+                    <HiUser className="w-5 h-5" />
                     Hồ sơ của bạn
                   </Link>
                   <div className="h-px bg-slate-100 dark:bg-white/5 my-1 mx-2"></div>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors mx-1 rounded-lg"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-base text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors mx-1 rounded-lg cursor-pointer font-semibold"
                   >
-                    <HiArrowRightOnRectangle className="w-4 h-4" />
+                    <HiArrowRightOnRectangle className="w-5 h-5" />
                     Đăng xuất
                   </button>
                 </div>

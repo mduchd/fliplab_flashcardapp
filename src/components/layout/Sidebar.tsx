@@ -12,7 +12,7 @@ import {
   HiFire,
   HiFlag,
   HiStar,
-  HiArrowTrendingUp
+  HiCheckBadge
 } from 'react-icons/hi2';
 
 // Helper to check if two dates are the same day
@@ -90,13 +90,11 @@ const Sidebar: React.FC = () => {
     }
   }, []);
 
-  // Listen for study events (custom event from Study page)
+  // Listen for incremental study events
   useEffect(() => {
-    const handleStudyComplete = (event: CustomEvent) => {
-      const { cardsStudied } = event.detail;
-      
+    const handleCardStudied = () => {
       // Update progress
-      const newProgress = todayProgress + cardsStudied;
+      const newProgress = todayProgress + 1;
       setTodayProgress(newProgress);
       localStorage.setItem('dailyProgress', JSON.stringify({
         date: new Date().toISOString(),
@@ -115,9 +113,9 @@ const Sidebar: React.FC = () => {
       }
     };
 
-    window.addEventListener('studyComplete', handleStudyComplete as EventListener);
+    window.addEventListener('cardStudied', handleCardStudied);
     return () => {
-      window.removeEventListener('studyComplete', handleStudyComplete as EventListener);
+      window.removeEventListener('cardStudied', handleCardStudied);
     };
   }, [streak, studiedToday, todayProgress]);
   
@@ -169,7 +167,7 @@ const Sidebar: React.FC = () => {
         {/* Main Navigation */}
         <div className={`mb-6 ${isCollapsed ? 'space-y-2' : 'space-y-1'}`}>
           <div className={`h-6 flex items-center mb-2 px-3 transition-opacity duration-200 ${isCollapsed ? 'opacity-0 h-0 mb-0' : 'opacity-100'}`}>
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider whitespace-nowrap">
               Menu
             </p>
           </div>
@@ -184,12 +182,12 @@ const Sidebar: React.FC = () => {
                   ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
                       isActive
                         ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                        : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                        : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                     }`
                   : `flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium whitespace-nowrap overflow-hidden ${
                       isActive
                         ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                        : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                        : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                     }`
               }
             >
@@ -223,8 +221,8 @@ const Sidebar: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Chuỗi ngày</p>
-                        <p className="font-bold text-slate-900 dark:text-white truncate">{streak} ngày</p>
+                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">Chuỗi ngày</p>
+                        <p className="font-bold text-lg text-slate-900 dark:text-white truncate">{streak} ngày</p>
                       </div>
                       {streak >= 7 && (
                         <div className="flex items-center gap-1 text-orange-500">
@@ -265,14 +263,13 @@ const Sidebar: React.FC = () => {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Mục tiêu hôm nay</p>
-                        <p className="font-bold text-slate-900 dark:text-white truncate">
+                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">Mục tiêu hôm nay</p>
+                        <p className="font-bold text-lg text-slate-900 dark:text-white truncate">
                           {todayProgress}/{dailyGoal} thẻ
                         </p>
                       </div>
                       {goalCompleted && (
                         <div className="text-green-500">
-                          <HiArrowTrendingUp className="w-[18px] h-[18px]" />
                         </div>
                       )}
                     </div>
@@ -289,11 +286,10 @@ const Sidebar: React.FC = () => {
                     style={{ width: `${goalPercentage}%` }}
                   />
                 </div>
-                {goalCompleted && (
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-2 font-medium whitespace-nowrap">
-                    🎉 Hoàn thành mục tiêu!
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-2 font-medium whitespace-nowrap flex items-center gap-1">
+                    <HiCheckBadge className="w-4 h-4" />
+                    Hoàn thành mục tiêu!
                   </p>
-                )}
               </>
             )}
           </div>
@@ -311,7 +307,7 @@ const Sidebar: React.FC = () => {
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
-                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left ${
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left cursor-pointer ${
                     location.pathname === '/' && !location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
@@ -331,7 +327,7 @@ const Sidebar: React.FC = () => {
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
-                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left ${
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left cursor-pointer ${
                     location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
@@ -351,7 +347,7 @@ const Sidebar: React.FC = () => {
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
-                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left ${
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left cursor-pointer ${
                     location.pathname === '/settings'
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'

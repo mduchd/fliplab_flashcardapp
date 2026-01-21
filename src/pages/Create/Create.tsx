@@ -199,7 +199,7 @@ const Create: React.FC = () => {
         <div className="mb-8">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 transition-colors"
           >
             <HiArrowLeft className="w-6 h-6 text-slate-600 dark:text-slate-300" />
           </button>
@@ -220,7 +220,7 @@ const Create: React.FC = () => {
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Thông tin bộ thẻ</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-slate-700 dark:text-purple-200 text-sm mb-2">Tên bộ thẻ</label>
+                <label className="block text-slate-700 dark:text-blue-200 text-sm mb-2">Tên bộ thẻ</label>
                 <input
                   type="text"
                   value={name}
@@ -231,7 +231,7 @@ const Create: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-purple-200 text-sm mb-2">Mô tả (tùy chọn)</label>
+                <label className="block text-slate-700 dark:text-blue-200 text-sm mb-2">Mô tả (tùy chọn)</label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -242,7 +242,7 @@ const Create: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-purple-200 text-sm mb-2">Tags (phân cách bằng dấu phẩy)</label>
+                <label className="block text-slate-700 dark:text-blue-200 text-sm mb-2">Tags (phân cách bằng dấu phẩy)</label>
                 <input
                   type="text"
                   value={tags}
@@ -253,7 +253,7 @@ const Create: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-700 dark:text-purple-200 text-sm mb-2">Màu sắc</label>
+                <label className="block text-slate-700 dark:text-blue-200 text-sm mb-2">Màu sắc</label>
                 <div className="flex gap-3">
                   {colors.map((c) => (
                     <button
@@ -261,7 +261,7 @@ const Create: React.FC = () => {
                       type="button"
                       onClick={() => setColor(c)}
                       className={`w-10 h-10 rounded-full transition-all ${
-                        color === c ? 'ring-4 ring-purple-500 dark:ring-white ring-offset-2 ring-offset-white dark:ring-offset-slate-900' : ''
+                        color === c ? 'ring-4 ring-blue-500 dark:ring-white ring-offset-2 ring-offset-white dark:ring-offset-slate-900' : ''
                       }`}
                       style={{ backgroundColor: c }}
                     />
@@ -278,7 +278,7 @@ const Create: React.FC = () => {
               <button
                 type="button"
                 onClick={addCard}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-purple-500 transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-all flex items-center gap-2"
               >
                 <HiPlus className="w-[18px] h-[18px]" />
                 Thêm thẻ
@@ -289,7 +289,7 @@ const Create: React.FC = () => {
               {cards.map((card, index) => (
                 <div
                   key={card.id}
-                  className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-start group shadow-sm hover:border-blue-600 dark:hover:border-purple-500/30 transition-all"
+                  className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-start group shadow-sm hover:border-blue-600 dark:hover:border-blue-500/30 transition-all"
                 >
                   {/* 1. Index Circle */}
                   <div className="flex-shrink-0 pt-2 hidden sm:block">
@@ -353,7 +353,7 @@ const Create: React.FC = () => {
                        />
                        <label
                           htmlFor={`file-${card.id}`}
-                          className="w-10 h-10 flex items-center justify-center border border-slate-200 dark:border-white/20 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-blue-600 hover:border-purple-200 cursor-pointer transition-all bg-white dark:bg-transparent shadow-sm"
+                          className="w-10 h-10 flex items-center justify-center border border-slate-200 dark:border-white/20 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 hover:border-blue-300 cursor-pointer transition-all bg-white dark:bg-transparent shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
                           title="Thêm/Đổi ảnh"
                        >
                           <HiPhoto className="w-5 h-5" />
@@ -365,7 +365,7 @@ const Create: React.FC = () => {
                         type="button"
                         onClick={() => removeCard(card.id)}
                         disabled={cards.length <= 1}
-                        className="w-10 h-10 flex items-center justify-center border border-red-200 dark:border-red-500/30 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all bg-white dark:bg-transparent shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:border-slate-200"
+                        className="w-10 h-10 flex items-center justify-center border border-red-200 dark:border-red-500/30 rounded-lg text-red-500 hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 transition-all bg-white dark:bg-transparent shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:border-slate-200 cursor-pointer hover:shadow-md hover:scale-105 active:scale-95"
                         title="Xóa thẻ"
                      >
                         <HiTrash className="w-5 h-5" />
@@ -378,9 +378,9 @@ const Create: React.FC = () => {
             <button
               type="button"
               onClick={addCard}
-              className="w-full mt-6 py-4 border-2 border-dashed border-slate-300 dark:border-white/20 text-slate-500 dark:text-slate-400 rounded-xl hover:border-purple-500 hover:text-blue-500 dark:hover:text-purple-400 transition-all flex items-center justify-center gap-2 font-medium hover:bg-purple-50 dark:hover:bg-purple-500/5 group"
+              className="w-full mt-6 py-4 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-bold group active:scale-[0.99] cursor-pointer"
             >
-              <div className="p-1 bg-slate-200 dark:bg-white/10 rounded-full group-hover:bg-purple-200 dark:group-hover:bg-purple-500/30 transition-colors">
+              <div className="p-1 bg-white dark:bg-white/10 rounded-full text-slate-900 dark:text-white group-hover:bg-blue-500 group-hover:text-white transition-colors">
                 <HiPlus className="w-5 h-5" />
               </div>
               Thêm thẻ mới
@@ -392,14 +392,14 @@ const Create: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex-1 py-4 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-lg"
+              className="flex-1 py-4 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-lg cursor-pointer"
             >
               Hủy bỏ
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-[2] py-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold hover:from-purple-500 hover:to-indigo-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg shadow-lg shadow-purple-500/20 hover:shadow-purple-500/40 hover:-translate-y-0.5"
+              className="flex-[2] py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg active:scale-[0.98] cursor-pointer"
             >
               {isLoading ? (
                 <>

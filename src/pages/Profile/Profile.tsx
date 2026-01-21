@@ -17,6 +17,7 @@ import {
 } from 'react-icons/hi2';
 import ActivityStats from '../../components/profile/ActivityStats';
 import { authService } from '../../services/authService';
+import { flashcardService } from '../../services/flashcardService';
 import { useToastContext } from '../../contexts/ToastContext';
 
 // Preset Animal Avatars
@@ -43,7 +44,8 @@ const Profile: React.FC = () => {
   const [stats, setStats] = useState({
     streak: 0,
     studiedToday: 0,
-    dailyGoal: 20
+    dailyGoal: 20,
+    totalDecks: 0
   });
 
   // Load stats from localStorage
@@ -78,8 +80,38 @@ const Profile: React.FC = () => {
     setStats({
       streak: currentStreak,
       studiedToday: progress,
-      dailyGoal: goal
+      dailyGoal: goal,
+      totalDecks: 0
     });
+
+    // 4. Load Total Decks
+    const fetchDecks = async () => {
+      try {
+        const response = await flashcardService.getAll();
+        if (response.success && response.data) {
+          setStats(prev => ({
+            ...prev,
+            totalDecks: response.data.flashcardSets.length
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to load decks', error);
+      }
+    };
+    fetchDecks();
+
+    // 5. Refresh User Data (to detect new study stats)
+    const fetchUser = async () => {
+      try {
+        const response = await authService.getMe();
+        if (response.success && response.data.user) {
+          updateUser(response.data.user);
+        }
+      } catch (error) {
+        console.error('Failed to refresh user data', error);
+      }
+    };
+    fetchUser();
   }, []);
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -208,18 +240,18 @@ const Profile: React.FC = () => {
 
               <div className="w-full space-y-3 mb-6">
                 <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 text-sm bg-slate-100 dark:bg-white/10 p-3 rounded-xl transition-all hover:bg-slate-200 dark:hover:bg-white/20">
-                  <HiUser className="w-5 h-5 flex-shrink-0 text-slate-500 dark:text-slate-400" />
+                  <HiUser className="w-5 h-5 flex-shrink-0 text-slate-600 dark:text-slate-400" />
                   <span className="truncate font-medium">{user?.email}</span>
                 </div>
                 <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 text-sm bg-slate-100 dark:bg-white/10 p-3 rounded-xl transition-all hover:bg-slate-200 dark:hover:bg-white/20">
-                  <HiClock className="w-5 h-5 flex-shrink-0 text-slate-500 dark:text-slate-400" />
+                  <HiClock className="w-5 h-5 flex-shrink-0 text-slate-600 dark:text-slate-400" />
                   <span className="font-medium">Tham gia: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</span>
                 </div>
               </div>
 
               <button 
                 onClick={openEditModal}
-                className="w-full py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-semibold hover:bg-slate-800 dark:hover:bg-slate-200 transition-all flex items-center justify-center gap-2 text-sm"
+                className="w-full py-2.5 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-lg font-semibold hover:bg-slate-800 dark:hover:bg-slate-200 transition-all flex items-center justify-center gap-2 text-sm cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5"
               >
                 <HiPencilSquare className="w-4 h-4" />
                 Chỉnh sửa hồ sơ
@@ -244,7 +276,7 @@ const Profile: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 text-center flex flex-col items-center shadow-sm">
             <HiRectangleStack className="w-6 h-6 text-blue-500 dark:text-blue-400 mb-3" />
-            <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">0</div>
+            <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{stats.totalDecks}</div>
             <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Bộ thẻ</div>
           </div>
           <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 text-center flex flex-col items-center shadow-sm">
@@ -275,8 +307,8 @@ const Profile: React.FC = () => {
             Streak của bạn
           </h2>
           <div className="text-center py-8">
-            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 bg-amber-100 dark:bg-amber-500/20">
-              <HiFire className="w-14 h-14 text-amber-500 dark:text-amber-400" />
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 bg-amber-100 dark:bg-amber-500/20 flame-container">
+              <HiFire className="w-14 h-14 text-amber-500 dark:text-amber-400 flame-icon" />
             </div>
             <div className="text-3xl font-bold text-amber-500 dark:text-amber-400 mb-2">{stats.streak} ngày</div>
             <p className="text-slate-700 dark:text-slate-300 font-medium">Bắt đầu streak bằng cách học mỗi ngày!</p>
@@ -320,7 +352,7 @@ const Profile: React.FC = () => {
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">Chỉnh sửa hồ sơ</h2>
               <button 
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-blue-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
               >
                 <HiXMark className="w-5 h-5 text-slate-500" />
               </button>
@@ -388,7 +420,7 @@ const Profile: React.FC = () => {
                         <button
                           key={idx}
                           onClick={() => selectPresetAvatar(emoji)}
-                          className={`w-10 h-10 text-xl flex items-center justify-center rounded-lg transition-all ${
+                          className={`w-10 h-10 text-xl flex items-center justify-center rounded-lg transition-all cursor-pointer ${
                             editAvatar === emoji 
                               ? 'bg-blue-500 scale-110 shadow-lg' 
                               : 'bg-white dark:bg-slate-600 hover:bg-slate-100 dark:hover:bg-slate-500 hover:scale-105'
@@ -439,14 +471,14 @@ const Profile: React.FC = () => {
             <div className="flex gap-3 p-6 border-t border-slate-100 dark:border-slate-700 sticky bottom-0 bg-white dark:bg-slate-800">
               <button 
                 onClick={() => setIsEditModalOpen(false)}
-                className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+                className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
               >
                 Hủy
               </button>
               <button 
                 onClick={handleSaveProfile}
                 disabled={isSaving}
-                className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5"
               >
                 {isSaving ? (
                   <>

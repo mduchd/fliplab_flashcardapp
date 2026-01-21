@@ -209,7 +209,7 @@ const Home: React.FC = () => {
           <HiBookOpen className="w-7 h-7 text-blue-500 dark:text-blue-400" />
           Bộ thẻ của bạn
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm">
+        <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
           Quản lý và học các bộ flashcard của bạn
         </p>
       </div>
@@ -220,10 +220,10 @@ const Home: React.FC = () => {
           <button
             key={btn.key}
             onClick={() => setActiveFilter(btn.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
               activeFilter === btn.key
                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
+                : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             {btn.label}
@@ -266,7 +266,7 @@ const Home: React.FC = () => {
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 leading-tight">
             Chưa có bộ thẻ nào
           </h3>
-          <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm max-w-md mx-auto">
+          <p className="text-slate-600 dark:text-slate-400 mb-8 text-sm max-w-md mx-auto">
             Tạo bộ thẻ đầu tiên của bạn để bắt đầu hành trình học tập hiệu quả
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -294,7 +294,7 @@ const Home: React.FC = () => {
           <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 leading-tight">
             Không tìm thấy kết quả
           </h3>
-          <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
+          <p className="text-slate-600 dark:text-slate-400 mb-6 text-sm">
             Không có bộ thẻ nào khớp với "{searchQuery}"
           </p>
           <button
@@ -322,13 +322,13 @@ const Home: React.FC = () => {
                   
                   {/* Description */}
                   {set.description && (
-                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-3 line-clamp-2 leading-relaxed">
+                    <p className="text-slate-600 dark:text-slate-400 text-sm mb-3 line-clamp-2 leading-relaxed">
                       {set.description}
                     </p>
                   )}
 
                   {/* Metadata */}
-                  <div className="flex items-center gap-4 text-xs text-slate-400 dark:text-slate-500 mb-3">
+                  <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mb-3 font-medium">
                     <span className="flex items-center gap-1">
                       <HiRectangleStack className="w-3.5 h-3.5" />
                       {set.cards.length} thẻ
@@ -368,7 +368,7 @@ const Home: React.FC = () => {
                   </Link>
                   <button
                     onClick={(e) => handleEditClick(e, set._id)}
-                    className="p-2.5 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-900 dark:hover:text-white hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                    className="p-2.5 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-900 dark:hover:text-white hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
                     title="Chỉnh sửa"
                   >
                     <HiPencilSquare className="w-4 h-4" />
@@ -376,7 +376,7 @@ const Home: React.FC = () => {
                   <button
                     onClick={(e) => openDeleteConfirm(e, set)}
                     disabled={deletingId === set._id}
-                    className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
+                    className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none cursor-pointer"
                     title="Xóa"
                   >
                     {deletingId === set._id ? (

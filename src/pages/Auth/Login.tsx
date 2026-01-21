@@ -46,12 +46,12 @@ const Login: React.FC = () => {
             <HiBolt className="w-12 h-12 text-blue-400" />
             FlipLab
           </h1>
-          <p className="text-xl text-blue-200 font-light">Lật thẻ. Nhớ sâu.</p>
+          <p className="text-xl text-blue-100 font-light">Lật thẻ. Nhớ sâu.</p>
         </div>
 
         {/* Login Form */}
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 border border-white/20 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white text-center mb-6">
+          <h2 className="text-3xl font-bold text-white text-center mb-6">
             Đăng nhập
           </h2>
 
@@ -63,24 +63,24 @@ const Login: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-blue-200 text-sm mb-2">Email</label>
+              <label className="block text-blue-100 text-sm mb-2">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="email@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-blue-200 text-sm mb-2">Mật khẩu</label>
+              <label className="block text-blue-100 text-sm mb-2">Mật khẩu</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
                 required
               />
@@ -103,7 +103,7 @@ const Login: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-blue-200">
+            <p className="text-blue-100">
               Chưa có tài khoản?{' '}
               <Link to="/register" className="text-blue-400 hover:text-blue-300 font-semibold underline underline-offset-2">
                 Đăng ký ngay
@@ -113,7 +113,7 @@ const Login: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-purple-300/60 text-sm mt-6">
+        <p className="text-center text-blue-200/70 text-sm mt-6">
           © 2026 FlipLab. All rights reserved.
         </p>
       </div>

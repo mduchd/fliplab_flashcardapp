@@ -119,6 +119,89 @@ body {
   animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
 
+/* Fire/Flame Animation */
+@keyframes flame-flicker {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.05) rotate(-2deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(0deg);
+  }
+  75% {
+    transform: scale(1.05) rotate(2deg);
+  }
+}
+
+.flame-icon {
+  animation: flame-flicker 1.5s ease-in-out infinite;
+}
+
+.flame-container {
+  /* No glow effect */
+}
+
+/* Mode Switch Animation - Sliding Window Effect */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0.5;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-out-left {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slide-out-right {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.slide-in-from-left-mode {
+  animation: slide-in-left 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.slide-in-from-right-mode {
+  animation: slide-in-right 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Content container for mode switching */
+.mode-content-container {
+  overflow: hidden;
+  position: relative;
+}
+
 /* Sidebar Transitions - Smooth & Performant */
 .sidebar-transition {
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
