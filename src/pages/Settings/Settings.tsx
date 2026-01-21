@@ -4,26 +4,26 @@ import ConfirmModal from '../../components/ConfirmModal';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
 import {
-  Settings as SettingsIcon,
-  Moon,
-  Sun,
-  Bell,
-  Shield,
-  Globe,
-  Trash2,
-  LogOut,
-  ChevronRight,
-  Target,
-  Volume2,
-  VolumeX,
-  Download,
-  Clock,
-  Palette,
-  Zap,
-  HelpCircle,
-  Mail,
-  RefreshCw,
-} from 'lucide-react';
+  HiCog6Tooth as SettingsIcon,
+  HiMoon as Moon,
+  HiSun as Sun,
+  HiBell as Bell,
+  HiShieldCheck as Shield,
+  HiGlobeAlt as Globe,
+  HiTrash as Trash2,
+  HiArrowRightOnRectangle as LogOut,
+  HiChevronRight as ChevronRight,
+  HiAdjustmentsVertical as Target,
+  HiSpeakerWave as Volume2,
+  HiSpeakerXMark as VolumeX,
+  HiArrowDownTray as Download,
+  HiClock as Clock,
+  HiSwatch as Palette,
+  HiBolt as Zap,
+  HiQuestionMarkCircle as HelpCircle,
+  HiEnvelope as Mail,
+  HiArrowPath as RefreshCw,
+} from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useToastContext } from '../../contexts/ToastContext';
 
@@ -90,8 +90,8 @@ const ToggleSwitch: React.FC<{
       onToggle();
     }}
     type="button"
-    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 ${
-      enabled ? 'bg-purple-600' : 'bg-slate-300 dark:bg-slate-600'
+    className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+      enabled ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
     }`}
   >
     <span
@@ -235,7 +235,7 @@ const Settings: React.FC = () => {
       {/* Header */}
       <div className="mb-8 max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-3">
-          <SettingsIcon className="text-purple-500 dark:text-purple-400" size={32} />
+          <SettingsIcon className="text-blue-500 dark:text-blue-400" size={32} />
           Cài đặt
         </h1>
         <p className="text-slate-600 dark:text-slate-400">
@@ -250,7 +250,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Target size={18} className="text-purple-500" />
+              <Target size={18} className="text-blue-500" />
               Mục tiêu học tập
             </h2>
           </div>
@@ -264,7 +264,7 @@ const Settings: React.FC = () => {
                 <select
                   value={dailyGoal}
                   onChange={(e) => setDailyGoal(Number(e.target.value))}
-                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-purple-500 font-medium"
+                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 font-medium"
                 >
                   {dailyGoalOptions.map((goal) => (
                     <option key={goal} value={goal}>
@@ -280,7 +280,7 @@ const Settings: React.FC = () => {
                     onClick={() => setDailyGoal(goal)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                       dailyGoal === goal
-                        ? 'bg-purple-600 text-white'
+                        ? 'bg-blue-600 text-white'
                         : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/20'
                     }`}
                   >
@@ -298,7 +298,7 @@ const Settings: React.FC = () => {
                   type="time"
                   value={reminderTime}
                   onChange={(e) => setReminderTime(e.target.value)}
-                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-sm border-0 focus:ring-2 focus:ring-purple-500"
+                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500"
                 />
               }
             />
@@ -309,7 +309,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Palette size={18} className="text-purple-500" />
+              <Palette size={18} className="text-blue-500" />
               Giao diện
             </h2>
           </div>
@@ -328,7 +328,7 @@ const Settings: React.FC = () => {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-purple-500 appearance-none cursor-pointer"
+                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
                 >
                   <option value="vi">Tiếng Việt</option>
                   <option value="en">English</option>
@@ -342,7 +342,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Bell size={18} className="text-purple-500" />
+              <Bell size={18} className="text-blue-500" />
               Âm thanh & Thông báo
             </h2>
           </div>
@@ -372,7 +372,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Download size={18} className="text-purple-500" />
+              <Download size={18} className="text-blue-500" />
               Quản lý dữ liệu
             </h2>
           </div>
@@ -396,7 +396,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Shield size={18} className="text-purple-500" />
+              <Shield size={18} className="text-blue-500" />
               Tài khoản
             </h2>
           </div>
@@ -426,7 +426,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <HelpCircle size={18} className="text-purple-500" />
+              <HelpCircle size={18} className="text-blue-500" />
               Trợ giúp
             </h2>
           </div>
@@ -464,10 +464,7 @@ const Settings: React.FC = () => {
       </div>
 
       {/* Version Info */}
-      <div className="mt-8 text-center text-sm text-slate-400 max-w-4xl mx-auto">
-        <p>FlipLab v1.0.0</p>
-        <p className="mt-1">Made with ❤️ for learners</p>
-      </div>
+
     </MainLayout>
   );
 };

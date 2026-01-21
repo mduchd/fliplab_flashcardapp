@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../../contexts/SidebarContext';
 import { 
   HiHome, 
@@ -28,6 +29,7 @@ const isYesterday = (date1: Date, date2: Date) => {
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { isCollapsed, isMobileOpen, setMobileOpen } = useSidebar();
   
   // Streak state
@@ -181,12 +183,12 @@ const Sidebar: React.FC = () => {
                 isCollapsed
                   ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
                       isActive
-                        ? 'bg-purple-100 dark:bg-purple-600/20 text-purple-600 dark:text-purple-300'
+                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
                         : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                     }`
                   : `flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium whitespace-nowrap overflow-hidden ${
                       isActive
-                        ? 'bg-purple-100 dark:bg-purple-600/20 text-purple-600 dark:text-purple-300'
+                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                         : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                     }`
               }
@@ -247,17 +249,17 @@ const Sidebar: React.FC = () => {
               rounded-xl transition-all duration-300 overflow-hidden cursor-pointer
               ${isCollapsed 
                 ? 'flex items-center justify-center w-10 h-10 mx-auto hover:bg-slate-100 dark:hover:bg-white/5' 
-                : 'bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 p-3 border border-purple-100 dark:border-purple-500/20'}
+                : 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 p-3 border border-blue-100 dark:border-blue-500/20'}
             `}
             title={isCollapsed ? `Mục tiêu: ${todayProgress}/${dailyGoal} thẻ` : undefined}
           >
             {/* Collapsed: Just icon */}
             {isCollapsed ? (
-              <HiFlag className={`w-6 h-6 ${goalCompleted ? 'text-green-500' : 'text-purple-500'}`} />
+              <HiFlag className={`w-6 h-6 ${goalCompleted ? 'text-green-500' : 'text-blue-500'}`} />
             ) : (
               <>
                 <div className="flex items-center gap-3 mb-2">
-                  <div className={`p-1.5 rounded-lg flex-shrink-0 ${goalCompleted ? 'bg-green-500 text-white' : 'bg-purple-500 text-white'}`}>
+                  <div className={`p-1.5 rounded-lg flex-shrink-0 ${goalCompleted ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}>
                     <HiFlag className="w-[18px] h-[18px]" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -282,7 +284,7 @@ const Sidebar: React.FC = () => {
                     className={`h-full rounded-full transition-all duration-500 ${
                       goalCompleted 
                         ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                        : 'bg-gradient-to-r from-purple-500 to-indigo-500'
+                        : 'bg-gradient-to-r from-blue-600 to-indigo-600'
                     }`}
                     style={{ width: `${goalPercentage}%` }}
                   />
@@ -304,8 +306,16 @@ const Sidebar: React.FC = () => {
             title="Thư viện của tôi"
             className={
               isCollapsed
-                ? 'flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all'
-                : 'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left'
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                    location.pathname === '/' && !location.search.includes('filter=recent')
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left ${
+                    location.pathname === '/' && !location.search.includes('filter=recent')
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
             }
           >
             <HiBookOpen className="w-6 h-6 flex-shrink-0" />
@@ -316,8 +326,16 @@ const Sidebar: React.FC = () => {
             title="Đã học gần đây"
             className={
               isCollapsed
-                ? 'flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all'
-                : 'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left'
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                    location.search.includes('filter=recent')
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left ${
+                    location.search.includes('filter=recent')
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
             }
           >
             <HiClock className="w-6 h-6 flex-shrink-0" />
@@ -328,8 +346,16 @@ const Sidebar: React.FC = () => {
             title="Cài đặt"
             className={
               isCollapsed
-                ? 'flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all'
-                : 'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left'
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                    location.pathname === '/settings'
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left ${
+                    location.pathname === '/settings'
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
             }
           >
             <HiCog6Tooth className="w-6 h-6 flex-shrink-0" />

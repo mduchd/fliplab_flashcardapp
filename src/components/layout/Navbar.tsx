@@ -12,7 +12,8 @@ import {
   HiSun, 
   HiMoon, 
   HiPlus,
-  HiXMark
+  HiXMark,
+  HiMagnifyingGlass
 } from 'react-icons/hi2';
 
 const Navbar: React.FC = () => {
@@ -65,10 +66,10 @@ const Navbar: React.FC = () => {
         
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group min-w-fit ml-4 md:ml-0">
-          <div className="p-1.5 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-lg group-hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-shadow">
+          <div className="p-1.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg group-hover:shadow-[0_0_15px_rgba(37,99,235,0.5)] transition-shadow">
             <HiBolt className="w-6 h-6 text-white" />
           </div>
-          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-indigo-500 to-indigo-600 dark:from-purple-400 dark:via-indigo-300 dark:to-indigo-400 group-hover:scale-105 transition-all duration-300">
+          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-blue-700 via-indigo-600 to-blue-600 dark:from-blue-400 dark:via-indigo-300 dark:to-blue-400 group-hover:scale-105 transition-all duration-300">
             FlipLab
           </span>
         </Link>
@@ -79,9 +80,12 @@ const Navbar: React.FC = () => {
         {/* CENTER: Search Bar & Theme Toggle */}
         <div className="max-w-2xl px-4 flex items-center gap-4">
           <div className="relative group w-[480px]">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <HiMagnifyingGlass className="h-5 w-5 text-slate-500 group-focus-within:text-blue-600 transition-colors" />
+            </div>
             <input
               type="text"
-              className="block w-full px-4 py-2 bg-slate-100 dark:bg-slate-800 border border-transparent rounded-xl leading-5 text-slate-900 dark:text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-1 focus:ring-purple-500 focus:border-purple-500 sm:text-sm transition-all"
+              className="block w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border border-transparent rounded-xl leading-5 text-slate-900 dark:text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
               placeholder="Tìm kiếm..."
             />
           </div>
@@ -89,10 +93,17 @@ const Navbar: React.FC = () => {
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-            className="p-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-full transition-all focus:outline-none flex-shrink-0 border border-slate-200 dark:border-white/10"
+            className="group/theme p-2.5 bg-white dark:bg-white/5 text-slate-500 dark:text-yellow-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all duration-300 focus:outline-none flex-shrink-0 border border-slate-200 dark:border-white/10 hover:scale-110 active:scale-95"
             title={theme === 'dark' ? 'Chuyển sang chế độ sáng' : 'Chuyển sang chế độ tối'}
           >
-            {theme === 'dark' ? <HiSun className="w-5 h-5" /> : <HiMoon className="w-5 h-5" />}
+            <div className="relative w-5 h-5">
+              <div className={`absolute inset-0 transform transition-transform duration-500 ${theme === 'dark' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'}`}>
+                <HiSun className="w-5 h-5" />
+              </div>
+              <div className={`absolute inset-0 transform transition-transform duration-500 ${theme === 'dark' ? '-rotate-90 opacity-0' : 'rotate-0 opacity-100'}`}>
+                <HiMoon className="w-5 h-5" />
+              </div>
+            </div>
           </button>
         </div>
 
@@ -105,7 +116,7 @@ const Navbar: React.FC = () => {
           {/* Create New Button */}
           <Link 
             to="/create"
-            className="p-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-full hover:from-purple-500 hover:to-indigo-500 transition-all shadow-sm hover:shadow-md flex items-center justify-center"
+            className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full hover:from-blue-500 hover:to-indigo-500 hover:shadow-blue-500/30 transition-all shadow-sm hover:shadow-md flex items-center justify-center"
             title="Tạo bộ thẻ mới"
           >
             <HiPlus className="w-5 h-5" />
@@ -122,7 +133,7 @@ const Navbar: React.FC = () => {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-2 group focus:outline-none p-1 rounded-full hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
-              <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-200 font-medium group-hover:border-purple-500 transition-colors shadow-sm">
+              <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-200 font-medium group-hover:border-blue-500 transition-colors shadow-sm">
                 {user?.displayName?.charAt(0).toUpperCase() || 'U'}
               </div>
               <HiChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -139,7 +150,7 @@ const Navbar: React.FC = () => {
                   <Link
                     to="/profile"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-purple-600 dark:hover:text-purple-300 transition-colors mx-1 rounded-lg"
+                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-300 transition-colors mx-1 rounded-lg"
                   >
                     <HiUser className="w-4 h-4" />
                     Hồ sơ của bạn

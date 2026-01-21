@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { Zap, Loader2 } from 'lucide-react';
+import { HiBolt, HiArrowPath } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
 
 const Login: React.FC = () => {
@@ -32,10 +32,10 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900 p-4">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500/30 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600/30 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/30 rounded-full blur-3xl"></div>
       </div>
 
@@ -43,10 +43,10 @@ const Login: React.FC = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold text-white mb-2 tracking-tight flex items-center justify-center gap-3">
-            <Zap size={48} className="text-purple-400" fill="currentColor" />
+            <HiBolt className="w-12 h-12 text-blue-400" />
             FlipLab
           </h1>
-          <p className="text-xl text-purple-200 font-light">Lật thẻ. Nhớ sâu.</p>
+          <p className="text-xl text-blue-200 font-light">Lật thẻ. Nhớ sâu.</p>
         </div>
 
         {/* Login Form */}
@@ -63,24 +63,24 @@ const Login: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-purple-200 text-sm mb-2">Email</label>
+              <label className="block text-blue-200 text-sm mb-2">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="email@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-purple-200 text-sm mb-2">Mật khẩu</label>
+              <label className="block text-blue-200 text-sm mb-2">Mật khẩu</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 placeholder="••••••••"
                 required
               />
@@ -89,11 +89,11 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
+              className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-500 hover:to-indigo-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <Loader2 className="animate-spin" size={20} />
+                  <HiArrowPath className="animate-spin w-5 h-5" />
                   Đang đăng nhập...
                 </span>
               ) : (
@@ -103,9 +103,9 @@ const Login: React.FC = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-purple-200">
+            <p className="text-blue-200">
               Chưa có tài khoản?{' '}
-              <Link to="/register" className="text-purple-400 hover:text-purple-300 font-semibold underline underline-offset-2">
+              <Link to="/register" className="text-blue-400 hover:text-blue-300 font-semibold underline underline-offset-2">
                 Đăng ký ngay
               </Link>
             </p>

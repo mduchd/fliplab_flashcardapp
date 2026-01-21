@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import MainLayout from '../../components/layout/MainLayout';
 import { 
@@ -13,7 +13,7 @@ import {
   HiCamera,
   HiArrowPath,
   HiCloudArrowUp,
-  HiSparkles
+  HiFaceSmile
 } from 'react-icons/hi2';
 import ActivityStats from '../../components/profile/ActivityStats';
 import { authService } from '../../services/authService';
@@ -39,7 +39,48 @@ const Profile: React.FC = () => {
   const [showAvatarPresets, setShowAvatarPresets] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle Avatar Upload
+  // Stats State
+  const [stats, setStats] = useState({
+    streak: 0,
+    studiedToday: 0,
+    dailyGoal: 20
+  });
+
+  // Load stats from localStorage
+  useEffect(() => {
+    // 1. Load Daily Goal
+    const savedGoal = localStorage.getItem('settings_dailyGoal');
+    const goal = savedGoal ? parseInt(savedGoal) : 20;
+
+    // 2. Load Streak
+    let currentStreak = 0;
+    const streakData = localStorage.getItem('streakData');
+    if (streakData) {
+      const { currentStreak: savedStreak, lastStudyDate } = JSON.parse(streakData);
+      const lastDate = new Date(lastStudyDate);
+      const today = new Date();
+      if (lastDate.toDateString() === today.toDateString() || 
+          new Date(today.setDate(today.getDate() - 1)).toDateString() === lastDate.toDateString()) {
+        currentStreak = savedStreak;
+      }
+    }
+
+    // 3. Load Today's Progress
+    let progress = 0;
+    const progressData = localStorage.getItem('dailyProgress');
+    if (progressData) {
+      const { date, cardsStudied } = JSON.parse(progressData);
+      if (new Date(date).toDateString() === new Date().toDateString()) {
+        progress = cardsStudied;
+      }
+    }
+
+    setStats({
+      streak: currentStreak,
+      studiedToday: progress,
+      dailyGoal: goal
+    });
+  }, []);
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -117,7 +158,7 @@ const Profile: React.FC = () => {
       // Check if emoji
       if (isEmojiAvatar(avatarUrl)) {
         return (
-          <div className={`${sizeClasses} rounded-full bg-gradient-to-br from-purple-100 to-indigo-100 dark:from-purple-900/20 dark:to-indigo-900/20 flex items-center justify-center shadow-xl shadow-purple-500/30`}>
+          <div className={`${sizeClasses} rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 flex items-center justify-center`}>
             <span className={size === 'lg' ? 'text-6xl' : 'text-5xl'}>{avatarUrl}</span>
           </div>
         );
@@ -127,13 +168,13 @@ const Profile: React.FC = () => {
         <img 
           src={avatarUrl} 
           alt="Avatar" 
-          className={`${sizeClasses} rounded-full object-cover shadow-xl shadow-purple-500/30`}
+          className={`${sizeClasses} rounded-full object-cover`}
         />
       );
     }
     // Default initial
     return (
-      <div className={`${sizeClasses} rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center font-bold text-white shadow-xl shadow-purple-500/30`}>
+      <div className={`${sizeClasses} rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-bold text-white`}>
         {displayName?.charAt(0).toUpperCase() || <HiUser className="w-10 h-10" />}
       </div>
     );
@@ -152,27 +193,27 @@ const Profile: React.FC = () => {
                 {renderAvatar(user?.avatar, user?.displayName)}
               </div>
 
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 text-center">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-1 text-center">
                 {user?.displayName}
               </h1>
-              <p className="text-purple-600 dark:text-purple-400 font-medium mb-2 flex items-center gap-1">
+              <p className="text-blue-600 dark:text-blue-400 font-medium mb-2 flex items-center gap-1">
                 @{user?.username} <HiCheckCircle className="w-3.5 h-3.5" />
               </p>
 
               {user?.bio && (
-                <p className="text-slate-600 dark:text-slate-400 text-sm text-center mb-4 px-4 italic">
+                <p className="text-slate-600 dark:text-slate-400 text-base text-center mb-6 px-4 font-medium">
                   "{user.bio}"
                 </p>
               )}
 
-              <div className="w-full space-y-2 mb-5">
-                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm bg-slate-50 dark:bg-white/5 p-2.5 rounded-lg">
-                  <HiUser className="w-3.5 h-3.5" />
-                  <span className="truncate text-xs">{user?.email}</span>
+              <div className="w-full space-y-3 mb-6">
+                <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 text-sm bg-slate-100 dark:bg-white/10 p-3 rounded-xl transition-all hover:bg-slate-200 dark:hover:bg-white/20">
+                  <HiUser className="w-5 h-5 flex-shrink-0 text-slate-500 dark:text-slate-400" />
+                  <span className="truncate font-medium">{user?.email}</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm bg-slate-50 dark:bg-white/5 p-2.5 rounded-lg">
-                  <HiClock className="w-3.5 h-3.5" />
-                  <span className="text-xs">Tham gia: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</span>
+                <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300 text-sm bg-slate-100 dark:bg-white/10 p-3 rounded-xl transition-all hover:bg-slate-200 dark:hover:bg-white/20">
+                  <HiClock className="w-5 h-5 flex-shrink-0 text-slate-500 dark:text-slate-400" />
+                  <span className="font-medium">Tham gia: {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</span>
                 </div>
               </div>
 
@@ -202,28 +243,28 @@ const Profile: React.FC = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 text-center flex flex-col items-center shadow-sm">
-            <HiRectangleStack className="w-6 h-6 text-purple-500 dark:text-purple-400 mb-3" />
+            <HiRectangleStack className="w-6 h-6 text-blue-500 dark:text-blue-400 mb-3" />
             <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">0</div>
-            <div className="text-slate-500 dark:text-slate-400 text-sm">Bộ thẻ</div>
+            <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Bộ thẻ</div>
           </div>
           <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 text-center flex flex-col items-center shadow-sm">
             <HiCheckCircle className="w-6 h-6 text-green-500 dark:text-green-400 mb-3" />
             <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
               {user?.totalCardsStudied || 0}
             </div>
-            <div className="text-slate-500 dark:text-slate-400 text-sm">Thẻ đã học</div>
+            <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Thẻ đã học</div>
           </div>
           <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 text-center flex flex-col items-center shadow-sm">
             <HiFire className="w-6 h-6 text-amber-500 dark:text-amber-400 mb-3" />
-            <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">0</div>
-            <div className="text-slate-500 dark:text-slate-400 text-sm">Ngày streak</div>
+            <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">{stats.streak}</div>
+            <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Ngày streak</div>
           </div>
           <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 text-center flex flex-col items-center shadow-sm">
             <HiClock className="w-6 h-6 text-blue-500 dark:text-blue-400 mb-3" />
             <div className="text-3xl font-bold text-slate-900 dark:text-white mb-1">
               {Math.floor((user?.totalStudyTime || 0) / 60)}h
             </div>
-            <div className="text-slate-500 dark:text-slate-400 text-sm">Giờ học</div>
+            <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Giờ học</div>
           </div>
         </div>
 
@@ -234,11 +275,11 @@ const Profile: React.FC = () => {
             Streak của bạn
           </h2>
           <div className="text-center py-8">
-            <div className="bg-amber-100 dark:bg-amber-500/10 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-              <HiFire className="w-12 h-12 text-amber-500" />
+            <div className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 bg-amber-100 dark:bg-amber-500/20">
+              <HiFire className="w-14 h-14 text-amber-500 dark:text-amber-400" />
             </div>
-            <div className="text-3xl font-bold text-amber-500 dark:text-amber-400 mb-2">0 ngày</div>
-            <p className="text-slate-600 dark:text-slate-400">Bắt đầu streak bằng cách học mỗi ngày!</p>
+            <div className="text-3xl font-bold text-amber-500 dark:text-amber-400 mb-2">{stats.streak} ngày</div>
+            <p className="text-slate-700 dark:text-slate-300 font-medium">Bắt đầu streak bằng cách học mỗi ngày!</p>
           </div>
         </div>
 
@@ -252,19 +293,19 @@ const Profile: React.FC = () => {
           <div className="flex items-center gap-4 mb-4">
             <div className="flex-1">
               <div className="flex justify-between text-sm mb-2">
-                <span className="text-slate-500 dark:text-slate-400">Tiến độ</span>
-                <span className="text-slate-900 dark:text-white font-medium">0 / 20 thẻ</span>
+                <span className="text-slate-600 dark:text-slate-400 font-medium">Tiến độ</span>
+                <span className="text-slate-900 dark:text-white font-medium">{stats.studiedToday} / {stats.dailyGoal} thẻ</span>
               </div>
               <div className="h-3 bg-slate-100 dark:bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-600 to-indigo-600"
-                  style={{ width: '0%' }}
+                  className="h-full bg-gradient-to-r from-blue-600 to-indigo-600"
+                  style={{ width: `${Math.min(100, (stats.studiedToday / stats.dailyGoal) * 100)}%` }}
                 />
               </div>
             </div>
           </div>
 
-          <p className="text-slate-500 text-sm">
+          <p className="text-slate-600 dark:text-slate-300 font-medium">
             Học 20 thẻ mỗi ngày để duy trì streak và cải thiện trí nhớ!
           </p>
         </div>
@@ -279,7 +320,7 @@ const Profile: React.FC = () => {
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">Chỉnh sửa hồ sơ</h2>
               <button 
                 onClick={() => setIsEditModalOpen(false)}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                className="p-2 hover:bg-slate-100 dark:hover:bg-blue-700 rounded-lg transition-colors"
               >
                 <HiXMark className="w-5 h-5 text-slate-500" />
               </button>
@@ -311,7 +352,7 @@ const Profile: React.FC = () => {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-sm text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
                   >
                     <HiCamera className="w-3.5 h-3.5" />
                     Tải ảnh lên
@@ -319,9 +360,9 @@ const Profile: React.FC = () => {
                   <span className="text-slate-300 dark:text-slate-600">|</span>
                   <button 
                     onClick={() => setShowAvatarPresets(!showAvatarPresets)}
-                    className="text-sm text-purple-600 dark:text-purple-400 hover:underline flex items-center gap-1"
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
                   >
-                    <HiSparkles className="w-3.5 h-3.5" />
+                    <HiFaceSmile className="w-3.5 h-3.5" />
                     Chọn động vật
                   </button>
                 </div>
@@ -339,7 +380,7 @@ const Profile: React.FC = () => {
                 {showAvatarPresets && (
                   <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg w-full">
                     <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-3 flex items-center gap-1">
-                      <HiSparkles className="w-3 h-3" />
+                      <HiFaceSmile className="w-3 h-3" />
                       Chọn avatar động vật ngộ nghĩnh:
                     </p>
                     <div className="grid grid-cols-8 gap-2 justify-items-center">
@@ -349,7 +390,7 @@ const Profile: React.FC = () => {
                           onClick={() => selectPresetAvatar(emoji)}
                           className={`w-10 h-10 text-xl flex items-center justify-center rounded-lg transition-all ${
                             editAvatar === emoji 
-                              ? 'bg-purple-500 scale-110 shadow-lg' 
+                              ? 'bg-blue-500 scale-110 shadow-lg' 
                               : 'bg-white dark:bg-slate-600 hover:bg-slate-100 dark:hover:bg-slate-500 hover:scale-105'
                           }`}
                         >
@@ -370,7 +411,7 @@ const Profile: React.FC = () => {
                   type="text"
                   value={editDisplayName}
                   onChange={(e) => setEditDisplayName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
                   placeholder="Nhập tên hiển thị"
                 />
               </div>
@@ -388,7 +429,7 @@ const Profile: React.FC = () => {
                   onChange={(e) => setEditBio(e.target.value)}
                   maxLength={150}
                   rows={3}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white resize-none"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white resize-none"
                   placeholder="Viết vài dòng về bản thân bạn..."
                 />
               </div>
@@ -405,7 +446,7 @@ const Profile: React.FC = () => {
               <button 
                 onClick={handleSaveProfile}
                 disabled={isSaving}
-                className="flex-1 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isSaving ? (
                   <>

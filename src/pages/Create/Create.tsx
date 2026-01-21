@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { flashcardService, Flashcard, CreateFlashcardSetData } from '../../services/flashcardService';
 import MainLayout from '../../components/layout/MainLayout';
-import { ArrowLeft, Plus, Save, Trash2, Loader2, Image as ImageIcon } from 'lucide-react';
+import { HiArrowLeft, HiPlus, HiBookmarkSquare, HiTrash, HiArrowPath, HiPhoto } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
 
 interface CardInput {
@@ -186,7 +186,7 @@ const Create: React.FC = () => {
     return (
       <MainLayout>
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="animate-spin text-purple-500" size={40} />
+          <HiArrowPath className="animate-spin text-blue-500 w-10 h-10" />
         </div>
       </MainLayout>
     );
@@ -201,7 +201,7 @@ const Create: React.FC = () => {
             onClick={() => navigate('/')}
             className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 transition-colors"
           >
-            <ArrowLeft size={24} className="text-slate-600 dark:text-slate-300" />
+            <HiArrowLeft className="w-6 h-6 text-slate-600 dark:text-slate-300" />
           </button>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
             {isEditing ? 'Chỉnh sửa bộ thẻ' : 'Tạo bộ thẻ mới'}
@@ -225,7 +225,7 @@ const Create: React.FC = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all font-medium text-lg"
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-lg"
                   placeholder="Ví dụ: Từ vựng IELTS chủ đề Environment..."
                 />
               </div>
@@ -235,7 +235,7 @@ const Create: React.FC = () => {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="Mô tả ngắn về bộ thẻ này..."
                   rows={3}
                 />
@@ -247,7 +247,7 @@ const Create: React.FC = () => {
                   type="text"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="english, vocabulary, beginner"
                 />
               </div>
@@ -278,9 +278,9 @@ const Create: React.FC = () => {
               <button
                 type="button"
                 onClick={addCard}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-500 transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-purple-500 transition-all flex items-center gap-2"
               >
-                <Plus size={18} />
+                <HiPlus className="w-[18px] h-[18px]" />
                 Thêm thẻ
               </button>
             </div>
@@ -289,11 +289,11 @@ const Create: React.FC = () => {
               {cards.map((card, index) => (
                 <div
                   key={card.id}
-                  className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-start group shadow-sm hover:border-purple-300 dark:hover:border-purple-500/30 transition-all"
+                  className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-start group shadow-sm hover:border-blue-600 dark:hover:border-purple-500/30 transition-all"
                 >
                   {/* 1. Index Circle */}
                   <div className="flex-shrink-0 pt-2 hidden sm:block">
-                    <div className="w-8 h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
+                    <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-md">
                       {index + 1}
                     </div>
                   </div>
@@ -305,7 +305,7 @@ const Create: React.FC = () => {
                         type="text"
                         value={card.term}
                         onChange={(e) => updateCard(card.id, 'term', e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all font-medium"
+                        className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                         placeholder="Thuật ngữ (Term)..."
                       />
                       <span className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold pointer-events-none uppercase tracking-wider bg-slate-50 dark:bg-white/5 px-1">Term</span>
@@ -315,7 +315,7 @@ const Create: React.FC = () => {
                         type="text"
                         value={card.definition}
                         onChange={(e) => updateCard(card.id, 'definition', e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all font-medium"
+                        className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                         placeholder="Định nghĩa (Definition)..."
                       />
                       <span className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold pointer-events-none uppercase tracking-wider bg-slate-50 dark:bg-white/5 px-1">Def</span>
@@ -328,13 +328,13 @@ const Create: React.FC = () => {
                         {card.image ? (
                           <img src={card.image} alt="Visual" className="w-full h-full object-cover" />
                         ) : (
-                          <ImageIcon className="text-slate-300 dark:text-slate-600" size={32} />
+                          <HiPhoto className="text-slate-300 dark:text-slate-600 w-8 h-8" />
                         )}
                      </div>
                      {card.image && (
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center rounded-xl pointer-events-none">
                           <span className="text-white text-xs font-medium pointer-events-auto cursor-pointer p-1 bg-red-500 rounded-lg hover:bg-red-600" onClick={() => removeImage(card.id)}>
-                            <Trash2 size={16} />
+                            <HiTrash className="w-4 h-4" />
                           </span>
                         </div>
                      )}
@@ -353,10 +353,10 @@ const Create: React.FC = () => {
                        />
                        <label
                           htmlFor={`file-${card.id}`}
-                          className="w-10 h-10 flex items-center justify-center border border-slate-200 dark:border-white/20 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-purple-600 hover:border-purple-200 cursor-pointer transition-all bg-white dark:bg-transparent shadow-sm"
+                          className="w-10 h-10 flex items-center justify-center border border-slate-200 dark:border-white/20 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-blue-600 hover:border-purple-200 cursor-pointer transition-all bg-white dark:bg-transparent shadow-sm"
                           title="Thêm/Đổi ảnh"
                        >
-                          <ImageIcon size={20} />
+                          <HiPhoto className="w-5 h-5" />
                        </label>
                      </div>
 
@@ -368,7 +368,7 @@ const Create: React.FC = () => {
                         className="w-10 h-10 flex items-center justify-center border border-red-200 dark:border-red-500/30 rounded-lg text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-all bg-white dark:bg-transparent shadow-sm disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:border-slate-200"
                         title="Xóa thẻ"
                      >
-                        <Trash2 size={20} />
+                        <HiTrash className="w-5 h-5" />
                      </button>
                   </div>
                 </div>
@@ -378,10 +378,10 @@ const Create: React.FC = () => {
             <button
               type="button"
               onClick={addCard}
-              className="w-full mt-6 py-4 border-2 border-dashed border-slate-300 dark:border-white/20 text-slate-500 dark:text-slate-400 rounded-xl hover:border-purple-500 hover:text-purple-500 dark:hover:text-purple-400 transition-all flex items-center justify-center gap-2 font-medium hover:bg-purple-50 dark:hover:bg-purple-500/5 group"
+              className="w-full mt-6 py-4 border-2 border-dashed border-slate-300 dark:border-white/20 text-slate-500 dark:text-slate-400 rounded-xl hover:border-purple-500 hover:text-blue-500 dark:hover:text-purple-400 transition-all flex items-center justify-center gap-2 font-medium hover:bg-purple-50 dark:hover:bg-purple-500/5 group"
             >
               <div className="p-1 bg-slate-200 dark:bg-white/10 rounded-full group-hover:bg-purple-200 dark:group-hover:bg-purple-500/30 transition-colors">
-                <Plus size={20} />
+                <HiPlus className="w-5 h-5" />
               </div>
               Thêm thẻ mới
             </button>
@@ -403,12 +403,12 @@ const Create: React.FC = () => {
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="animate-spin" size={24} />
+                  <HiArrowPath className="animate-spin w-6 h-6" />
                   Đang lưu bộ thẻ...
                 </>
               ) : (
                 <>
-                  <Save size={24} />
+                  <HiBookmarkSquare className="w-6 h-6" />
                   {isEditing ? 'Lưu thay đổi' : 'Hoàn tất & Tạo bộ thẻ'}
                 </>
               )}

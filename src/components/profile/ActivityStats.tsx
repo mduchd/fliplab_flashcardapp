@@ -104,18 +104,18 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
   // Empty State Component
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
-      <div className="w-16 h-16 bg-purple-100 dark:bg-purple-500/10 rounded-full flex items-center justify-center mb-4">
-        <HiChartBar className="w-7 h-7 text-purple-500" />
+      <div className="w-16 h-16 bg-blue-100 dark:bg-blue-500/10 rounded-full flex items-center justify-center mb-4">
+        <HiChartBar className="w-7 h-7 text-blue-500" />
       </div>
-      <h4 className="text-base font-semibold text-slate-700 dark:text-slate-300 mb-2">
+      <h4 className="text-base font-bold text-slate-900 dark:text-white mb-2">
         Chưa có hoạt động
       </h4>
-      <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 max-w-xs">
+      <p className="text-sm text-slate-600 dark:text-slate-400 mb-4 max-w-xs font-medium">
         Hãy học 1 bộ thẻ để bắt đầu theo dõi thống kê của bạn
       </p>
       <Link
         to="/"
-        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm font-medium hover:bg-purple-500 transition-colors"
+        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors"
       >
         <HiBookOpen className="w-4 h-4" />
         Bắt đầu học
@@ -128,8 +128,10 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
       {/* Weekly Bar Chart */}
       <div className="bg-slate-50 dark:bg-white/5 rounded-lg p-4 border border-slate-100 dark:border-white/5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 text-sm">
-            <HiArrowTrendingUp className="w-4 h-4 text-purple-500" />
+          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-3 text-sm">
+            <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400">
+              <HiArrowTrendingUp className="w-5 h-5" />
+            </div>
             Hoạt động 7 ngày qua
           </h3>
           {hasRealData && avgPerDay > 0 && (
@@ -145,7 +147,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
               <div key={i} className="flex flex-col items-center flex-1 group cursor-default">
                 <div className="relative w-full flex flex-col items-center h-full justify-end">
                   <div
-                    className="w-full max-w-[20px] bg-gradient-to-t from-purple-600 to-indigo-500 rounded-md transition-all duration-300 group-hover:scale-110"
+                    className="w-full max-w-[20px] bg-gradient-to-t from-blue-600 to-indigo-500 rounded-md transition-all duration-300 group-hover:scale-110"
                     style={{ height: `${d.height}%` }}
                   >
                     <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded pointer-events-none transition-opacity whitespace-nowrap z-20 font-bold">
@@ -153,7 +155,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
                     </div>
                   </div>
                 </div>
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1.5 font-medium">
+                <span className="text-[10px] text-slate-600 dark:text-slate-400 mt-1.5 font-bold">
                   {d.day}
                 </span>
               </div>
@@ -165,8 +167,10 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
       {/* Contribution Heatmap */}
       <div className="bg-slate-50 dark:bg-white/5 rounded-lg p-4 border border-slate-100 dark:border-white/5">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-2 text-sm">
-            <HiCalendarDays className="w-4 h-4 text-green-500" />
+          <h3 className="font-bold text-slate-900 dark:text-white flex items-center gap-3 text-sm">
+            <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400">
+              <HiCalendarDays className="w-5 h-5" />
+            </div>
             Lịch sử hoạt động
           </h3>
           {hasRealData && (
@@ -182,7 +186,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
 
         {!hasRealData ? (
           <div className="py-6 text-center">
-            <p className="text-sm text-slate-400 dark:text-slate-500">
+            <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
               Biểu đồ sẽ hiển thị khi bạn bắt đầu học
             </p>
           </div>

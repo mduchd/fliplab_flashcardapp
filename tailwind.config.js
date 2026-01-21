@@ -7,6 +7,11 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        heading: ['Plus Jakarta Sans', 'SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        logo: ['Righteous', 'cursive'],
+      },
       colors: {
         primary: {
           50: '#f5f3ff',

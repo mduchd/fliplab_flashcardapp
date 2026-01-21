@@ -56,7 +56,7 @@ body.dark-mode {
 }
 
 body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg-primary);
     min-height: 100vh;
     color: var(--text-primary);
@@ -267,7 +267,7 @@ body.dark-mode .sidebar-nav a.active {
 }
 
 .header-left h1 {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 1.75rem;
     font-weight: 800;
     color: #4255ff;

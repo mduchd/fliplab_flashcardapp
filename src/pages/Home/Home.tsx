@@ -206,7 +206,7 @@ const Home: React.FC = () => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-3 leading-tight">
-          <HiBookOpen className="w-7 h-7 text-purple-500 dark:text-purple-400" />
+          <HiBookOpen className="w-7 h-7 text-blue-500 dark:text-blue-400" />
           Bộ thẻ của bạn
         </h1>
         <p className="text-slate-500 dark:text-slate-400 text-sm">
@@ -222,7 +222,7 @@ const Home: React.FC = () => {
             onClick={() => setActiveFilter(btn.key)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               activeFilter === btn.key
-                ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
                 : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
@@ -233,7 +233,7 @@ const Home: React.FC = () => {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-100 dark:bg-red-500/20 border border-red-300 dark:border-red-500/50 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg mb-6 text-sm">
+        <div className="bg-red-100 dark:bg-red-500/20 border border-red-300 dark:border-blue-500/50 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg mb-6 text-sm">
           {error}
         </div>
       )}
@@ -272,7 +272,7 @@ const Home: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               to="/create"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all text-sm"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5 transition-all text-sm"
             >
               <HiPlus className="w-[18px] h-[18px]" />
               <span>Tạo bộ thẻ mới</span>
@@ -299,7 +299,7 @@ const Home: React.FC = () => {
           </p>
           <button
             onClick={() => setSearchQuery('')}
-            className="text-purple-600 dark:text-purple-400 font-medium text-sm hover:underline"
+            className="text-blue-600 dark:text-blue-400 font-medium text-sm hover:underline"
           >
             Xóa tìm kiếm
           </button>
@@ -311,12 +311,12 @@ const Home: React.FC = () => {
             <div
               key={set._id}
               onClick={() => handleCardClick(set._id)}
-              className="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg overflow-hidden cursor-pointer hover:border-purple-300 dark:hover:border-purple-500/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 flex flex-col h-full"
+              className="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg overflow-hidden cursor-pointer hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 flex flex-col h-full"
             >
               <div className="p-5 flex flex-col h-full">
                 <div className="flex-1">
                   {/* Title */}
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {set.name}
                   </h3>
                   
@@ -347,7 +347,7 @@ const Home: React.FC = () => {
                       {set.tags.slice(0, 3).map((tag, i) => (
                         <span
                           key={i}
-                          className="px-2 py-0.5 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs rounded-md font-medium"
+                          className="px-2 py-0.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs rounded-md font-medium"
                         >
                           #{tag}
                         </span>
@@ -361,7 +361,7 @@ const Home: React.FC = () => {
                   <Link
                     to={`/study/${set._id}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-1 py-2.5 bg-purple-600 text-white text-center rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-purple-500 hover:shadow-md hover:shadow-purple-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                    className="flex-1 py-2.5 bg-blue-600 text-white text-center rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-blue-500 hover:shadow-md hover:shadow-blue-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all"
                   >
                     <HiAcademicCap className="w-4 h-4" />
                     Học

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CheckCircle2, XCircle, AlertTriangle, Info, X, Undo2 } from 'lucide-react';
+import { HiCheckCircle, HiXCircle, HiExclamationTriangle, HiInformationCircle, HiXMark, HiArrowUturnLeft } from 'react-icons/hi2';
 import type { ToastMessage } from '../types';
 
 interface ToastProps {
@@ -31,21 +31,21 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
     switch (type) {
       case 'success':
         return {
-          icon: <CheckCircle2 size={22} className="text-white" />,
+          icon: <HiCheckCircle className="w-[22px] h-[22px] text-white" />,
           bg: 'bg-gradient-to-r from-emerald-500 to-teal-600',
           shadow: 'shadow-emerald-500/30',
           border: 'border-emerald-400/30'
         };
       case 'error':
         return {
-          icon: <XCircle size={22} className="text-white" />,
+          icon: <HiXCircle className="w-[22px] h-[22px] text-white" />,
           bg: 'bg-gradient-to-r from-red-500 to-rose-600',
           shadow: 'shadow-red-500/30',
           border: 'border-red-400/30'
         };
       case 'warning':
         return {
-          icon: <AlertTriangle size={22} className="text-white" />,
+          icon: <HiExclamationTriangle className="w-[22px] h-[22px] text-white" />,
           bg: 'bg-gradient-to-r from-amber-500 to-orange-600',
           shadow: 'shadow-amber-500/30',
           border: 'border-amber-400/30'
@@ -53,7 +53,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
       case 'info':
       default:
         return {
-          icon: <Info size={22} className="text-white" />,
+          icon: <HiInformationCircle className="w-[22px] h-[22px] text-white" />,
           bg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
           shadow: 'shadow-blue-500/30',
           border: 'border-blue-400/30'
@@ -100,7 +100,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
           onClick={handleUndo}
           className="flex-shrink-0 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-md text-sm font-semibold transition-all flex items-center gap-1.5 border border-white/10"
         >
-          <Undo2 size={14} />
+          <HiArrowUturnLeft className="w-3.5 h-3.5" />
           Hoàn tác
         </button>
       )}
@@ -113,7 +113,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
         }}
         className="flex-shrink-0 p-1 rounded-md hover:bg-white/20 opacity-0 group-hover:opacity-100 transition-all text-white/80 hover:text-white"
       >
-        <X size={16} />
+        <HiXMark className="w-4 h-4" />
       </button>
     </div>
   );

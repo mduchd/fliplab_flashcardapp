@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertTriangle, X } from 'lucide-react';
+import { HiExclamationTriangle, HiXMark } from 'react-icons/hi2';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -34,8 +34,8 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       button: 'bg-yellow-600 hover:bg-yellow-500 text-white',
     },
     info: {
-      icon: 'bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400',
-      button: 'bg-purple-600 hover:bg-purple-500 text-white',
+      icon: 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400',
+      button: 'bg-blue-600 hover:bg-blue-700 text-white',
     },
   };
 
@@ -56,13 +56,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           onClick={onCancel}
           className="absolute top-4 right-4 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
         >
-          <X size={20} />
+          <HiXMark className="w-5 h-5" />
         </button>
 
         {/* Icon */}
         <div className="flex justify-center mb-4">
           <div className={`p-3 rounded-full ${styles.icon}`}>
-            <AlertTriangle size={32} />
+            <HiExclamationTriangle className="w-8 h-8" />
           </div>
         </div>
 
