@@ -75,9 +75,35 @@ const Create: React.FC = () => {
     ]);
   };
 
-  const removeCard = (id: string) => {
-    if (cards.length <= 1) return;
-    setCards(cards.filter((c) => c.id !== id));
+  const removeCard = (cardId: string) => {
+    if (cards.length <= 1) {
+      toast.warning('Bộ thẻ cần có ít nhất 1 thẻ');
+      return;
+    }
+    
+    const cardToRemove = cards.find(c => c.id === cardId);
+    const cardIndex = cards.findIndex(c => c.id === cardId);
+    
+    // If card has content, show undo option
+    if (cardToRemove && (cardToRemove.term.trim() || cardToRemove.definition.trim())) {
+      setCards(cards.filter((c) => c.id !== cardId));
+      
+      toast.success(
+        `Đã xóa thẻ "${cardToRemove.term.slice(0, 20) || 'không có tiêu đề'}..."`,
+        () => {
+          // Undo: restore the card at its original position
+          setCards(prev => {
+            const newCards = [...prev];
+            newCards.splice(cardIndex, 0, cardToRemove);
+            return newCards;
+          });
+          toast.success('Đã hoàn tác xóa thẻ');
+        }
+      );
+    } else {
+      // Card is empty, just remove without confirmation
+      setCards(cards.filter((c) => c.id !== cardId));
+    }
   };
 
   const updateCard = (id: string, field: keyof CardInput, value: string) => {

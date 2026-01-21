@@ -8,6 +8,7 @@ export interface IUser extends Document {
   password: string;
   displayName: string;
   avatar?: string;
+  bio?: string;
   createdAt: Date;
   updatedAt: Date;
   lastLogin?: Date;
@@ -48,6 +49,11 @@ const userSchema = new Schema<IUser>(
     avatar: {
       type: String,
       default: '',
+    },
+    bio: {
+      type: String,
+      default: '',
+      maxlength: [150, 'Bio cannot exceed 150 characters'],
     },
     lastLogin: {
       type: Date,

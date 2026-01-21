@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { CheckCircle2, XCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertTriangle, Info, X, Undo2 } from 'lucide-react';
 import type { ToastMessage } from '../types';
 
 interface ToastProps {
@@ -8,7 +8,7 @@ interface ToastProps {
 }
 
 export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
-  const { id, type, message, duration } = toast;
+  const { id, type, message, duration, onUndo } = toast;
 
   useEffect(() => {
     if (duration && duration > 0) {
@@ -19,25 +19,33 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
     }
   }, [id, duration, onClose]);
 
+  const handleUndo = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onUndo) {
+      onUndo();
+      onClose(id);
+    }
+  };
+
   const getConfig = () => {
     switch (type) {
       case 'success':
         return {
-          icon: <CheckCircle2 size={24} className="text-white" />,
+          icon: <CheckCircle2 size={22} className="text-white" />,
           bg: 'bg-gradient-to-r from-emerald-500 to-teal-600',
           shadow: 'shadow-emerald-500/30',
           border: 'border-emerald-400/30'
         };
       case 'error':
         return {
-          icon: <XCircle size={24} className="text-white" />,
+          icon: <XCircle size={22} className="text-white" />,
           bg: 'bg-gradient-to-r from-red-500 to-rose-600',
           shadow: 'shadow-red-500/30',
           border: 'border-red-400/30'
         };
       case 'warning':
         return {
-          icon: <AlertTriangle size={24} className="text-white" />,
+          icon: <AlertTriangle size={22} className="text-white" />,
           bg: 'bg-gradient-to-r from-amber-500 to-orange-600',
           shadow: 'shadow-amber-500/30',
           border: 'border-amber-400/30'
@@ -45,7 +53,7 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
       case 'info':
       default:
         return {
-          icon: <Info size={24} className="text-white" />,
+          icon: <Info size={22} className="text-white" />,
           bg: 'bg-gradient-to-r from-blue-500 to-indigo-600',
           shadow: 'shadow-blue-500/30',
           border: 'border-blue-400/30'
@@ -59,11 +67,11 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
     <div 
       className={`
         relative overflow-hidden
-        flex items-center gap-4 p-4 rounded-2xl
+        flex items-center gap-3 p-3.5 rounded-lg
         ${config.bg} ${config.shadow} 
         border ${config.border}
         shadow-lg backdrop-blur-md
-        min-w-[320px] max-w-sm
+        min-w-[300px] max-w-sm
         animate-in slide-in-from-right
         text-white group
         cursor-pointer
@@ -75,19 +83,27 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
 
       {/* Icon Container */}
-      <div className="flex-shrink-0 p-2 bg-white/20 rounded-xl backdrop-blur-sm shadow-inner border border-white/10">
+      <div className="flex-shrink-0 p-1.5 bg-white/20 rounded-lg backdrop-blur-sm border border-white/10">
         {config.icon}
       </div>
 
       {/* Content */}
       <div className="flex-1 min-w-0 pointer-events-none">
-        <h4 className="font-bold text-sm uppercase tracking-wider opacity-90 mb-0.5">
-          {type === 'info' ? 'Thông báo' : type === 'warning' ? 'Chú ý' : type === 'error' ? 'Lỗi' : 'Thành công'}
-        </h4>
-        <p className="font-medium text-[15px] leading-snug opacity-95 break-words">
+        <p className="font-medium text-sm leading-snug opacity-95 break-words">
           {message}
         </p>
       </div>
+
+      {/* Undo Button - Only show if onUndo is provided */}
+      {onUndo && (
+        <button
+          onClick={handleUndo}
+          className="flex-shrink-0 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-md text-sm font-semibold transition-all flex items-center gap-1.5 border border-white/10"
+        >
+          <Undo2 size={14} />
+          Hoàn tác
+        </button>
+      )}
 
       {/* Close Button */}
       <button
@@ -95,9 +111,9 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
           e.stopPropagation();
           onClose(id);
         }}
-        className="flex-shrink-0 p-1 rounded-lg hover:bg-white/20 opacity-0 group-hover:opacity-100 transition-all text-white/80 hover:text-white"
+        className="flex-shrink-0 p-1 rounded-md hover:bg-white/20 opacity-0 group-hover:opacity-100 transition-all text-white/80 hover:text-white"
       >
-        <X size={18} />
+        <X size={16} />
       </button>
     </div>
   );

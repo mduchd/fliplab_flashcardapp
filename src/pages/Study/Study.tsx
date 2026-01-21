@@ -18,7 +18,9 @@ import {
   Shuffle,
   LayoutGrid,
   CreditCard,
-  Puzzle
+  Puzzle,
+  Edit2,
+  Save
 } from 'lucide-react';
 import { useToastContext } from '../../contexts/ToastContext';
 import { shuffleArray } from '../../utils/helpers';
@@ -69,6 +71,12 @@ const Study: React.FC = () => {
   const [isMatchPlaying, setIsMatchPlaying] = useState(false);
   const [isMatchStarted, setIsMatchStarted] = useState(false);
   const [matchBestTime, setMatchBestTime] = useState<number | null>(null);
+
+  // Edit Card Modal State
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editTerm, setEditTerm] = useState('');
+  const [editDefinition, setEditDefinition] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   useEffect(() => {
     if (activeCards.length > 0) {
@@ -288,6 +296,65 @@ const Study: React.FC = () => {
     toast.success('Đã trộn lại bộ thẻ!');
   };
 
+  // Open edit modal for current card
+  const openEditModal = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card flip
+    if (currentCard) {
+      setEditTerm(currentCard.term);
+      setEditDefinition(currentCard.definition);
+      setIsEditModalOpen(true);
+    }
+  };
+
+  // Save edited card
+  const handleSaveEdit = async () => {
+    if (!flashcardSet || !currentCard) return;
+    
+    setIsSavingEdit(true);
+    try {
+      // Update local state first
+      const updatedCards = activeCards.map(card => 
+        card._id === currentCard._id 
+          ? { ...card, term: editTerm, definition: editDefinition }
+          : card
+      );
+      setActiveCards(updatedCards);
+      
+      // Update in flashcardSet
+      const updatedFlashcardSet = {
+        ...flashcardSet,
+        cards: flashcardSet.cards.map(card =>
+          card._id === currentCard._id
+            ? { ...card, term: editTerm, definition: editDefinition }
+            : card
+        )
+      };
+      setFlashcardSet(updatedFlashcardSet);
+      
+      // Save to backend
+      await flashcardService.update(flashcardSet._id, {
+        name: flashcardSet.name,
+        description: flashcardSet.description,
+        cards: updatedFlashcardSet.cards.map(c => ({
+          term: c.term,
+          definition: c.definition,
+          image: c.image,
+          starred: c.starred,
+          box: c.box
+        })),
+        tags: flashcardSet.tags,
+        color: flashcardSet.color
+      });
+      
+      setIsEditModalOpen(false);
+      toast.success('Đã lưu thay đổi!');
+    } catch (err) {
+      toast.error('Không thể lưu thay đổi');
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+
   const handleKeyPress = useCallback((e: KeyboardEvent) => {
     if (isLoading || error || !flashcardSet || isCompleted) return;
 
@@ -418,13 +485,22 @@ const Study: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{flashcardSet.name}</h1>
           </div>
-          <button
-            onClick={() => navigate('/')}
-            className="px-4 py-2 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center gap-2"
-          >
-            <X size={20} />
-            Thoát
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => navigate(`/create/${id}`)}
+              className="px-4 py-2 bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 rounded-lg hover:bg-purple-200 dark:hover:bg-purple-500/30 transition-all flex items-center gap-2 font-medium"
+            >
+              <Edit2 size={18} />
+              Chỉnh sửa bộ thẻ
+            </button>
+            <button
+              onClick={() => navigate('/')}
+              className="px-4 py-2 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center gap-2"
+            >
+              <X size={20} />
+              Thoát
+            </button>
+          </div>
         </div>
 
         {/* Progress Bar */}
@@ -497,6 +573,15 @@ const Study: React.FC = () => {
                   className="absolute inset-0 w-full h-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center p-8 backface-hidden group-hover:border-purple-400 dark:group-hover:border-purple-500/50 transition-colors shadow-sm"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
+                  {/* Edit Button - Top Right */}
+                  <button
+                    onClick={openEditModal}
+                    className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/20 hover:text-purple-600 dark:hover:text-purple-400 transition-all opacity-0 group-hover:opacity-100 z-10"
+                    title="Chỉnh sửa thẻ"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+
                   <div className="text-center w-full max-w-lg mx-auto">
                     <span className="block text-slate-500 dark:text-slate-400 text-sm mb-4">Thuật ngữ</span>
                     
@@ -529,6 +614,15 @@ const Study: React.FC = () => {
                     transform: 'rotateY(180deg)'
                   }}
                 >
+                  {/* Edit Button - Top Right (Back) */}
+                  <button
+                    onClick={openEditModal}
+                    className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-500/20 hover:text-purple-600 dark:hover:text-purple-400 transition-all z-10"
+                    title="Chỉnh sửa thẻ"
+                  >
+                    <Edit2 size={16} />
+                  </button>
+
                   <div className="text-center">
                     <span className="block text-slate-500 dark:text-slate-400 text-sm mb-4">Định nghĩa</span>
                     <span className="text-2xl md:text-3xl font-medium text-slate-900 dark:text-white">
@@ -729,6 +823,84 @@ const Study: React.FC = () => {
           </span>
         </div>
       </div>
+
+      {/* Edit Card Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-700">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Edit2 size={18} className="text-purple-500" />
+                Chỉnh sửa thẻ
+              </h2>
+              <button 
+                onClick={() => setIsEditModalOpen(false)}
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <X size={18} className="text-slate-500" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Thuật ngữ
+                </label>
+                <input 
+                  type="text"
+                  value={editTerm}
+                  onChange={(e) => setEditTerm(e.target.value)}
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
+                  placeholder="Nhập thuật ngữ"
+                  autoFocus
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  Định nghĩa
+                </label>
+                <textarea 
+                  value={editDefinition}
+                  onChange={(e) => setEditDefinition(e.target.value)}
+                  rows={4}
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white resize-none"
+                  placeholder="Nhập định nghĩa"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex gap-3 p-5 border-t border-slate-100 dark:border-slate-700">
+              <button 
+                onClick={() => setIsEditModalOpen(false)}
+                className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+              >
+                Hủy
+              </button>
+              <button 
+                onClick={handleSaveEdit}
+                disabled={isSavingEdit || !editTerm.trim() || !editDefinition.trim()}
+                className="flex-1 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSavingEdit ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Đang lưu...
+                  </>
+                ) : (
+                  <>
+                    <Save size={18} />
+                    Lưu thay đổi
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 };

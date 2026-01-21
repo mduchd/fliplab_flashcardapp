@@ -22,8 +22,26 @@ export const getFlashcardSets = async (req: AuthRequest, res: Response): Promise
       query.tags = { $in: tagArray };
     }
     
+    // Optimized query: exclude image data from cards for list view
+    // Only return essential fields for the home page list
     const flashcardSets = await FlashcardSet.find(query)
-      .sort({ updatedAt: -1 });
+      .select({
+        name: 1,
+        description: 1,
+        tags: 1,
+        color: 1,
+        lastStudied: 1,
+        totalStudies: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        'cards._id': 1,
+        'cards.term': 1,
+        'cards.definition': 1,
+        'cards.box': 1,
+        // Explicitly exclude image field to reduce payload
+      })
+      .sort({ updatedAt: -1 })
+      .lean(); // Use lean() for faster query
 
     res.json({
       success: true,

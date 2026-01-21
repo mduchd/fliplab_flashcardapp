@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useSidebar } from '../../contexts/SidebarContext';
 import { 
-  Home, 
-  PlusCircle, 
-  User, 
-  Settings, 
-  Library, 
-  History,
-  Flame,
-  Target,
-  Star,
-  TrendingUp
-} from 'lucide-react';
+  HiHome, 
+  HiPlusCircle, 
+  HiUser, 
+  HiCog6Tooth, 
+  HiBookOpen, 
+  HiClock,
+  HiFire,
+  HiFlag,
+  HiStar,
+  HiArrowTrendingUp
+} from 'react-icons/hi2';
 
 // Helper to check if two dates are the same day
 const isSameDay = (date1: Date, date2: Date) => {
@@ -27,6 +28,7 @@ const isYesterday = (date1: Date, date2: Date) => {
 
 const Sidebar: React.FC = () => {
   const navigate = useNavigate();
+  const { isCollapsed, isMobileOpen, setMobileOpen } = useSidebar();
   
   // Streak state
   const [streak, setStreak] = useState(0);
@@ -118,9 +120,9 @@ const Sidebar: React.FC = () => {
   }, [streak, studiedToday, todayProgress]);
   
   const links = [
-    { to: '/', label: 'Trang chủ', icon: Home },
-    { to: '/create', label: 'Tạo bộ thẻ', icon: PlusCircle },
-    { to: '/profile', label: 'Hồ sơ', icon: User },
+    { to: '/', label: 'Trang chủ', icon: HiHome },
+    { to: '/create', label: 'Tạo bộ thẻ', icon: HiPlusCircle },
+    { to: '/profile', label: 'Hồ sơ', icon: HiUser },
   ];
 
   const handleLibraryClick = (action: 'library' | 'recent' | 'settings') => {
@@ -141,121 +143,201 @@ const Sidebar: React.FC = () => {
   const goalCompleted = todayProgress >= dailyGoal;
 
   return (
-    <aside className="fixed left-0 top-16 bottom-0 w-64 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-r border-slate-200 dark:border-white/10 p-4 hidden md:flex flex-col z-40 transition-colors duration-300">
-      
-      {/* Main Navigation - First */}
-      <div className="space-y-1 mb-6">
-        <p className="px-4 text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-2">Menu</p>
-        {links.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
-                isActive
-                  ? 'bg-purple-100 dark:bg-purple-600/20 text-purple-600 dark:text-purple-300'
-                  : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-              }`
+    <>
+      {/* Mobile Overlay - with smooth fade */}
+      <div 
+        className={`fixed inset-0 bg-black/50 z-30 md:hidden transition-opacity duration-300 ease-out ${
+          isMobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setMobileOpen(false)}
+      />
+
+      {/* Sidebar - Fix layout inconsistencies */}
+      <aside 
+        className={`
+          fixed left-0 top-16 bottom-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-r border-slate-200 dark:border-white/10 z-40 
+          transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]
+          will-change-[width]
+          ${isCollapsed ? 'w-[72px]' : 'w-64'}
+          ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0 flex flex-col overflow-hidden p-3
+        `}
+      >
+        
+        {/* Main Navigation */}
+        <div className={`mb-6 ${isCollapsed ? 'space-y-2' : 'space-y-1'}`}>
+          <div className={`h-6 flex items-center mb-2 px-3 transition-opacity duration-200 ${isCollapsed ? 'opacity-0 h-0 mb-0' : 'opacity-100'}`}>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider whitespace-nowrap">
+              Menu
+            </p>
+          </div>
+          {links.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              onClick={() => setMobileOpen(false)}
+              title={link.label}
+              className={({ isActive }) =>
+                isCollapsed
+                  ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                      isActive
+                        ? 'bg-purple-100 dark:bg-purple-600/20 text-purple-600 dark:text-purple-300'
+                        : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                    }`
+                  : `flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium whitespace-nowrap overflow-hidden ${
+                      isActive
+                        ? 'bg-purple-100 dark:bg-purple-600/20 text-purple-600 dark:text-purple-300'
+                        : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                    }`
+              }
+            >
+              <link.icon className="w-6 h-6 flex-shrink-0" />
+              {!isCollapsed && <span>{link.label}</span>}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Unified Widgets Section */}
+        <div className={`mb-6 ${isCollapsed ? 'space-y-2' : 'space-y-2'}`}>
+          {/* Streak Widget */}
+          <div 
+            className={`
+              rounded-xl transition-all duration-300 overflow-hidden cursor-pointer
+              ${isCollapsed 
+                ? 'flex items-center justify-center w-10 h-10 mx-auto hover:bg-slate-100 dark:hover:bg-white/5' 
+                : 'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 p-3 border border-orange-100 dark:border-orange-500/20'}
+            `}
+            title={isCollapsed ? `Chuỗi: ${streak} ngày` : undefined}
+          >
+            {/* Collapsed: Just icon */}
+            {isCollapsed ? (
+              <HiFire className={`w-6 h-6 ${streak > 0 ? 'text-orange-500' : 'text-slate-400'}`} />
+            ) : (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className={`p-1.5 rounded-lg flex-shrink-0 ${streak > 0 ? 'bg-orange-500 text-white' : 'bg-orange-200 dark:bg-orange-800 text-orange-600 dark:text-orange-300'}`}>
+                    <HiFire className="w-[18px] h-[18px]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Chuỗi ngày</p>
+                        <p className="font-bold text-slate-900 dark:text-white truncate">{streak} ngày</p>
+                      </div>
+                      {streak >= 7 && (
+                        <div className="flex items-center gap-1 text-orange-500">
+                          <HiStar className="w-3.5 h-3.5" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {!studiedToday && streak > 0 && (
+                  <p className="text-xs text-orange-600 dark:text-orange-400 mt-2 whitespace-nowrap">
+                    Học hôm nay để giữ streak!
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Daily Goal Widget */}
+          <div 
+            className={`
+              rounded-xl transition-all duration-300 overflow-hidden cursor-pointer
+              ${isCollapsed 
+                ? 'flex items-center justify-center w-10 h-10 mx-auto hover:bg-slate-100 dark:hover:bg-white/5' 
+                : 'bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 p-3 border border-purple-100 dark:border-purple-500/20'}
+            `}
+            title={isCollapsed ? `Mục tiêu: ${todayProgress}/${dailyGoal} thẻ` : undefined}
+          >
+            {/* Collapsed: Just icon */}
+            {isCollapsed ? (
+              <HiFlag className={`w-6 h-6 ${goalCompleted ? 'text-green-500' : 'text-purple-500'}`} />
+            ) : (
+              <>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className={`p-1.5 rounded-lg flex-shrink-0 ${goalCompleted ? 'bg-green-500 text-white' : 'bg-purple-500 text-white'}`}>
+                    <HiFlag className="w-[18px] h-[18px]" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">Mục tiêu hôm nay</p>
+                        <p className="font-bold text-slate-900 dark:text-white truncate">
+                          {todayProgress}/{dailyGoal} thẻ
+                        </p>
+                      </div>
+                      {goalCompleted && (
+                        <div className="text-green-500">
+                          <HiArrowTrendingUp className="w-[18px] h-[18px]" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* Progress Bar */}
+                <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      goalCompleted 
+                        ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
+                        : 'bg-gradient-to-r from-purple-500 to-indigo-500'
+                    }`}
+                    style={{ width: `${goalPercentage}%` }}
+                  />
+                </div>
+                {goalCompleted && (
+                  <p className="text-xs text-green-600 dark:text-green-400 mt-2 font-medium whitespace-nowrap">
+                    🎉 Hoàn thành mục tiêu!
+                  </p>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Library Section */}
+        <div className={`flex-1 ${isCollapsed ? 'space-y-2' : 'space-y-1'}`}>
+          <button
+            onClick={() => { handleLibraryClick('library'); setMobileOpen(false); }}
+            title="Thư viện của tôi"
+            className={
+              isCollapsed
+                ? 'flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all'
+                : 'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left'
             }
           >
-            <link.icon size={20} />
-            {link.label}
-          </NavLink>
-        ))}
-      </div>
-
-      {/* Streak & Daily Goal Widgets */}
-      <div className="space-y-3 mb-6">
-        {/* Streak Widget */}
-        <div className="bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 rounded-xl p-3 border border-orange-100 dark:border-orange-500/20">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className={`p-1.5 rounded-lg ${streak > 0 ? 'bg-orange-500 text-white' : 'bg-orange-200 dark:bg-orange-800 text-orange-600 dark:text-orange-300'}`}>
-                <Flame size={18} />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Chuỗi ngày</p>
-                <p className="font-bold text-slate-900 dark:text-white">{streak} ngày</p>
-              </div>
-            </div>
-            {streak >= 7 && (
-              <div className="flex items-center gap-1 text-orange-500">
-                <Star size={14} fill="currentColor" />
-              </div>
-            )}
-          </div>
-          {!studiedToday && streak > 0 && (
-            <p className="text-xs text-orange-600 dark:text-orange-400 mt-2">
-              Học hôm nay để giữ streak!
-            </p>
-          )}
+            <HiBookOpen className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Thư viện của tôi</span>}
+          </button>
+          <button
+            onClick={() => { handleLibraryClick('recent'); setMobileOpen(false); }}
+            title="Đã học gần đây"
+            className={
+              isCollapsed
+                ? 'flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all'
+                : 'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left'
+            }
+          >
+            <HiClock className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Đã học gần đây</span>}
+          </button>
+          <button
+            onClick={() => { handleLibraryClick('settings'); setMobileOpen(false); }}
+            title="Cài đặt"
+            className={
+              isCollapsed
+                ? 'flex items-center justify-center w-10 h-10 mx-auto rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all'
+                : 'w-full flex items-center gap-3 px-3 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left'
+            }
+          >
+            <HiCog6Tooth className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Cài đặt</span>}
+          </button>
         </div>
-
-        {/* Daily Goal Widget */}
-        <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 rounded-xl p-3 border border-purple-100 dark:border-purple-500/20">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <div className={`p-1.5 rounded-lg ${goalCompleted ? 'bg-green-500 text-white' : 'bg-purple-500 text-white'}`}>
-                <Target size={18} />
-              </div>
-              <div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Mục tiêu hôm nay</p>
-                <p className="font-bold text-slate-900 dark:text-white">
-                  {todayProgress}/{dailyGoal} thẻ
-                </p>
-              </div>
-            </div>
-            {goalCompleted && (
-              <div className="text-green-500">
-                <TrendingUp size={18} />
-              </div>
-            )}
-          </div>
-          {/* Progress Bar */}
-          <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-            <div 
-              className={`h-full rounded-full transition-all duration-500 ${
-                goalCompleted 
-                  ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                  : 'bg-gradient-to-r from-purple-500 to-indigo-500'
-              }`}
-              style={{ width: `${goalPercentage}%` }}
-            />
-          </div>
-          {goalCompleted && (
-            <p className="text-xs text-green-600 dark:text-green-400 mt-2 font-medium">
-              🎉 Hoàn thành mục tiêu!
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Library Section */}
-      <div className="space-y-1 flex-1">
-        <p className="px-4 text-xs font-semibold text-slate-500 dark:text-slate-500 uppercase tracking-wider mb-2">Thư viện</p>
-        <button
-          onClick={() => handleLibraryClick('library')}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left"
-        >
-          <Library size={20} />
-          Thư viện của tôi
-        </button>
-        <button
-          onClick={() => handleLibraryClick('recent')}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left"
-        >
-          <History size={20} />
-          Đã học gần đây
-        </button>
-        <button
-          onClick={() => handleLibraryClick('settings')}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-all font-medium text-left"
-        >
-          <Settings size={20} />
-          Cài đặt
-        </button>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };
 

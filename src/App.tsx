@@ -112,17 +112,18 @@ const AppRoutes: React.FC = () => {
 
 import { ThemeProvider } from './contexts/ThemeContext';
 import { ToastProvider } from './contexts/ToastContext';
-
-// ...
+import { SidebarProvider } from './contexts/SidebarContext';
 
 const App: React.FC = () => {
   return (
     <BrowserRouter>
       <AuthProvider>
         <ThemeProvider>
-          <ToastProvider>
-            <AppRoutes />
-          </ToastProvider>
+          <SidebarProvider>
+            <ToastProvider>
+              <AppRoutes />
+            </ToastProvider>
+          </SidebarProvider>
         </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>

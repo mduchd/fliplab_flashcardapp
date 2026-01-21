@@ -18,6 +18,7 @@ export interface User {
   email: string;
   displayName: string;
   avatar?: string;
+  bio?: string;
   totalStudyTime?: number;
   totalCardsStudied?: number;
   createdAt?: string;
@@ -52,7 +53,7 @@ export const authService = {
   },
 
   // Update profile
-  async updateProfile(data: { displayName?: string; avatar?: string }): Promise<{ success: boolean; data: { user: User } }> {
+  async updateProfile(data: { displayName?: string; avatar?: string; bio?: string }): Promise<{ success: boolean; data: { user: User } }> {
     const response = await api.put('/auth/profile', data);
     return response.data;
   },

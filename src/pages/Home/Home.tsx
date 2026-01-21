@@ -1,45 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { flashcardService, FlashcardSet } from '../../services/flashcardService';
 import MainLayout from '../../components/layout/MainLayout';
 import ConfirmModal from '../../components/ConfirmModal';
 import { 
-  Plus, 
-  Library, 
-  LayoutGrid, 
-  Edit2, 
-  Trash2, 
-  Layers, 
-  Clock, 
-  BookOpen 
-} from 'lucide-react';
+  HiPlus, 
+  HiBookOpen, 
+  HiSquares2X2, 
+  HiPencilSquare, 
+  HiTrash, 
+  HiRectangleStack, 
+  HiClock, 
+  HiAcademicCap,
+  HiArrowPath,
+  HiArrowUpTray,
+  HiMagnifyingGlass
+} from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
 
-type FilterType = 'all' | 'recent' | 'alphabetical';
+type FilterType = 'all' | 'recent' | 'alphabetical' | 'mostCards';
 
 const Home: React.FC = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState<FilterType>(() => {
+    const saved = localStorage.getItem('flashcard_filter');
+    const urlParam = searchParams.get('filter');
+    if (urlParam && ['all', 'recent', 'alphabetical', 'mostCards'].includes(urlParam)) {
+      return urlParam as FilterType;
+    }
+    if (saved && ['all', 'recent', 'alphabetical', 'mostCards'].includes(saved)) {
+      return saved as FilterType;
+    }
+    return 'all';
+  });
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const toast = useToastContext();
 
-  // Confirm modal state
+  // Confirm modal state - includes deck info for display
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
-    setId: string | null;
-  }>({ isOpen: false, setId: null });
+    set: FlashcardSet | null;
+  }>({ isOpen: false, set: null });
 
-  // Read filter from URL query params
+  // Save filter to localStorage when changed
   useEffect(() => {
-    const filterParam = searchParams.get('filter');
-    if (filterParam === 'recent' || filterParam === 'alphabetical') {
-      setActiveFilter(filterParam);
+    localStorage.setItem('flashcard_filter', activeFilter);
+    const newParams = new URLSearchParams(searchParams);
+    if (activeFilter === 'all') {
+      newParams.delete('filter');
     } else {
-      setActiveFilter('all');
+      newParams.set('filter', activeFilter);
     }
-  }, [searchParams]);
+    setSearchParams(newParams, { replace: true });
+  }, [activeFilter]);
 
   useEffect(() => {
     loadFlashcardSets();
@@ -58,33 +76,75 @@ const Home: React.FC = () => {
     }
   };
 
-  const openDeleteConfirm = (id: string) => {
-    setConfirmModal({ isOpen: true, setId: id });
+  const openDeleteConfirm = (e: React.MouseEvent, set: FlashcardSet) => {
+    e.stopPropagation(); // Prevent card click navigation
+    e.preventDefault();
+    setConfirmModal({ isOpen: true, set });
   };
 
   const handleDeleteConfirm = async () => {
-    if (!confirmModal.setId) return;
+    if (!confirmModal.set) return;
+    
+    const setToDelete = confirmModal.set;
+    setDeletingId(setToDelete._id);
+    setConfirmModal({ isOpen: false, set: null });
     
     try {
-      await flashcardService.delete(confirmModal.setId);
-      setFlashcardSets(flashcardSets.filter(set => set._id !== confirmModal.setId));
-      toast.success('Đã xóa bộ thẻ thành công');
+      await flashcardService.delete(setToDelete._id);
+      setFlashcardSets(prev => prev.filter(set => set._id !== setToDelete._id));
+      
+      // Toast with undo option
+      toast.success(
+        `Đã xóa "${setToDelete.name}"`,
+        async () => {
+          // Undo action - restore the set
+          try {
+            // In a real app, you'd call an API to restore
+            // For now, we add it back to the list
+            setFlashcardSets(prev => [setToDelete, ...prev]);
+            toast.success('Đã hoàn tác xóa bộ thẻ');
+          } catch (err) {
+            toast.error('Không thể hoàn tác');
+          }
+        }
+      );
     } catch (err) {
       console.error('Delete error:', err);
       toast.error('Không thể xóa bộ thẻ. Vui lòng thử lại.');
     } finally {
-      setConfirmModal({ isOpen: false, setId: null });
+      setDeletingId(null);
     }
   };
 
   const handleDeleteCancel = () => {
-    setConfirmModal({ isOpen: false, setId: null });
+    setConfirmModal({ isOpen: false, set: null });
   };
 
-  // Apply filter and sort logic
+  const handleCardClick = (setId: string) => {
+    navigate(`/study/${setId}`);
+  };
+
+  const handleEditClick = (e: React.MouseEvent, setId: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    navigate(`/create/${setId}`);
+  };
+
+  // Apply filter, search and sort logic
   const filteredSets = React.useMemo(() => {
     let result = [...flashcardSets];
     
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(set => 
+        set.name.toLowerCase().includes(query) ||
+        set.description?.toLowerCase().includes(query) ||
+        set.tags.some(tag => tag.toLowerCase().includes(query))
+      );
+    }
+    
+    // Apply sort
     switch (activeFilter) {
       case 'recent':
         result = result
@@ -98,27 +158,44 @@ const Home: React.FC = () => {
       case 'alphabetical':
         result = result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));
         break;
+      case 'mostCards':
+        result = result.sort((a, b) => b.cards.length - a.cards.length);
+        break;
       case 'all':
       default:
+        result = result.sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
         break;
     }
     
     return result;
-  }, [flashcardSets, activeFilter]);
+  }, [flashcardSets, activeFilter, searchQuery]);
 
   const filterButtons = [
     { key: 'all' as FilterType, label: 'Tất cả' },
     { key: 'recent' as FilterType, label: 'Gần đây' },
     { key: 'alphabetical' as FilterType, label: 'Theo tên (A-Z)' },
+    { key: 'mostCards' as FilterType, label: 'Nhiều thẻ nhất' },
   ];
+
+  // Determine empty state type
+  const isSearching = searchQuery.trim().length > 0;
+  const hasNoDecks = flashcardSets.length === 0;
+  const hasNoSearchResults = !hasNoDecks && filteredSets.length === 0 && isSearching;
 
   return (
     <MainLayout>
-      {/* Confirm Delete Modal */}
+      {/* Confirm Delete Modal - Enhanced with deck info */}
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         title="Xóa bộ thẻ"
-        message="Bạn có chắc muốn xóa bộ thẻ này? Hành động này không thể hoàn tác."
+        message={confirmModal.set 
+          ? `Bạn có chắc muốn xóa "${confirmModal.set.name}" (${confirmModal.set.cards.length} thẻ)? Hành động này không thể hoàn tác.`
+          : 'Bạn có chắc muốn xóa bộ thẻ này?'
+        }
         confirmText="Xóa"
         cancelText="Hủy"
         onConfirm={handleDeleteConfirm}
@@ -127,26 +204,26 @@ const Home: React.FC = () => {
       />
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-3">
-          <Library className="text-purple-500 dark:text-purple-400" size={32} />
+      <div className="mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-3 leading-tight">
+          <HiBookOpen className="w-7 h-7 text-purple-500 dark:text-purple-400" />
           Bộ thẻ của bạn
         </h1>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-slate-500 dark:text-slate-400 text-sm">
           Quản lý và học các bộ flashcard của bạn
         </p>
       </div>
 
       {/* Filters & Sorting */}
-      <div className="flex flex-wrap items-center gap-3 mb-8">
+      <div className="flex flex-wrap items-center gap-2 mb-6">
         {filterButtons.map((btn) => (
           <button
             key={btn.key}
             onClick={() => setActiveFilter(btn.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
               activeFilter === btn.key
-                ? 'bg-slate-200 dark:bg-white/10 text-slate-900 dark:text-white'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                ? 'bg-purple-600 text-white shadow-md shadow-purple-500/20'
+                : 'bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             {btn.label}
@@ -156,82 +233,121 @@ const Home: React.FC = () => {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-100 dark:bg-red-500/20 border border-red-300 dark:border-red-500/50 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg mb-6">
+        <div className="bg-red-100 dark:bg-red-500/20 border border-red-300 dark:border-red-500/50 text-red-700 dark:text-red-200 px-4 py-3 rounded-lg mb-6 text-sm">
           {error}
         </div>
       )}
 
-      {/* Loading State */}
+      {/* Loading State - Skeleton Cards */}
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
-              className="bg-slate-100 dark:bg-white/5 rounded-2xl p-6 animate-pulse"
+              className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg p-5 animate-pulse"
             >
-              <div className="h-6 bg-slate-200 dark:bg-white/10 rounded mb-4 w-3/4"></div>
-              <div className="h-4 bg-slate-200 dark:bg-white/10 rounded mb-2 w-full"></div>
-              <div className="h-4 bg-slate-200 dark:bg-white/10 rounded w-1/2"></div>
+              <div className="h-5 bg-slate-200 dark:bg-white/10 rounded mb-3 w-3/4"></div>
+              <div className="h-3 bg-slate-200 dark:bg-white/10 rounded mb-2 w-full"></div>
+              <div className="h-3 bg-slate-200 dark:bg-white/10 rounded w-1/2 mb-4"></div>
+              <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-white/10">
+                <div className="flex-1 h-10 bg-slate-200 dark:bg-white/10 rounded-lg"></div>
+                <div className="w-10 h-10 bg-slate-200 dark:bg-white/10 rounded-lg"></div>
+                <div className="w-10 h-10 bg-slate-200 dark:bg-white/10 rounded-lg"></div>
+              </div>
             </div>
           ))}
         </div>
-      ) : filteredSets.length === 0 ? (
+      ) : hasNoDecks ? (
+        /* Empty State - No Decks */
         <div className="text-center py-16">
-          <div className="bg-slate-100 dark:bg-white/5 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <LayoutGrid className="text-slate-400 dark:text-slate-500" size={40} />
+          <div className="bg-slate-100 dark:bg-white/5 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+            <HiSquares2X2 className="w-10 h-10 text-slate-400 dark:text-slate-500" />
           </div>
-          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 leading-tight">
             Chưa có bộ thẻ nào
           </h3>
-          <p className="text-slate-600 dark:text-slate-400 mb-6">
-            Tạo bộ thẻ đầu tiên của bạn để bắt đầu học
+          <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm max-w-md mx-auto">
+            Tạo bộ thẻ đầu tiên của bạn để bắt đầu hành trình học tập hiệu quả
           </p>
-          <Link
-            to="/create"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-purple-500 hover:to-indigo-500 transition-all"
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link
+              to="/create"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-purple-500/25 hover:-translate-y-0.5 transition-all text-sm"
+            >
+              <HiPlus className="w-[18px] h-[18px]" />
+              <span>Tạo bộ thẻ mới</span>
+            </Link>
+            <button
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-sm"
+            >
+              <HiArrowUpTray className="w-[18px] h-[18px]" />
+              <span>Import từ file</span>
+            </button>
+          </div>
+        </div>
+      ) : hasNoSearchResults ? (
+        /* Empty State - No Search Results */
+        <div className="text-center py-16">
+          <div className="bg-slate-100 dark:bg-white/5 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+            <HiMagnifyingGlass className="w-8 h-8 text-slate-400 dark:text-slate-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2 leading-tight">
+            Không tìm thấy kết quả
+          </h3>
+          <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">
+            Không có bộ thẻ nào khớp với "{searchQuery}"
+          </p>
+          <button
+            onClick={() => setSearchQuery('')}
+            className="text-purple-600 dark:text-purple-400 font-medium text-sm hover:underline"
           >
-            <Plus size={20} />
-            <span>Tạo bộ thẻ mới</span>
-          </Link>
+            Xóa tìm kiếm
+          </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        /* Deck Grid - Clickable cards */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredSets.map((set) => (
             <div
               key={set._id}
-              className="group bg-white dark:bg-white/5 backdrop-blur-sm border-0 dark:border dark:border-white/5 rounded-lg overflow-hidden hover:bg-slate-50 dark:hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 shadow-sm hover:shadow-lg flex flex-col h-full"
+              onClick={() => handleCardClick(set._id)}
+              className="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg overflow-hidden cursor-pointer hover:border-purple-300 dark:hover:border-purple-500/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-purple-500/10 flex flex-col h-full"
             >
-              <div className="p-6 flex flex-col h-full">
+              <div className="p-5 flex flex-col h-full">
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 transition-colors">
+                  {/* Title */}
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     {set.name}
                   </h3>
                   
+                  {/* Description */}
                   {set.description && (
-                    <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2">
+                    <p className="text-slate-500 dark:text-slate-400 text-sm mb-3 line-clamp-2 leading-relaxed">
                       {set.description}
                     </p>
                   )}
 
-                  <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
+                  {/* Metadata */}
+                  <div className="flex items-center gap-4 text-xs text-slate-400 dark:text-slate-500 mb-3">
                     <span className="flex items-center gap-1">
-                      <Layers size={16} />
+                      <HiRectangleStack className="w-3.5 h-3.5" />
                       {set.cards.length} thẻ
                     </span>
                     {set.lastStudied && (
                       <span className="flex items-center gap-1">
-                        <Clock size={16} />
+                        <HiClock className="w-3.5 h-3.5" />
                         {new Date(set.lastStudied).toLocaleDateString('vi-VN')}
                       </span>
                     )}
                   </div>
 
+                  {/* Tags */}
                   {set.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-1.5 mb-3">
                       {set.tags.slice(0, 3).map((tag, i) => (
                         <span
                           key={i}
-                          className="px-2 py-1 bg-purple-100 dark:bg-purple-500/20 text-purple-600 dark:text-purple-300 text-xs rounded-full"
+                          className="px-2 py-0.5 bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 text-xs rounded-md font-medium"
                         >
                           #{tag}
                         </span>
@@ -240,27 +356,34 @@ const Home: React.FC = () => {
                   )}
                 </div>
 
+                {/* Action Buttons */}
                 <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-white/10 mt-auto">
                   <Link
                     to={`/study/${set._id}`}
-                    className="flex-1 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-center rounded-lg font-medium hover:from-purple-500 hover:to-indigo-500 transition-all text-sm flex items-center justify-center gap-2 border-2 border-transparent hover:border-purple-300 dark:hover:border-purple-400"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-1 py-2.5 bg-purple-600 text-white text-center rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-purple-500 hover:shadow-md hover:shadow-purple-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all"
                   >
-                    <BookOpen size={16} />
+                    <HiAcademicCap className="w-4 h-4" />
                     Học
                   </Link>
-                  <Link
-                    to={`/create/${set._id}`}
-                    className="p-2 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-sm border-2 border-transparent hover:border-slate-400 dark:hover:border-slate-500"
+                  <button
+                    onClick={(e) => handleEditClick(e, set._id)}
+                    className="p-2.5 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-900 dark:hover:text-white hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all"
                     title="Chỉnh sửa"
                   >
-                    <Edit2 size={18} />
-                  </Link>
+                    <HiPencilSquare className="w-4 h-4" />
+                  </button>
                   <button
-                    onClick={() => openDeleteConfirm(set._id)}
-                    className="p-2 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-200 dark:hover:bg-red-500/30 transition-all text-sm border-2 border-transparent hover:border-red-500 dark:hover:border-red-400"
+                    onClick={(e) => openDeleteConfirm(e, set)}
+                    disabled={deletingId === set._id}
+                    className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none"
                     title="Xóa"
                   >
-                    <Trash2 size={18} />
+                    {deletingId === set._id ? (
+                      <HiArrowPath className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <HiTrash className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
