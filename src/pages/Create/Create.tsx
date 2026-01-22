@@ -216,7 +216,7 @@ const Create: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Set Info */}
-          <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">Thông tin bộ thẻ</h2>
             <div className="space-y-4">
               <div>
@@ -225,7 +225,7 @@ const Create: React.FC = () => {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-lg"
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium text-lg"
                   placeholder="Ví dụ: Từ vựng IELTS chủ đề Environment..."
                 />
               </div>
@@ -235,7 +235,7 @@ const Create: React.FC = () => {
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="Mô tả ngắn về bộ thẻ này..."
                   rows={3}
                 />
@@ -247,7 +247,7 @@ const Create: React.FC = () => {
                   type="text"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-xl text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                  className="w-full px-4 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   placeholder="english, vocabulary, beginner"
                 />
               </div>
@@ -272,7 +272,7 @@ const Create: React.FC = () => {
           </div>
 
           {/* Cards */}
-          <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-2xl p-6 shadow-sm">
+          <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Danh sách thẻ ({cards.length})</h2>
               <button
@@ -289,7 +289,7 @@ const Create: React.FC = () => {
               {cards.map((card, index) => (
                 <div
                   key={card.id}
-                  className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4 flex flex-col sm:flex-row gap-4 items-start group shadow-sm hover:border-blue-600 dark:hover:border-blue-500/30 transition-all"
+                  className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg p-4 flex flex-col sm:flex-row gap-4 items-start group shadow-sm hover:border-blue-600 dark:hover:border-blue-500/30 transition-all"
                 >
                   {/* 1. Index Circle */}
                   <div className="flex-shrink-0 pt-2 hidden sm:block">
@@ -324,7 +324,7 @@ const Create: React.FC = () => {
 
                   {/* 3. Image Preview */}
                   <div className="flex-shrink-0 relative group/image">
-                     <div className="w-full sm:w-28 h-28 border-2 border-dashed border-slate-300 dark:border-white/20 rounded-xl flex items-center justify-center bg-slate-50 dark:bg-white/5 overflow-hidden transition-colors hover:bg-slate-100 dark:hover:bg-white/10">
+                     <div className="w-full sm:w-28 h-28 border-2 border-dashed border-slate-300 dark:border-white/20 rounded-lg flex items-center justify-center bg-slate-50 dark:bg-white/5 overflow-hidden transition-colors hover:bg-slate-100 dark:hover:bg-white/10">
                         {card.image ? (
                           <img src={card.image} alt="Visual" className="w-full h-full object-cover" />
                         ) : (
@@ -332,7 +332,7 @@ const Create: React.FC = () => {
                         )}
                      </div>
                      {card.image && (
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center rounded-xl pointer-events-none">
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/image:opacity-100 transition-opacity flex items-center justify-center rounded-lg pointer-events-none">
                           <span className="text-white text-xs font-medium pointer-events-auto cursor-pointer p-1 bg-red-500 rounded-lg hover:bg-red-600" onClick={() => removeImage(card.id)}>
                             <HiTrash className="w-4 h-4" />
                           </span>
@@ -378,7 +378,7 @@ const Create: React.FC = () => {
             <button
               type="button"
               onClick={addCard}
-              className="w-full mt-6 py-4 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-xl hover:bg-slate-200 dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-bold group active:scale-[0.99] cursor-pointer"
+              className="w-full mt-6 py-4 bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-white/10 transition-all flex items-center justify-center gap-2 font-bold group active:scale-[0.99] cursor-pointer"
             >
               <div className="p-1 bg-white dark:bg-white/10 rounded-full text-slate-900 dark:text-white group-hover:bg-blue-500 group-hover:text-white transition-colors">
                 <HiPlus className="w-5 h-5" />
@@ -392,14 +392,14 @@ const Create: React.FC = () => {
             <button
               type="button"
               onClick={() => navigate('/')}
-              className="flex-1 py-4 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-lg cursor-pointer"
+              className="flex-1 py-4 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-bold hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-lg cursor-pointer"
             >
               Hủy bỏ
             </button>
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-[2] py-4 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg active:scale-[0.98] cursor-pointer"
+              className="flex-[2] py-4 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 text-lg active:scale-[0.98] cursor-pointer"
             >
               {isLoading ? (
                 <>

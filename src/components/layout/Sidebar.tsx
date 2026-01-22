@@ -11,7 +11,6 @@ import {
   HiClock,
   HiFire,
   HiFlag,
-  HiStar,
   HiCheckBadge
 } from 'react-icons/hi2';
 
@@ -179,12 +178,12 @@ const Sidebar: React.FC = () => {
               title={link.label}
               className={({ isActive }) =>
                 isCollapsed
-                  ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                  ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
                       isActive
                         ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
                         : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                     }`
-                  : `flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium whitespace-nowrap overflow-hidden ${
+                  : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden ${
                       isActive
                         ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                         : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
@@ -197,100 +196,91 @@ const Sidebar: React.FC = () => {
           ))}
         </div>
 
-        {/* Unified Widgets Section */}
-        <div className={`mb-6 ${isCollapsed ? 'space-y-2' : 'space-y-2'}`}>
-          {/* Streak Widget */}
+        {/* Unified Widgets Section - Modern Clean Design */}
+        <div className={`mb-6 ${isCollapsed ? 'space-y-3 px-1' : 'space-y-3'}`}>
+          
+          {/* Streak Card */}
           <div 
             className={`
-              rounded-xl transition-all duration-300 overflow-hidden cursor-pointer
+              relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 
-                ? 'flex items-center justify-center w-10 h-10 mx-auto hover:bg-slate-100 dark:hover:bg-white/5' 
-                : 'bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/30 p-3 border border-orange-100 dark:border-orange-500/20'}
+                ? `w-10 h-10 mx-auto rounded-xl flex items-center justify-center bg-white dark:bg-slate-800 border shadow-sm hover:shadow-md ${studiedToday ? 'border-amber-100 dark:border-amber-900/30 hover:border-amber-300' : 'border-slate-200 dark:border-slate-700'}`
+                : `bg-white dark:bg-slate-800 rounded-xl p-3 border shadow-sm hover:shadow-lg hover:-translate-y-0.5 ${studiedToday ? 'border-slate-200 dark:border-slate-700 hover:shadow-amber-500/10 hover:border-amber-200 dark:hover:border-amber-700/50' : 'border-slate-200 dark:border-slate-700'}`}
             `}
             title={isCollapsed ? `Chuỗi: ${streak} ngày` : undefined}
           >
-            {/* Collapsed: Just icon */}
+            {!isCollapsed && studiedToday && <div className="absolute top-0 right-0 w-12 h-12 bg-amber-500/10 dark:bg-amber-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-amber-500/20 duration-500"></div>}
+
             {isCollapsed ? (
-              <HiFire className={`w-6 h-6 ${streak > 0 ? 'text-orange-500' : 'text-slate-400'}`} />
+              <HiFire className={`w-5 h-5 transition-transform group-hover:scale-110 ${studiedToday ? 'text-amber-500' : 'text-slate-400'}`} />
             ) : (
-              <>
-                <div className="flex items-center gap-3">
-                  <div className={`p-1.5 rounded-lg flex-shrink-0 ${streak > 0 ? 'bg-orange-500 text-white' : 'bg-orange-200 dark:bg-orange-800 text-orange-600 dark:text-orange-300'}`}>
-                    <HiFire className="w-[18px] h-[18px]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">Chuỗi ngày</p>
-                        <p className="font-bold text-lg text-slate-900 dark:text-white truncate">{streak} ngày</p>
-                      </div>
-                      {streak >= 7 && (
-                        <div className="flex items-center gap-1 text-orange-500">
-                          <HiStar className="w-3.5 h-3.5" />
-                        </div>
-                      )}
-                    </div>
+              <div className="flex items-center gap-3 relative z-10">
+                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm text-white shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3 ${studiedToday ? 'bg-amber-500' : 'bg-slate-200 dark:bg-slate-700'}`}>
+                  <HiFire className={`w-6 h-6 ${studiedToday ? 'text-white' : 'text-slate-400'}`} />
+                </div>
+                <div>
+                  <div className={`text-[10px] uppercase font-bold tracking-wider mb-0.5 transition-colors ${studiedToday ? 'text-slate-400 dark:text-slate-500 group-hover:text-amber-600 dark:group-hover:text-amber-400' : 'text-slate-400 dark:text-slate-500'}`}>Chuỗi ngày</div>
+                  <div className="text-lg font-bold text-slate-800 dark:text-white leading-none">
+                    {streak} <span className="text-xs font-semibold text-slate-400">ngày</span>
                   </div>
                 </div>
-                {!studiedToday && streak > 0 && (
-                  <p className="text-xs text-orange-600 dark:text-orange-400 mt-2 whitespace-nowrap">
-                    Học hôm nay để giữ streak!
-                  </p>
-                )}
-              </>
+              </div>
+            )}
+            
+            {/* Streak Hint */}
+            {!isCollapsed && !studiedToday && (
+              <div className="mt-2 text-[10px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700/50 px-2 py-1.5 rounded border border-slate-200 dark:border-slate-600 inline-flex items-center gap-1.5 w-full justify-center group-hover:bg-slate-200 dark:group-hover:bg-slate-700 transition-colors">
+                 <HiFire className="w-3 h-3 text-slate-400" /> Học ngay để giữ chuỗi!
+              </div>
             )}
           </div>
 
-          {/* Daily Goal Widget */}
+          {/* Daily Goal Card */}
           <div 
             className={`
-              rounded-xl transition-all duration-300 overflow-hidden cursor-pointer
+              relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 
-                ? 'flex items-center justify-center w-10 h-10 mx-auto hover:bg-slate-100 dark:hover:bg-white/5' 
-                : 'bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 p-3 border border-blue-100 dark:border-blue-500/20'}
+                ? 'w-10 h-10 mx-auto rounded-xl flex items-center justify-center bg-white dark:bg-slate-800 border border-blue-100 dark:border-blue-900/30 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500/50' 
+                : 'bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 dark:hover:border-blue-700/50 hover:-translate-y-0.5'}
             `}
-            title={isCollapsed ? `Mục tiêu: ${todayProgress}/${dailyGoal} thẻ` : undefined}
+            title={isCollapsed ? `Mục tiêu: ${todayProgress}/${dailyGoal}` : undefined}
           >
-            {/* Collapsed: Just icon */}
+            {!isCollapsed && <div className="absolute top-0 right-0 w-12 h-12 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-blue-500/20 duration-500"></div>}
+
             {isCollapsed ? (
-              <HiFlag className={`w-6 h-6 ${goalCompleted ? 'text-green-500' : 'text-blue-500'}`} />
+              <HiFlag className={`w-5 h-5 transition-transform group-hover:scale-110 ${goalCompleted ? 'text-green-500' : 'text-blue-500'}`} />
             ) : (
-              <>
-                <div className="flex items-center gap-3 mb-2">
-                  <div className={`p-1.5 rounded-lg flex-shrink-0 ${goalCompleted ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}>
-                    <HiFlag className="w-[18px] h-[18px]" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-2.5">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center shadow-sm text-white shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3 ${goalCompleted ? 'bg-green-500' : 'bg-blue-500'}`}>
+                    {goalCompleted ? <HiCheckBadge className="w-5 h-5" /> : <HiFlag className="w-5 h-5" />}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-300 truncate">Mục tiêu hôm nay</p>
-                        <p className="font-bold text-lg text-slate-900 dark:text-white truncate">
-                          {todayProgress}/{dailyGoal} thẻ
-                        </p>
-                      </div>
-                      {goalCompleted && (
-                        <div className="text-green-500">
-                        </div>
-                      )}
+                  <div>
+                    <div className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">Mục tiêu ngày</div>
+                    <div className="text-lg font-bold text-slate-800 dark:text-white leading-none">
+                      {todayProgress}<span className="text-slate-300 mx-0.5 text-sm">/</span>{dailyGoal}
                     </div>
                   </div>
                 </div>
-                {/* Progress Bar */}
-                <div className="h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                
+                {/* Modern Thin Progress Bar */}
+                <div className="h-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-full overflow-hidden w-full">
                   <div 
-                    className={`h-full rounded-full transition-all duration-500 ${
+                    className={`h-full rounded-full transition-all duration-700 ease-out ${
                       goalCompleted 
-                        ? 'bg-gradient-to-r from-green-500 to-emerald-500' 
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600'
+                        ? 'bg-green-500' 
+                        : 'bg-blue-500 group-hover:brightness-110'
                     }`}
                     style={{ width: `${goalPercentage}%` }}
                   />
                 </div>
-                  <p className="text-xs text-green-600 dark:text-green-400 mt-2 font-medium whitespace-nowrap flex items-center gap-1">
-                    <HiCheckBadge className="w-4 h-4" />
-                    Hoàn thành mục tiêu!
-                  </p>
-              </>
+                
+                {goalCompleted && (
+                  <div className="mt-2 text-[10px] font-bold text-green-600 dark:text-green-400 flex items-center justify-end gap-1 group-hover:scale-105 transition-transform origin-right">
+                    <HiCheckBadge className="w-3 h-3" /> Đã hoàn thành!
+                  </div>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -302,12 +292,12 @@ const Sidebar: React.FC = () => {
             title="Thư viện của tôi"
             className={
               isCollapsed
-                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
                     location.pathname === '/' && !location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
-                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left cursor-pointer ${
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium text-left cursor-pointer ${
                     location.pathname === '/' && !location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
@@ -322,12 +312,12 @@ const Sidebar: React.FC = () => {
             title="Đã học gần đây"
             className={
               isCollapsed
-                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
                     location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
-                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left cursor-pointer ${
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium text-left cursor-pointer ${
                     location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
@@ -342,12 +332,12 @@ const Sidebar: React.FC = () => {
             title="Cài đặt"
             className={
               isCollapsed
-                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-xl transition-all ${
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
                     location.pathname === '/settings'
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
-                : `w-full flex items-center gap-3 px-3 py-3 rounded-xl transition-all font-medium text-left cursor-pointer ${
+                : `w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium text-left cursor-pointer ${
                     location.pathname === '/settings'
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'

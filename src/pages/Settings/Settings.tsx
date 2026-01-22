@@ -46,7 +46,7 @@ const SettingItem: React.FC<SettingItemProps> = ({
 }) => (
   <div
     onClick={onClick}
-    className={`flex items-center justify-between p-4 rounded-xl transition-all ${
+    className={`flex items-center justify-between p-4 rounded-lg transition-all ${
       onClick ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5' : ''
     } ${danger ? 'hover:bg-red-50 dark:hover:bg-red-500/10' : ''}`}
   >

@@ -46,13 +46,13 @@ const Navbar: React.FC = () => {
       <div className="w-full h-full flex items-center">
         
         {/* LEFT: Menu Toggle - Fixed width to match sidebar */}
-        <div className="hidden md:flex items-center justify-center w-[72px] h-full flex-shrink-0">
+        <div className="hidden md:flex items-center justify-center w-[72px] h-full flex-shrink-0 border-r border-slate-200 dark:border-white/10">
           <button 
             onClick={toggleSidebar}
-            className="flex items-center justify-center w-10 h-10 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 rounded-xl transition-all cursor-pointer hover:scale-105 active:scale-95"
+            className="flex items-center justify-center w-10 h-10 text-slate-500 hover:text-slate-900 dark:text-white dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-all cursor-pointer hover:scale-105 active:scale-95 group"
             title={isCollapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           >
-            <HiBars3 className="w-6 h-6" />
+            <HiBars3 className="w-6 h-6 stroke-2" style={{ strokeWidth: "2" }} />
           </button>
         </div>
         
@@ -85,7 +85,7 @@ const Navbar: React.FC = () => {
             </div>
             <input
               type="text"
-              className="block w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border border-transparent rounded-xl leading-5 text-slate-900 dark:text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
+              className="block w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 border border-transparent rounded-lg leading-5 text-slate-900 dark:text-slate-300 placeholder-slate-500 focus:outline-none focus:bg-white dark:focus:bg-slate-900 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all"
               placeholder="Tìm kiếm..."
             />
           </div>
@@ -141,24 +141,24 @@ const Navbar: React.FC = () => {
 
             {/* Dropdown Content */}
             {isDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ring-1 ring-black/5 z-50">
+              <div className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-lg shadow-xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200 ring-1 ring-black/5 z-50">
                 <div className="p-3 border-b border-slate-100 dark:border-white/10 sm:hidden">
                   <p className="text-slate-900 dark:text-white font-semibold text-base px-2">{user?.displayName}</p>
                   <p className="text-slate-600 dark:text-slate-400 text-sm px-2">@{user?.username}</p>
                 </div>
-                <div className="py-1">
+                <div className="p-1">
                   <Link
                     to="/profile"
                     onClick={() => setIsDropdownOpen(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-base text-slate-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors mx-1 rounded-lg font-medium"
+                    className="flex items-center gap-3 px-4 py-3 text-base text-slate-800 dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 transition-colors rounded-lg font-medium"
                   >
                     <HiUser className="w-5 h-5" />
                     Hồ sơ của bạn
                   </Link>
-                  <div className="h-px bg-slate-100 dark:bg-white/5 my-1 mx-2"></div>
+                  <div className="h-px bg-slate-100 dark:bg-white/5 my-1"></div>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-base text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors mx-1 rounded-lg cursor-pointer font-semibold"
+                    className="w-full flex items-center gap-3 px-4 py-3 text-base text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors rounded-lg cursor-pointer font-semibold"
                   >
                     <HiArrowRightOnRectangle className="w-5 h-5" />
                     Đăng xuất

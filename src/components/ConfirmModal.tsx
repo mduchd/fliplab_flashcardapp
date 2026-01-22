@@ -50,7 +50,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
       />
       
       {/* Modal */}
-      <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
+      <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-md p-6 animate-in fade-in zoom-in duration-200">
         {/* Close button */}
         <button
           onClick={onCancel}
@@ -80,13 +80,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-slate-200 dark:hover:bg-white/20 transition-all"
+            className="flex-1 px-4 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-white/20 transition-all"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 px-4 py-3 rounded-xl font-semibold transition-all ${styles.button}`}
+            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${styles.button}`}
           >
             {confirmText}
           </button>

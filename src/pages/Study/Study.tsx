@@ -413,7 +413,7 @@ const Study: React.FC = () => {
           <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">{error || 'Bộ thẻ không tồn tại'}</h2>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all flex items-center gap-2 mx-auto"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-all flex items-center gap-2 mx-auto"
           >
             <ArrowLeft size={20} />
             Quay về trang chủ
@@ -441,21 +441,21 @@ const Study: React.FC = () => {
             </p>
 
             <div className="grid grid-cols-3 gap-4 mb-8">
-              <div className="bg-slate-100 dark:bg-white/10 rounded-xl p-4">
+              <div className="bg-slate-100 dark:bg-white/10 rounded-lg p-4">
                 <div className="flex justify-center mb-2 text-slate-600 dark:text-slate-300">
                   <Layers size={24} />
                 </div>
                 <div className="text-3xl font-bold text-slate-900 dark:text-white">{activeCards.length}</div>
                 <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Tổng thẻ</div>
               </div>
-              <div className="bg-green-100 dark:bg-green-500/20 rounded-xl p-4">
+              <div className="bg-green-100 dark:bg-green-500/20 rounded-lg p-4">
                 <div className="flex justify-center mb-2 text-green-600 dark:text-green-400">
                   <Check size={24} />
                 </div>
                 <div className="text-3xl font-bold text-green-600 dark:text-green-400">{knownCards.size}</div>
                 <div className="text-slate-600 dark:text-slate-400 text-sm font-medium">Đã biết</div>
               </div>
-              <div className="bg-blue-100 dark:bg-blue-500/20 rounded-xl p-4">
+              <div className="bg-blue-100 dark:bg-blue-500/20 rounded-lg p-4">
                 <div className="flex justify-center mb-2 text-blue-600 dark:text-blue-400">
                   <Trophy size={24} />
                 </div>
@@ -467,14 +467,14 @@ const Study: React.FC = () => {
             <div className="flex gap-4 justify-center">
               <button
                 onClick={handleRestart}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all flex items-center gap-2"
               >
                 <RotateCcw size={20} />
                 Học lại
               </button>
               <button
                 onClick={() => navigate('/')}
-                className="px-6 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center gap-2"
               >
                 <Home size={20} />
                 Trang chủ
@@ -524,7 +524,7 @@ const Study: React.FC = () => {
 
         {/* Mode Toggle */}
         <div className="flex justify-center mb-6">
-          <div className="bg-slate-100 dark:bg-white/10 p-1 rounded-xl inline-flex">
+          <div className="bg-slate-100 dark:bg-white/10 p-1 rounded-lg inline-flex">
             <button
               onClick={() => {
                 setSlideDirection('left');
@@ -587,7 +587,7 @@ const Study: React.FC = () => {
               >
                 {/* Front */}
                 <div
-                  className="absolute inset-0 w-full h-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center p-8 backface-hidden group-hover:border-blue-400 dark:group-hover:border-blue-500/50 transition-colors shadow-sm"
+                  className="absolute inset-0 w-full h-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center p-8 backface-hidden group-hover:border-blue-400 dark:group-hover:border-blue-500/50 transition-colors shadow-sm"
                   style={{ backfaceVisibility: 'hidden' }}
                 >
                   {/* Edit Button - Top Right */}
@@ -625,7 +625,7 @@ const Study: React.FC = () => {
 
                 {/* Back */}
                 <div
-                  className="absolute inset-0 w-full h-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center p-8 shadow-sm"
+                  className="absolute inset-0 w-full h-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex items-center justify-center p-8 shadow-sm"
                   style={{ 
                     backfaceVisibility: 'hidden',
                     transform: 'rotateY(180deg)'
@@ -683,7 +683,7 @@ const Study: React.FC = () => {
                     const isCorrect = correctPair.includes(item.id);
 
                     if (isMatched) return (
-                        <div key={item.id} className="h-32 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 opacity-0 transition-opacity duration-500"></div>
+                        <div key={item.id} className="h-32 rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 opacity-0 transition-opacity duration-500"></div>
                     );
 
                     let itemClass = "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 hover:border-blue-400 dark:hover:border-blue-500 hover:scale-[1.05] cursor-pointer shadow-sm hover:shadow-md active:scale-95";
@@ -702,7 +702,7 @@ const Study: React.FC = () => {
                         <div
                             key={item.id}
                             onClick={() => handleMatchClick(item)}
-                            className={`h-32 p-4 rounded-xl border-2 flex items-center justify-center text-center transition-all duration-200 overflow-hidden font-medium ${itemClass}`}
+                            className={`h-32 p-4 rounded-lg border-2 flex items-center justify-center text-center transition-all duration-200 overflow-hidden font-medium ${itemClass}`}
                         >
                             <span className="line-clamp-4 text-base md:text-lg font-medium">{item.content}</span>
                         </div>
@@ -714,7 +714,7 @@ const Study: React.FC = () => {
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl animate-in fade-in">
                       <h3 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4 animate-bounce">Xuất sắc!</h3>
                       <p className="text-xl text-slate-600 dark:text-slate-300 font-medium mb-8">Thời gian: <span className="text-blue-600 dark:text-blue-400 font-bold text-2xl">{matchTime.toFixed(1)}s</span></p>
-                      <button onClick={startMatchGame} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-500 transition-colors inline-flex items-center gap-2 shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transform cursor-pointer active:translate-y-0">
+                      <button onClick={startMatchGame} className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-500 transition-colors inline-flex items-center gap-2 shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transform cursor-pointer active:translate-y-0">
                         <RotateCcw size={20} /> Chơi lại
                       </button>
                       <button onClick={() => setStudyMode('flashcard')} className="mt-6 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 font-medium transition-colors cursor-pointer">
@@ -765,7 +765,7 @@ const Study: React.FC = () => {
                         key={idx}
                         onClick={() => handleQuizAnswer(option)}
                         disabled={selectedAnswer !== null}
-                        className={`p-4 rounded-xl border-2 text-left transition-all font-medium ${btnClass} ${selectedAnswer === null ? 'hover:-translate-y-0.5 hover:shadow-md cursor-pointer active:scale-[0.99]' : 'cursor-default opacity-90'}`}
+                        className={`p-4 rounded-lg border-2 text-left transition-all font-medium ${btnClass} ${selectedAnswer === null ? 'hover:-translate-y-0.5 hover:shadow-md cursor-pointer active:scale-[0.99]' : 'cursor-default opacity-90'}`}
                       >
                          {option.definition}
                       </button>
@@ -808,14 +808,14 @@ const Study: React.FC = () => {
                  <button
                   onClick={handleShuffle}
                   title="Trộn thẻ"
-                  className="p-4 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 rounded-xl hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all cursor-pointer shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
+                  className="p-4 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all cursor-pointer shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
                 >
                   <Shuffle size={24} />
                 </button>
 
                 <button
                   onClick={handleDontKnow}
-                  className="flex-1 max-w-[200px] py-4 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-xl font-semibold hover:bg-red-200 dark:hover:bg-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+                  className="flex-1 max-w-[200px] py-4 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg font-semibold hover:bg-red-200 dark:hover:bg-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
                 >
                   <X size={24} />
                   <span>Chưa biết</span>
@@ -823,7 +823,7 @@ const Study: React.FC = () => {
 
                 <button
                   onClick={handleKnow}
-                  className="flex-1 max-w-[200px] py-4 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-xl font-semibold hover:bg-green-200 dark:hover:bg-green-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+                  className="flex-1 max-w-[200px] py-4 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-lg font-semibold hover:bg-green-200 dark:hover:bg-green-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
                 >
                   <Check size={24} />
                   <span>Đã biết</span>
@@ -847,7 +847,7 @@ const Study: React.FC = () => {
       {/* Edit Card Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-md animate-in zoom-in-95 duration-200">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-700">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
