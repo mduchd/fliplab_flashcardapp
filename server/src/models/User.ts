@@ -11,6 +11,7 @@ export interface IUser extends Document {
   bio?: string;
   createdAt: Date;
   updatedAt: Date;
+  avatarFrame?: string;
   lastLogin?: Date;
   totalStudyTime: number;
   totalCardsStudied: number;
@@ -54,6 +55,10 @@ const userSchema = new Schema<IUser>(
       type: String,
       default: '',
       maxlength: [150, 'Bio cannot exceed 150 characters'],
+    },
+    avatarFrame: {
+      type: String,
+      default: 'none',
     },
     lastLogin: {
       type: Date,

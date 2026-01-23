@@ -175,7 +175,6 @@ const Sidebar: React.FC = () => {
               key={link.to}
               to={link.to}
               onClick={() => setMobileOpen(false)}
-              title={link.label}
               className={({ isActive }) =>
                 isCollapsed
                   ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
@@ -205,9 +204,8 @@ const Sidebar: React.FC = () => {
               relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 
                 ? `w-10 h-10 mx-auto rounded-xl flex items-center justify-center bg-white dark:bg-slate-800 border shadow-sm hover:shadow-md ${studiedToday ? 'border-amber-100 dark:border-amber-900/30 hover:border-amber-300' : 'border-slate-200 dark:border-slate-700'}`
-                : `bg-white dark:bg-slate-800 rounded-xl p-3 border shadow-sm hover:shadow-lg hover:-translate-y-0.5 ${studiedToday ? 'border-slate-200 dark:border-slate-700 hover:shadow-amber-500/10 hover:border-amber-200 dark:hover:border-amber-700/50' : 'border-slate-200 dark:border-slate-700'}`}
+               : `bg-white dark:bg-slate-800 rounded-xl p-3 border shadow-sm hover:shadow-lg hover:-translate-y-0.5 ${studiedToday ? 'border-slate-200 dark:border-slate-700 hover:shadow-amber-500/10 hover:border-amber-200 dark:hover:border-amber-700/50' : 'border-slate-200 dark:border-slate-700'}`}
             `}
-            title={isCollapsed ? `Chuỗi: ${streak} ngày` : undefined}
           >
             {!isCollapsed && studiedToday && <div className="absolute top-0 right-0 w-12 h-12 bg-amber-500/10 dark:bg-amber-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-amber-500/20 duration-500"></div>}
 
@@ -243,7 +241,6 @@ const Sidebar: React.FC = () => {
                 ? 'w-10 h-10 mx-auto rounded-xl flex items-center justify-center bg-white dark:bg-slate-800 border border-blue-100 dark:border-blue-900/30 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500/50' 
                 : 'bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 dark:hover:border-blue-700/50 hover:-translate-y-0.5'}
             `}
-            title={isCollapsed ? `Mục tiêu: ${todayProgress}/${dailyGoal}` : undefined}
           >
             {!isCollapsed && <div className="absolute top-0 right-0 w-12 h-12 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-blue-500/20 duration-500"></div>}
 
@@ -289,7 +286,6 @@ const Sidebar: React.FC = () => {
         <div className={`flex-1 ${isCollapsed ? 'space-y-2' : 'space-y-1'}`}>
           <button
             onClick={() => { handleLibraryClick('library'); setMobileOpen(false); }}
-            title="Thư viện của tôi"
             className={
               isCollapsed
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
@@ -309,7 +305,6 @@ const Sidebar: React.FC = () => {
           </button>
           <button
             onClick={() => { handleLibraryClick('recent'); setMobileOpen(false); }}
-            title="Đã học gần đây"
             className={
               isCollapsed
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
@@ -329,7 +324,6 @@ const Sidebar: React.FC = () => {
           </button>
           <button
             onClick={() => { handleLibraryClick('settings'); setMobileOpen(false); }}
-            title="Cài đặt"
             className={
               isCollapsed
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${

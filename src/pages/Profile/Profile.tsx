@@ -32,6 +32,17 @@ const ANIMAL_AVATARS = [
   '🦆', '🐧', '🦉', '🦅', '🐺', '🦇', '🦋', '🐝'
 ];
 
+// Avatar Frames Definitions
+// Using ring for outer effects (visible outside element), border for inner edge
+const AVATAR_FRAMES = [
+  { id: 'none', name: 'Mặc định', class: 'ring-4 ring-white dark:ring-slate-700' },
+  { id: 'gold', name: 'Vàng kim', class: 'ring-4 ring-yellow-400 shadow-lg shadow-yellow-400/40' },
+  { id: 'neon', name: 'Neon', class: 'ring-4 ring-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.7)]' },
+  { id: 'rose', name: 'Hồng phấn', class: 'ring-4 ring-pink-400 shadow-lg shadow-pink-400/40' },
+  { id: 'fire', name: 'Lửa thiêng', class: 'ring-4 ring-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.7)]' },
+  { id: 'rainbow', name: 'Cầu vồng', class: 'rainbow-frame' }, // Special CSS class
+];
+
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
   const navigate = useNavigate();
@@ -41,9 +52,11 @@ const Profile: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editDisplayName, setEditDisplayName] = useState(user?.displayName || '');
   const [editAvatar, setEditAvatar] = useState<string | undefined>(user?.avatar);
+  const [editAvatarFrame, setEditAvatarFrame] = useState<string>(user?.avatarFrame || 'none');
   const [editBio, setEditBio] = useState(user?.bio || '');
   const [isSaving, setIsSaving] = useState(false);
   const [showAvatarPresets, setShowAvatarPresets] = useState(false);
+  const [showFrameSelector, setShowFrameSelector] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Vietnamese day names helper
@@ -233,10 +246,13 @@ const Profile: React.FC = () => {
   // Open Modal
   const openEditModal = () => {
     setEditDisplayName(user?.displayName || '');
+    setEditDisplayName(user?.displayName || '');
     setEditAvatar(user?.avatar);
+    setEditAvatarFrame(user?.avatarFrame || 'none');
     setEditBio(user?.bio || '');
     setIsEditModalOpen(true);
     setShowAvatarPresets(false);
+    setShowFrameSelector(false);
   };
 
   // Save Profile
@@ -256,6 +272,7 @@ const Profile: React.FC = () => {
       const response = await authService.updateProfile({
         displayName: editDisplayName.trim(),
         avatar: editAvatar,
+        avatarFrame: editAvatarFrame,
         bio: editBio.trim(),
       });
 
@@ -278,33 +295,58 @@ const Profile: React.FC = () => {
   };
 
   // Render Avatar (Image, Emoji or Initial)
-  const renderAvatar = (avatarUrl?: string, displayName?: string, size: 'sm' | 'lg' = 'lg') => {
-    const sizeClasses = size === 'lg' ? 'w-28 h-28 text-5xl' : 'w-24 h-24 text-4xl';
+  const renderAvatar = (avatarUrl?: string, displayName?: string, size: 'sm' | 'lg' = 'lg', frameId: string = 'none') => {
+    const sizeClasses = size === 'lg' ? 'w-28 h-28' : 'w-24 h-24';
+    const textSize = size === 'lg' ? 'text-6xl' : 'text-5xl';
+    const frameConfig = AVATAR_FRAMES.find(f => f.id === frameId) || AVATAR_FRAMES[0];
     
-    if (avatarUrl) {
-      // Check if emoji
-      if (isEmojiAvatar(avatarUrl)) {
+    // Render inner content (image, emoji, or initial)
+    const renderContent = () => {
+      if (avatarUrl) {
+        if (isEmojiAvatar(avatarUrl)) {
+          return (
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-bl from-white/40 to-transparent pointer-events-none" />
+              <span className={`${textSize} drop-shadow-sm z-10`}>{avatarUrl}</span>
+            </div>
+          );
+        }
+        // Custom uploaded image
         return (
-          <div className={`${sizeClasses} rounded-full bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] border-4 border-white dark:border-slate-700/50 relative overflow-hidden group-hover:scale-105 transition-transform duration-300 ring-1 ring-slate-100 dark:ring-slate-700`}>
-             {/* Glossy sheen */}
-             <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-white/40 to-transparent pointer-events-none"></div>
-            <span className={`${size === 'lg' ? 'text-6xl' : 'text-5xl'} transform group-hover:scale-110 transition-transform duration-300 drop-shadow-sm`}>{avatarUrl}</span>
-          </div>
+          <img 
+            src={avatarUrl} 
+            alt="Avatar" 
+            className="w-full h-full rounded-full object-cover"
+          />
         );
       }
-      // Image upload
+      // Default initial
       return (
-        <img 
-          src={avatarUrl} 
-          alt="Avatar" 
-          className={`${sizeClasses} rounded-full object-cover border-4 border-white dark:border-slate-700/50 shadow-md group-hover:scale-105 transition-transform duration-300 ring-1 ring-slate-100 dark:ring-slate-700`}
-        />
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center font-bold text-white text-4xl">
+          {displayName?.charAt(0).toUpperCase() || <HiUser className="w-10 h-10" />}
+        </div>
+      );
+    };
+
+    // Special handling for rainbow gradient border
+    if (frameId === 'rainbow') {
+      return (
+        <div className={`${sizeClasses} rounded-full rainbow-frame flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}>
+          <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900">
+            {renderContent()}
+          </div>
+        </div>
       );
     }
-    // Default initial
+
+    // Standard frames with border/ring/shadow
+    // Container has frame styles but no overflow-hidden (to show shadow/ring)
+    // Inner wrapper clips the content
     return (
-      <div className={`${sizeClasses} rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center font-bold text-white border-4 border-white dark:border-slate-700/50 shadow-md group-hover:scale-105 transition-transform ring-1 ring-slate-100 dark:ring-slate-700`}>
-        {displayName?.charAt(0).toUpperCase() || <HiUser className="w-10 h-10" />}
+      <div className={`${sizeClasses} rounded-full ${frameConfig.class} flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}>
+        <div className="w-full h-full rounded-full overflow-hidden">
+          {renderContent()}
+        </div>
       </div>
     );
   };
@@ -321,7 +363,7 @@ const Profile: React.FC = () => {
             <div className="lg:col-span-6 flex flex-col items-center lg:border-r border-slate-100 dark:border-white/10 lg:pr-8">
               {/* Avatar + Edit Button */}
               <div className="relative mb-3">
-                {renderAvatar(user?.avatar, user?.displayName)}
+                {renderAvatar(user?.avatar, user?.displayName, 'lg', user?.avatarFrame)}
                 <button 
                   onClick={openEditModal}
                   className="absolute -bottom-1 -right-1 p-2 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-full shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
@@ -727,7 +769,7 @@ const Profile: React.FC = () => {
               {/* Avatar Upload */}
               <div className="flex flex-col items-center">
                 <div className="relative group mb-3">
-                  {renderAvatar(editAvatar, editDisplayName, 'lg')}
+                  {renderAvatar(editAvatar, editDisplayName, 'lg', editAvatarFrame)}
                   
                   <button 
                     onClick={() => fileInputRef.current?.click()}
@@ -796,6 +838,39 @@ const Profile: React.FC = () => {
                     </div>
                   </div>
                 )}
+                
+                {/* Frame Selector Button and Grid */}
+                <div className="mt-4 w-full border-t border-slate-100 dark:border-slate-700/50 pt-4"> 
+                   <button 
+                      onClick={() => setShowFrameSelector(!showFrameSelector)}
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center gap-1 w-full font-medium mb-3 cursor-pointer"
+                   >
+                     <HiSparkles className="w-4 h-4" />
+                     {showFrameSelector ? 'Thu gọn khung viền' : 'Chọn khung viền avatar'}
+                   </button>
+                   
+                   {showFrameSelector && (
+                      <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg w-full animate-in slide-in-from-top-2">
+                         <div className="grid grid-cols-3 gap-4">
+                            {AVATAR_FRAMES.map((frame) => (
+                               <div 
+                                  key={frame.id}
+                                  onClick={() => setEditAvatarFrame(frame.id)}
+                                  className={`flex flex-col items-center gap-2 cursor-pointer p-3 rounded-lg transition-all border ${editAvatarFrame === frame.id ? 'bg-white dark:bg-slate-600 border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-transparent hover:bg-slate-200 dark:hover:bg-slate-600'}`}
+                               >
+                                  {/* Fixed size container for consistent preview */}
+                                  <div className="w-16 h-16 flex items-center justify-center overflow-visible">
+                                     <div className="scale-[0.55] origin-center pointer-events-none">
+                                        {renderAvatar(editAvatar || user?.avatar, editDisplayName || user?.displayName, 'lg', frame.id)}
+                                     </div>
+                                  </div>
+                                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{frame.name}</span>
+                               </div>
+                            ))}
+                         </div>
+                      </div>
+                   )}
+                </div>
               </div>
 
               {/* Display Name Input */}

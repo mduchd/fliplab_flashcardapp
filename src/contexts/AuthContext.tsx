@@ -7,6 +7,7 @@ interface User {
   email: string;
   displayName: string;
   avatar?: string;
+  avatarFrame?: string;
   bio?: string;
   totalStudyTime?: number;
   totalCardsStudied?: number;

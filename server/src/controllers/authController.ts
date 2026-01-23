@@ -55,6 +55,7 @@ export const register = async (req: AuthRequest, res: Response): Promise<void> =
           email: user.email,
           displayName: user.displayName,
           avatar: user.avatar,
+          avatarFrame: user.avatarFrame,
           bio: user.bio,
         },
         token,
@@ -112,6 +113,7 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
           email: user.email,
           displayName: user.displayName,
           avatar: user.avatar,
+          avatarFrame: user.avatarFrame,
           bio: user.bio,
         },
         token,
@@ -148,6 +150,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
           email: user.email,
           displayName: user.displayName,
           avatar: user.avatar,
+          avatarFrame: user.avatarFrame,
           bio: user.bio,
           totalStudyTime: user.totalStudyTime,
           totalCardsStudied: user.totalCardsStudied,
@@ -183,6 +186,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
     if (displayName) user.displayName = displayName;
     if (avatar !== undefined) user.avatar = avatar;
     if (bio !== undefined) user.bio = bio;
+    if (req.body.avatarFrame !== undefined) user.avatarFrame = req.body.avatarFrame;
 
     await user.save();
 
@@ -196,6 +200,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
           email: user.email,
           displayName: user.displayName,
           avatar: user.avatar,
+          avatarFrame: user.avatarFrame,
           bio: user.bio,
           totalStudyTime: user.totalStudyTime,
           totalCardsStudied: user.totalCardsStudied,

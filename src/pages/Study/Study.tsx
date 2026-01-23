@@ -594,7 +594,6 @@ const Study: React.FC = () => {
                   <button
                     onClick={openEditModal}
                     className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all opacity-0 group-hover:opacity-100 z-10 cursor-pointer"
-                    title="Chỉnh sửa thẻ"
                   >
                     <Edit2 size={16} />
                   </button>
@@ -635,7 +634,6 @@ const Study: React.FC = () => {
                   <button
                     onClick={openEditModal}
                     className="absolute top-4 right-4 p-2 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all z-10 cursor-pointer"
-                    title="Chỉnh sửa thẻ"
                   >
                     <Edit2 size={16} />
                   </button>

@@ -369,7 +369,6 @@ const Home: React.FC = () => {
                   <button
                     onClick={(e) => handleEditClick(e, set._id)}
                     className="p-2.5 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-900 dark:hover:text-white hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
-                    title="Chỉnh sửa"
                   >
                     <HiPencilSquare className="w-4 h-4" />
                   </button>
@@ -377,7 +376,6 @@ const Home: React.FC = () => {
                     onClick={(e) => openDeleteConfirm(e, set)}
                     disabled={deletingId === set._id}
                     className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none cursor-pointer"
-                    title="Xóa"
                   >
                     {deletingId === set._id ? (
                       <HiArrowPath className="w-4 h-4 animate-spin" />

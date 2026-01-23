@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { theme, toggleTheme } = useTheme();
-  const { isCollapsed, toggleSidebar, isMobileOpen, setMobileOpen } = useSidebar();
+  const { toggleSidebar, isMobileOpen, setMobileOpen } = useSidebar();
 
   const handleLogout = () => {
     logout();
@@ -50,7 +50,6 @@ const Navbar: React.FC = () => {
           <button 
             onClick={toggleSidebar}
             className="flex items-center justify-center w-10 h-10 text-slate-500 hover:text-slate-900 dark:text-white dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/10 rounded-lg transition-all cursor-pointer hover:scale-105 active:scale-95 group"
-            title={isCollapsed ? "Mở rộng sidebar" : "Thu gọn sidebar"}
           >
             <HiBars3 className="w-6 h-6 stroke-2" style={{ strokeWidth: "2" }} />
           </button>
@@ -94,7 +93,6 @@ const Navbar: React.FC = () => {
           <button
             onClick={toggleTheme}
             className="group/theme p-2.5 bg-white dark:bg-white/5 text-slate-500 dark:text-yellow-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all duration-300 focus:outline-none flex-shrink-0 border border-slate-200 dark:border-white/10 hover:scale-110 active:scale-95 cursor-pointer"
-            title={theme === 'dark' ? 'Chuyển sang chế độ sáng' : 'Chuyển sang chế độ tối'}
           >
             <div className="relative w-5 h-5">
               <div className={`absolute inset-0 transform transition-transform duration-500 ${theme === 'dark' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'}`}>
@@ -117,7 +115,6 @@ const Navbar: React.FC = () => {
           <Link 
             to="/create"
             className="p-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full hover:from-blue-500 hover:to-indigo-500 hover:shadow-blue-500/30 transition-all shadow-sm hover:shadow-md flex items-center justify-center"
-            title="Tạo bộ thẻ mới"
           >
             <HiPlus className="w-5 h-5" />
           </Link>
