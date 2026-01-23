@@ -7,6 +7,7 @@ import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Home from './pages/Home/Home';
 import Create from './pages/Create/Create';
+import CreateFolder from './pages/Folder/CreateFolder';
 import Study from './pages/Study/Study';
 import Profile from './pages/Profile/Profile';
 import Settings from './pages/Settings/Settings';
@@ -60,6 +61,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Home />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/create-folder"
+        element={
+          <ProtectedRoute>
+            <CreateFolder />
           </ProtectedRoute>
         }
       />

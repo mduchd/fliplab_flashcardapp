@@ -11,14 +11,13 @@ import {
   HiClock, 
   HiXMark,
   HiCamera,
-  HiArrowPath,
   HiCloudArrowUp,
-  HiFaceSmile,
   HiPlusCircle,
   HiCalendarDays,
   HiBolt,
   HiSparkles,
-  HiAcademicCap
+  HiAcademicCap,
+  HiArrowPath
 } from 'react-icons/hi2';
 import ActivityStats from '../../components/profile/ActivityStats';
 import { authService } from '../../services/authService';
@@ -32,14 +31,13 @@ const ANIMAL_AVATARS = [
   '🦆', '🐧', '🦉', '🦅', '🐺', '🦇', '🦋', '🐝'
 ];
 
-// Avatar Frames Definitions
-// Using ring for outer effects (visible outside element), border for inner edge
+// Avatar Frames Definitions - Reduced Glow/Shadow
 const AVATAR_FRAMES = [
   { id: 'none', name: 'Mặc định', class: 'ring-4 ring-white dark:ring-slate-700' },
-  { id: 'gold', name: 'Vàng kim', class: 'ring-[6px] ring-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.6)]' },
-  { id: 'neon', name: 'Neon', class: 'ring-[6px] ring-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.8)]' },
-  { id: 'fire', name: 'Lửa thiêng', class: 'ring-[6px] ring-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)]' },
-  { id: 'rose', name: 'Hồng phấn', class: 'ring-[6px] ring-pink-400 shadow-[0_0_20px_rgba(244,114,182,0.6)]' },
+  { id: 'gold', name: 'Vàng kim', class: 'ring-[4px] ring-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.3)]' },
+  { id: 'neon', name: 'Neon', class: 'ring-[4px] ring-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]' },
+  { id: 'fire', name: 'Lửa thiêng', class: 'ring-[4px] ring-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' },
+  { id: 'rose', name: 'Hồng phấn', class: 'ring-[4px] ring-pink-400 shadow-[0_0_10px_rgba(244,114,182,0.3)]' },
   { id: 'rainbow', name: 'Cầu vồng', class: 'rainbow-frame' }, 
   { id: 'cosmic', name: 'Vũ trụ', class: 'frame-cosmic' },
   { id: 'lightning', name: 'Sấm sét', class: 'frame-lightning' },
@@ -395,7 +393,6 @@ const Profile: React.FC = () => {
               )}
 
               {/* Big Numbers - Inline compact */}
-              {/* Big Numbers - Inline compact */}
               <div className="flex items-center justify-center gap-4 mb-3 text-center">
                 <div className="group cursor-pointer transition-transform hover:scale-110 duration-200">
                   <div className="text-xl font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{user?.totalCardsStudied || 0}</div>
@@ -413,29 +410,52 @@ const Profile: React.FC = () => {
                 </div>
               </div>
 
-              {/* Level & Badges - Compact */}
+              {/* Level & Badges - Compact & Optimized with Tooltips */}
               <div className="w-full px-2 mb-3">
                 <div className="flex justify-between items-center text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
                   <span className="text-indigo-700 dark:text-indigo-300">Lv.5 Học giả</span>
                   <span>340/500 XP</span>
                 </div>
-                <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-2">
+                <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
                   <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-[68%]" />
                 </div>
-                <div className="flex justify-center gap-1.5">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center cursor-help hover:scale-110 transition-transform shadow-sm" title="Streak Master">
-                    <HiFire className="w-4 h-4 text-white" />
+                
+                {/* Simplified Badges - Informative Tooltips */}
+                <div className="flex justify-center gap-2">
+                  <div className="group relative">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center cursor-help shadow-sm hover:scale-105 transition-transform">
+                      <HiFire className="w-4 h-4 text-white" />
+                    </div>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Streak 3 ngày liên tiếp
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                    </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center cursor-help hover:scale-110 transition-transform shadow-sm" title="Speed Learner">
-                    <HiBolt className="w-4 h-4 text-white" />
+
+                  <div className="group relative">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-cyan-500 flex items-center justify-center cursor-help shadow-sm hover:scale-105 transition-transform">
+                      <HiBolt className="w-4 h-4 text-white" />
+                    </div>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Học 50 thẻ/tuần
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                    </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center cursor-help hover:scale-110 transition-transform shadow-sm" title="Scholar">
-                    <HiAcademicCap className="w-4 h-4 text-white" />
+
+                  <div className="group relative">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-400 to-pink-500 flex items-center justify-center cursor-help shadow-sm hover:scale-105 transition-transform">
+                      <HiAcademicCap className="w-4 h-4 text-white" />
+                    </div>
+                    {/* Tooltip */}
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-[10px] rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-lg">
+                      Thuộc trọn bộ 1000 từ
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-slate-800"></div>
+                    </div>
                   </div>
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center cursor-help hover:scale-110 transition-transform shadow-sm" title="Early Bird">
-                    <HiSparkles className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] font-bold text-slate-500 cursor-pointer hover:bg-slate-300 transition-colors">
+
+                  <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center text-[10px] font-bold text-slate-500 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors" title="Xem thêm 2 huy hiệu khác">
                     +2
                   </div>
                 </div>
@@ -458,7 +478,7 @@ const Profile: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Activity Stats */}
+            {/* Right Column: Activity Stats - Improved with Bar Chart */}
             <div className="lg:col-span-6 h-full">
               {/* Pass activityData when user has studied cards */}
               <ActivityStats 
@@ -798,47 +818,42 @@ const Profile: React.FC = () => {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline"
                   >
-                    <HiCamera className="w-3.5 h-3.5" />
                     Tải ảnh lên
                   </button>
-                  <span className="text-slate-300 dark:text-slate-600">|</span>
+                  <span className="text-slate-300">|</span>
                   <button 
-                    onClick={() => setShowAvatarPresets(!showAvatarPresets)}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 cursor-pointer"
+                    onClick={() => {
+                        setShowAvatarPresets(!showAvatarPresets);
+                        setShowFrameSelector(false);
+                    }}
+                    className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline"
                   >
-                    <HiFaceSmile className="w-3.5 h-3.5" />
-                    Chọn động vật
+                    Chọn Emoji
+                  </button>
+                  <span className="text-slate-300">|</span>
+                  <button 
+                    onClick={() => {
+                        setShowFrameSelector(!showFrameSelector);
+                        setShowAvatarPresets(false);
+                    }}
+                    className="text-sm text-purple-600 dark:text-purple-400 font-medium hover:underline"
+                  >
+                    Khung hình
                   </button>
                 </div>
 
-                {editAvatar && (
-                  <button 
-                    onClick={() => setEditAvatar(undefined)}
-                    className="mt-2 text-xs text-red-500 hover:underline cursor-pointer"
-                  >
-                    Xóa ảnh
-                  </button>
-                )}
-
-                {/* Animal Presets Grid */}
+                {/* Avatar Presets */}
                 {showAvatarPresets && (
-                  <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg w-full">
-                    <p className="text-xs font-medium text-slate-600 dark:text-slate-300 mb-3 flex items-center gap-1">
-                      <HiFaceSmile className="w-3 h-3" />
-                      Chọn avatar động vật ngộ nghĩnh:
-                    </p>
-                    <div className="grid grid-cols-8 gap-2 justify-items-center">
-                      {ANIMAL_AVATARS.map((emoji, idx) => (
+                  <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg w-full">
+                    <p className="text-xs font-semibold text-slate-500 mb-2">Chọn Emoji đại diện:</p>
+                    <div className="grid grid-cols-8 gap-2">
+                      {ANIMAL_AVATARS.map((emoji) => (
                         <button
-                          key={idx}
+                          key={emoji}
                           onClick={() => selectPresetAvatar(emoji)}
-                          className={`w-10 h-10 text-xl flex items-center justify-center rounded-lg transition-all cursor-pointer ${
-                            editAvatar === emoji 
-                              ? 'bg-blue-500 scale-110 shadow-lg' 
-                              : 'bg-white dark:bg-slate-600 hover:bg-slate-100 dark:hover:bg-slate-500 hover:scale-105'
-                          }`}
+                          className="w-8 h-8 flex items-center justify-center text-xl hover:bg-white dark:hover:bg-slate-600 rounded transition-colors"
                         >
                           {emoji}
                         </button>
@@ -846,95 +861,86 @@ const Profile: React.FC = () => {
                     </div>
                   </div>
                 )}
-                
-                {/* Frame Selector Button and Grid */}
-                <div className="mt-4 w-full border-t border-slate-100 dark:border-slate-700/50 pt-4"> 
-                   <button 
-                      onClick={() => setShowFrameSelector(!showFrameSelector)}
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center justify-center gap-1 w-full font-medium mb-3 cursor-pointer"
-                   >
-                     <HiSparkles className="w-4 h-4" />
-                     {showFrameSelector ? 'Thu gọn khung viền' : 'Chọn khung viền avatar'}
-                   </button>
-                   
-                   {showFrameSelector && (
-                      <div className="p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg w-full animate-in slide-in-from-top-2">
-                         <div className="grid grid-cols-3 gap-4">
-                            {AVATAR_FRAMES.map((frame) => (
-                               <div 
-                                  key={frame.id}
-                                  onClick={() => setEditAvatarFrame(frame.id)}
-                                  className={`flex flex-col items-center gap-2 cursor-pointer p-3 rounded-lg transition-all border ${editAvatarFrame === frame.id ? 'bg-white dark:bg-slate-600 border-blue-500 shadow-md ring-1 ring-blue-500' : 'border-transparent hover:bg-slate-200 dark:hover:bg-slate-600'}`}
-                               >
-                                  {/* Fixed size container for consistent preview */}
-                                  <div className="w-16 h-16 flex items-center justify-center overflow-visible">
-                                     <div className="scale-[0.55] origin-center pointer-events-none">
-                                        {renderAvatar(editAvatar || user?.avatar, editDisplayName || user?.displayName, 'lg', frame.id)}
-                                     </div>
-                                  </div>
-                                  <span className="text-xs font-medium text-slate-700 dark:text-slate-300">{frame.name}</span>
-                               </div>
-                            ))}
-                         </div>
-                      </div>
-                   )}
+
+                 {/* Frame Selector */}
+                 {showFrameSelector && (
+                  <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg w-full">
+                    <p className="text-xs font-semibold text-slate-500 mb-2">Chọn khung hình:</p>
+                    <div className="grid grid-cols-4 gap-3">
+                      {AVATAR_FRAMES.map((frame) => (
+                        <button
+                          key={frame.id}
+                          onClick={() => {
+                            setEditAvatarFrame(frame.id);
+                            setShowFrameSelector(false);
+                          }}
+                          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${editAvatarFrame === frame.id ? 'bg-blue-100 dark:bg-blue-900/30 ring-1 ring-blue-500' : 'hover:bg-white dark:hover:bg-slate-600'}`}
+                        >
+                          <div className={`w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 ${frame.class}`}></div>
+                          <span className="text-[10px] text-slate-600 dark:text-slate-300 truncate w-full text-center">{frame.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Form Fields */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Tên hiển thị <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={editDisplayName}
+                    onChange={(e) => setEditDisplayName(e.target.value)}
+                    className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:text-white"
+                    placeholder="Nhập tên hiển thị của bạn"
+                    maxLength={50}
+                  />
                 </div>
-              </div>
 
-              {/* Display Name Input */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Tên hiển thị
-                </label>
-                <input 
-                  type="text"
-                  value={editDisplayName}
-                  onChange={(e) => setEditDisplayName(e.target.value)}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
-                  placeholder="Nhập tên hiển thị"
-                />
-              </div>
-
-              {/* Bio Input */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-                  Mô tả ngắn
-                  <span className="text-xs text-slate-400 ml-2">
-                    ({editBio.length}/150)
-                  </span>
-                </label>
-                <textarea 
-                  value={editBio}
-                  onChange={(e) => setEditBio(e.target.value)}
-                  maxLength={150}
-                  rows={3}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white resize-none"
-                  placeholder="Viết vài dòng về bản thân bạn..."
-                />
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Giới thiệu bản thân
+                  </label>
+                  <textarea
+                    value={editBio}
+                    onChange={(e) => setEditBio(e.target.value)}
+                    className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all dark:text-white min-h-[100px] resize-none"
+                    placeholder="Chia sẻ đôi điều về bạn..."
+                    maxLength={150}
+                  />
+                  <div className="text-right text-xs text-slate-400 mt-1">
+                    {editBio.length}/150
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="flex gap-3 p-6 border-t border-slate-100 dark:border-slate-700 sticky bottom-0 bg-white dark:bg-slate-800">
-              <button 
+            <div className="p-6 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 sticky bottom-0 rounded-b-lg">
+              <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                className="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                disabled={isSaving}
               >
                 Hủy
               </button>
-              <button 
+              <button
                 onClick={handleSaveProfile}
                 disabled={isSaving}
-                className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-blue-500/30 transition-all"
               >
                 {isSaving ? (
                   <>
-                    <HiArrowPath className="w-[18px] h-[18px] animate-spin" />
+                    <HiArrowPath className="w-4 h-4 animate-spin" />
                     Đang lưu...
                   </>
                 ) : (
                   <>
-                    <HiCloudArrowUp className="w-[18px] h-[18px]" />
+                    <HiCloudArrowUp className="w-4 h-4" />
                     Lưu thay đổi
                   </>
                 )}

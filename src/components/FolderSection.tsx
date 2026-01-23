@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   HiFolderOpen, 
   HiFolderPlus, 
@@ -126,8 +127,6 @@ interface FolderSectionProps {
   selectedFolderId?: string | null;
   // New props for external control
   hideHeader?: boolean;
-  isCreateModalOpen?: boolean;
-  onCreateModalClose?: () => void;
 }
 
 const FolderSection: React.FC<FolderSectionProps> = ({
@@ -138,11 +137,9 @@ const FolderSection: React.FC<FolderSectionProps> = ({
   onFolderClick,
   selectedFolderId,
   hideHeader = false,
-  isCreateModalOpen,
-  onCreateModalClose,
 }) => {
+  const navigate = useNavigate();
   const toast = useToastContext();
-  const [internalIsModalOpen, setInternalIsModalOpen] = useState(false);
   const [editingFolder, setEditingFolder] = useState<Folder | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -152,32 +149,17 @@ const FolderSection: React.FC<FolderSectionProps> = ({
     folder: Folder | null;
   }>({ isOpen: false, folder: null });
   
-  // Resolve modal state (controlled vs uncontrolled)
-  const isModalOpen = isCreateModalOpen !== undefined ? isCreateModalOpen : internalIsModalOpen;
-  const setIsModalOpen = (isOpen: boolean) => {
-    if (onCreateModalClose && !isOpen) {
-      onCreateModalClose();
-    }
-    setInternalIsModalOpen(isOpen);
-  };
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Form state
   const [formName, setFormName] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formColor, setFormColor] = useState('blue');
-  const [formIcon, setFormIcon] = useState('📁');
+  const [formIcon, setFormIcon] = useState('folder');
 
   const getColorClass = (colorId: string) => {
     return FOLDER_COLORS.find(c => c.id === colorId)?.class || 'bg-blue-500';
-  };
-
-  const openCreateModal = () => {
-    setEditingFolder(null);
-    setFormName('');
-    setFormDescription('');
-    setFormColor('blue');
-    setFormIcon('folder');
-    setIsModalOpen(true);
   };
 
   const openEditModal = (e: React.MouseEvent, folder: Folder) => {
@@ -187,58 +169,28 @@ const FolderSection: React.FC<FolderSectionProps> = ({
     setFormDescription(folder.description || '');
     setFormColor(folder.color || 'blue');
     setFormIcon(folder.icon || 'folder');
-    // Force open modal internally even if controlled for create
-    // Ideally we should separate Create and Edit modals or managing state better
-    // For now, let's assume Edit is always internal
     setIsModalOpen(true); 
   };
   
-  // ... Handle Submit needs update to differentiate create/edit logic if needed
-  // ... But since we use same modal, we just need to ensure correct state opens it.
-  
-  // NOTE: openEditModal sets editingFolder != null. 
-  // If controlled isCreateModalOpen is used for "Create", we need to handle "Edit" properly.
-  // The simplest way is to make the modal control completely external or separate Edit.
-  // Let's keep it simple: if external prop is used, it only controls CREATE. Edit uses internal state?
-  // Actually, mixing controlled/uncontrolled is tricky.
-  // Let's just make Home control everything or use Ref.
-  
-  // Plan B: Expose a ref to open modal.
-  // Plan C (Selected): Just accept `isCreateModalOpen` which forces modal open in Create mode.
-  
-  React.useEffect(() => {
-    if (isCreateModalOpen) {
-       openCreateModal();
-    }
-  }, [isCreateModalOpen]);
-
   const handleSubmit = async () => {
     if (!formName.trim()) {
       toast.error('Vui lòng nhập tên thư mục');
       return;
     }
 
+    if (!editingFolder) return;
+
     setIsSubmitting(true);
     try {
-      if (editingFolder) {
-        const response = await folderService.updateFolder(editingFolder._id, {
-          name: formName.trim(),
-          description: formDescription.trim(),
-          color: formColor,
-          icon: formIcon,
-        });
-        onFolderUpdated(response.data.folder);
-        toast.success('Đã cập nhật thư mục');
-      } else {
-        const response = await folderService.createFolder({
-          name: formName.trim(),
-          description: formDescription.trim(),
-          color: formColor,
-          icon: formIcon,
-        });
-        onFolderCreated(response.data.folder);
-        toast.success('Đã tạo thư mục mới');
-      }
+      const response = await folderService.updateFolder(editingFolder._id, {
+        name: formName.trim(),
+        description: formDescription.trim(),
+        color: formColor,
+        icon: formIcon,
+      });
+      onFolderUpdated(response.data.folder);
+      toast.success('Đã cập nhật thư mục');
+      
       setIsModalOpen(false);
     } catch (error: any) {
       toast.error(error.message || 'Lỗi khi lưu thư mục');
@@ -314,7 +266,7 @@ const FolderSection: React.FC<FolderSectionProps> = ({
             </h2>
             <div className="h-4 w-px bg-slate-300 dark:bg-slate-600"></div>
             <button
-              onClick={openCreateModal}
+              onClick={() => navigate('/create-folder')}
               className="flex items-center gap-1.5 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors cursor-pointer"
             >
               <HiFolderPlus className="w-4 h-4" />
@@ -392,7 +344,7 @@ const FolderSection: React.FC<FolderSectionProps> = ({
             {/* Modal Header */}
             <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-700">
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                {editingFolder ? 'Chỉnh sửa thư mục' : 'Tạo thư mục mới'}
+                Chỉnh sửa thư mục
               </h2>
               <button 
                 onClick={() => setIsModalOpen(false)}
@@ -500,10 +452,8 @@ const FolderSection: React.FC<FolderSectionProps> = ({
                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Đang lưu...
                   </>
-                ) : editingFolder ? (
-                  'Cập nhật'
                 ) : (
-                  'Tạo thư mục'
+                  'Cập nhật'
                 )}
               </button>
             </div>

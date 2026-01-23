@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { HiArrowTrendingUp, HiBookOpen, HiChartBar, HiTrophy, HiFire, HiAcademicCap } from 'react-icons/hi2';
+import { HiArrowTrendingUp, HiBookOpen, HiChartBar, HiTrophy, HiFire, HiAcademicCap, HiSparkles } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
 interface ActivityStatsProps {
@@ -40,7 +40,8 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
         day: days[dayIndex],
         count,
         height: Math.max(10, Math.min(100, (count / 40) * 100)),
-        isPeak: count > 25
+        isPeak: count > 25,
+        isToday: i === 6
       });
     }
 
@@ -67,7 +68,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
 
   return (
     <div className="flex flex-col gap-3 h-full">
-      {/* Weekly Chart */}
+      {/* Weekly Chart - Simple 7 Columns */}
       <div className="bg-white dark:bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-slate-200 dark:border-white/10 shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2 text-base">
@@ -77,40 +78,35 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
             Hoạt động tuần qua
           </h3>
           {hasRealData && avgPerDay > 0 && (
-            <span className="text-xs font-bold px-2 py-1 bg-slate-100 dark:bg-slate-700 rounded-full text-slate-600 dark:text-slate-300">
+            <span className="text-xs font-bold px-2 py-1 bg-slate-100 dark:bg-slate-700/50 rounded-full text-slate-600 dark:text-slate-300">
               ~{avgPerDay} thẻ/ngày
             </span>
           )}
         </div>
 
         {!hasRealData ? <EmptyState /> : (
-          <div className="flex items-end justify-between h-24 gap-2 mt-3 px-1">
+          <div className="flex items-end justify-between h-32 gap-3 mt-4 px-2 pb-2">
             {weeklyData.map((d, i) => (
-              <div key={i} className="flex flex-col items-center flex-1 group relative">
-                {/* Data Point Dot */}
-                <div 
-                  className={`w-2 h-2 rounded-full mb-1 transition-all duration-300 ${d.isPeak ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]' : 'bg-slate-300 dark:bg-slate-600'} group-hover:scale-125`}
-                  style={{ marginBottom: `${d.height/15}px` }} 
-                />
-                
-                {/* Bar with Gradient */}
-                <div className="relative w-full flex justify-center h-full items-end">
-                   <div 
-                    className={`w-full max-w-[12px] md:max-w-[20px] rounded-t-sm transition-all duration-500 ease-out group-hover:opacity-90 ${
-                      d.isPeak 
-                      ? 'bg-gradient-to-t from-indigo-600 to-blue-400' 
-                      : 'bg-gradient-to-t from-slate-300 to-slate-200 dark:from-slate-700 dark:to-slate-600'
-                    }`}
-                    style={{ height: `${d.height}%` }}
-                   ></div>
-                </div>
-
+              <div key={i} className="flex flex-col items-center flex-1 group h-full justify-end">
                 {/* Tooltip */}
-                <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none transition-all z-20 font-bold whitespace-nowrap transform translate-y-2 group-hover:translate-y-0">
+                <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-slate-800 text-white text-[10px] px-2 py-1 rounded shadow-lg pointer-events-none transition-all z-20 font-bold whitespace-nowrap mb-1">
                   {d.count} thẻ
                 </div>
 
-                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 mt-2 uppercase tracking-wide">{d.day}</span>
+                {/* Simple Bar */}
+                <div 
+                  className={`w-full max-w-[16px] rounded-t-sm transition-all duration-300 ${
+                    d.isToday 
+                      ? 'bg-blue-500 dark:bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]' 
+                      : 'bg-slate-200 dark:bg-slate-700 hover:bg-blue-300 dark:hover:bg-blue-600/50'
+                  }`}
+                  style={{ height: `${d.height}%` }}
+                ></div>
+
+                {/* Day Label */}
+                <span className={`text-[10px] font-bold mt-2 uppercase tracking-wide ${d.isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}>
+                  {d.day}
+                </span>
               </div>
             ))}
           </div>
@@ -167,18 +163,32 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
           </div>
         </div>
 
-        {/* Level Progress with Particle Effect */}
-        <div className="bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 relative overflow-hidden mt-auto">
-          <div className="flex justify-between items-center mb-2 relative z-10">
-            <span className="text-sm font-bold text-slate-800 dark:text-white">Cấp độ hiện tại: <span className="text-indigo-700 dark:text-indigo-300">Học giả Lv.5</span></span>
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-700 px-2 py-0.5 rounded-full border border-slate-100 dark:border-slate-600 shadow-sm">340/500 XP</span>
+        {/* REPLACED: Level Progress -> Informative Text Stats */}
+        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 mt-auto">
+          <div className="flex items-center justify-between mb-2">
+             <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tiến độ cấp độ</span>
+             </div>
+             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Lv.5 Học giả</span>
           </div>
           
-          <div className="h-2 w-full bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden relative">
-            <div className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 w-[68%] relative">
-               {/* Shimmer Effect */}
-               <div className="absolute top-0 left-0 bottom-0 right-0 bg-gradient-to-r from-transparent via-white/30 to-transparent w-full -translate-x-full animate-[shimmer_2s_infinite]"></div>
-            </div>
+          <div className="flex items-center gap-4">
+             <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                  <HiSparkles className="w-5 h-5" />
+                </div>
+                <div>
+                   <div className="text-xs text-slate-500 dark:text-slate-400">Gần đạt cấp mới</div>
+                   <div className="text-sm font-bold text-slate-800 dark:text-white">Còn <span className="text-indigo-600 dark:text-indigo-400">160 XP</span></div>
+                </div>
+             </div>
+             
+             <div className="w-px h-8 bg-slate-200 dark:bg-slate-700"></div>
+             
+             <div className="flex flex-col">
+                <div className="text-[10px] font-bold text-green-600 dark:text-green-400">+45 XP hôm nay</div>
+                <div className="text-[10px] font-bold text-blue-600 dark:text-blue-400">+320 XP tuần này</div>
+             </div>
           </div>
         </div>
       </div>

@@ -196,7 +196,7 @@ const Sidebar: React.FC = () => {
           {/* Create Folder Button */}
           <button
             onClick={() => {
-              navigate('/?tab=folders&create=true');
+              navigate('/create-folder');
               setMobileOpen(false);
             }}
             className={

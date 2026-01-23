@@ -28,7 +28,7 @@ const Home: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'sets' | 'folders'>('sets');
-  const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
+
   const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
   const [folders, setFolders] = useState<Folder[]>([]);
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
@@ -92,20 +92,12 @@ const Home: React.FC = () => {
     loadData();
   }, []);
 
-  // Listen for URL params to switch tabs or open modals
+  // Listen for URL params to switch tabs
   useEffect(() => {
     const tab = searchParams.get('tab');
-    const create = searchParams.get('create');
 
     if (tab === 'folders') {
       setActiveTab('folders');
-      if (create === 'true') {
-        setIsCreateFolderModalOpen(true);
-        // Clean URL after opening modal
-        const newParams = new URLSearchParams(searchParams);
-        newParams.delete('create');
-        setSearchParams(newParams, { replace: true });
-      }
     } else if (tab === 'sets') {
       setActiveTab('sets');
     }
@@ -338,7 +330,7 @@ const Home: React.FC = () => {
             </Link>
           ) : (
             <button
-              onClick={() => setIsCreateFolderModalOpen(true)}
+              onClick={() => navigate('/create-folder')}
               className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium hover:-translate-y-0.5 transition-all cursor-pointer"
             >
               <HiFolder className="w-5 h-5" />
@@ -358,8 +350,7 @@ const Home: React.FC = () => {
           onFolderClick={handleFolderClick}
           selectedFolderId={selectedFolderId}
           hideHeader={true}
-          isCreateModalOpen={isCreateFolderModalOpen}
-          onCreateModalClose={() => setIsCreateFolderModalOpen(false)}
+
         />
       ) : (
         <>
