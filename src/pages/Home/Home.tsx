@@ -305,7 +305,7 @@ const Home: React.FC = () => {
           <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg inline-flex">
             <button
               onClick={() => setActiveTab('sets')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
                 activeTab === 'sets'
                   ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
@@ -315,7 +315,7 @@ const Home: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('folders')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all cursor-pointer ${
                 activeTab === 'folders'
                   ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
                   : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
@@ -331,7 +331,7 @@ const Home: React.FC = () => {
           {activeTab === 'sets' ? (
             <Link
               to="/create"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium shadow-lg shadow-blue-500/25 hover:-translate-y-0.5 transition-all"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium hover:-translate-y-0.5 transition-all"
             >
               <HiPlus className="w-5 h-5" />
               <span>Tạo bộ thẻ mới</span>
@@ -339,7 +339,7 @@ const Home: React.FC = () => {
           ) : (
             <button
               onClick={() => setIsCreateFolderModalOpen(true)}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium shadow-lg shadow-blue-500/25 hover:-translate-y-0.5 transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium hover:-translate-y-0.5 transition-all cursor-pointer"
             >
               <HiFolder className="w-5 h-5" />
               <span>Tạo thư mục mới</span>
@@ -523,7 +523,7 @@ const Home: React.FC = () => {
                     <Link
                       to={`/study/${set._id}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 py-2.5 bg-blue-600 text-white text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all z-20"
+                      className="flex-1 py-2.5 bg-blue-600 text-white text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 hover:-translate-y-0.5 active:translate-y-0 transition-all z-20"
                     >
                       <HiAcademicCap className="w-4 h-4" />
                       Học ngay

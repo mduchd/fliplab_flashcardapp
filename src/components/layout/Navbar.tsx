@@ -99,7 +99,7 @@ const Navbar: React.FC = () => {
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-            className="group/theme p-2.5 bg-white dark:bg-white/5 text-slate-500 dark:text-yellow-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-all duration-300 focus:outline-none flex-shrink-0 border border-slate-200 dark:border-white/10 hover:scale-110 active:scale-95 cursor-pointer"
+            className="group/theme p-2.5 bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-blue-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-300 rounded-full transition-all duration-200 focus:outline-none flex-shrink-0 border border-slate-200 dark:border-slate-700 active:scale-95 cursor-pointer"
           >
             <div className="relative w-5 h-5">
               <div className={`absolute inset-0 transform transition-transform duration-500 ${theme === 'dark' ? 'rotate-0 opacity-100' : 'rotate-90 opacity-0'}`}>

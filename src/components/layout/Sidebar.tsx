@@ -241,11 +241,9 @@ const Sidebar: React.FC = () => {
               relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 
                 ? `w-10 h-10 mx-auto rounded-lg flex items-center justify-center bg-white dark:bg-slate-800 border shadow-sm ${studiedToday ? 'border-amber-100 dark:border-amber-900/30' : 'border-slate-200 dark:border-slate-700'}`
-               : `bg-white dark:bg-slate-800 rounded-lg p-3 border shadow-sm hover:-translate-y-0.5 ${studiedToday ? 'border-slate-200 dark:border-slate-700' : 'border-slate-200 dark:border-slate-700'}`}
+               : `bg-white dark:bg-slate-800 rounded-lg p-3 border shadow-sm hover:bg-slate-50 dark:hover:bg-white/[0.03] ${studiedToday ? 'border-slate-200 dark:border-slate-700' : 'border-slate-200 dark:border-slate-700'}`}
             `}
           >
-            {!isCollapsed && studiedToday && <div className="absolute top-0 right-0 w-12 h-12 bg-amber-500/10 dark:bg-amber-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-amber-500/20 duration-500"></div>}
-
             {isCollapsed ? (
               <HiFire className={`w-5 h-5 transition-transform group-hover:scale-110 ${studiedToday ? 'text-amber-500' : 'text-slate-400'}`} />
             ) : (
@@ -276,11 +274,9 @@ const Sidebar: React.FC = () => {
               relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 
                 ? 'w-10 h-10 mx-auto rounded-lg flex items-center justify-center bg-white dark:bg-slate-800 border border-blue-100 dark:border-blue-900/30 shadow-sm' 
-                : 'bg-white dark:bg-slate-800 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:-translate-y-0.5'}
+                : 'bg-white dark:bg-slate-800 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:bg-slate-50 dark:hover:bg-white/[0.03]'}
             `}
           >
-            {!isCollapsed && <div className="absolute top-0 right-0 w-12 h-12 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-blue-500/20 duration-500"></div>}
-
             {isCollapsed ? (
               <HiFlag className={`w-5 h-5 transition-transform group-hover:scale-110 ${goalCompleted ? 'text-green-500' : 'text-blue-500'}`} />
             ) : (
