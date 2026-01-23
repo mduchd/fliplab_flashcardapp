@@ -36,11 +36,16 @@ const ANIMAL_AVATARS = [
 // Using ring for outer effects (visible outside element), border for inner edge
 const AVATAR_FRAMES = [
   { id: 'none', name: 'Mặc định', class: 'ring-4 ring-white dark:ring-slate-700' },
-  { id: 'gold', name: 'Vàng kim', class: 'ring-4 ring-yellow-400 shadow-lg shadow-yellow-400/40' },
-  { id: 'neon', name: 'Neon', class: 'ring-4 ring-cyan-400 shadow-[0_0_25px_rgba(34,211,238,0.7)]' },
-  { id: 'rose', name: 'Hồng phấn', class: 'ring-4 ring-pink-400 shadow-lg shadow-pink-400/40' },
-  { id: 'fire', name: 'Lửa thiêng', class: 'ring-4 ring-orange-500 shadow-[0_0_25px_rgba(249,115,22,0.7)]' },
-  { id: 'rainbow', name: 'Cầu vồng', class: 'rainbow-frame' }, // Special CSS class
+  { id: 'gold', name: 'Vàng kim', class: 'ring-[6px] ring-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.6)]' },
+  { id: 'neon', name: 'Neon', class: 'ring-[6px] ring-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.8)]' },
+  { id: 'fire', name: 'Lửa thiêng', class: 'ring-[6px] ring-orange-500 shadow-[0_0_30px_rgba(249,115,22,0.8)]' },
+  { id: 'rose', name: 'Hồng phấn', class: 'ring-[6px] ring-pink-400 shadow-[0_0_20px_rgba(244,114,182,0.6)]' },
+  { id: 'rainbow', name: 'Cầu vồng', class: 'rainbow-frame' }, 
+  { id: 'cosmic', name: 'Vũ trụ', class: 'frame-cosmic' },
+  { id: 'lightning', name: 'Sấm sét', class: 'frame-lightning' },
+  { id: 'mystic', name: 'Huyền bí', class: 'frame-mystic' },
+  { id: 'cyberpunk', name: 'Cyberpunk', class: 'frame-cyberpunk' },
+  { id: 'glitch', name: 'Glitch', class: 'frame-glitch' },
 ];
 
 const Profile: React.FC = () => {
@@ -328,10 +333,13 @@ const Profile: React.FC = () => {
       );
     };
 
-    // Special handling for rainbow gradient border
-    if (frameId === 'rainbow') {
+
+    // Special handling for frames that need inner background buffering (gradient borders)
+    const complexFrames = ['rainbow', 'cosmic'];
+    
+    if (complexFrames.includes(frameId)) {
       return (
-        <div className={`${sizeClasses} rounded-full rainbow-frame flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}>
+        <div className={`${sizeClasses} rounded-full ${frameConfig.class} flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}>
           <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900">
             {renderContent()}
           </div>
@@ -467,7 +475,7 @@ const Profile: React.FC = () => {
         {/* Action Cards Grid - Asymmetric Layout with Visual Hierarchy */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           {/* PRIMARY CARD: Thẻ cần học hôm nay - Modern Clean Design */}
-          <div className="col-span-2 relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-6 shadow-sm group hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300 cursor-pointer" onClick={() => recentDeck ? navigate(`/study/${recentDeck.id}`) : navigate('/')}>
+          <div className="col-span-2 relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-6 shadow-sm group hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => recentDeck ? navigate(`/study/${recentDeck.id}`) : navigate('/')}>
             {/* Subtle Gradient Glow Background */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 dark:bg-amber-500/5 blur-[50px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
             
@@ -531,7 +539,7 @@ const Profile: React.FC = () => {
           {/* SECONDARY CARDS - Bento Grid Style */}
           
           {/* Card 2: Bộ thẻ - Rich Content */}
-          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 group hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
+          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-lg p-5 group hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
              {/* Background Decoration - Moved to Top Right to avoid content overlap */}
             <div className="absolute -right-6 -top-6 opacity-5 dark:opacity-10 transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-500">
                <HiBookOpen className="w-32 h-32 text-slate-900 dark:text-indigo-400" />
@@ -567,7 +575,7 @@ const Profile: React.FC = () => {
           </div>
           
           {/* Card 3: Tổng thẻ đã thuộc - Visual Progress */}
-          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 group hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
+          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-lg p-5 group hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
              {/* Background Decoration - Moved to Top Right to avoid content overlap */}
              <div className="absolute -right-8 -top-8 opacity-5 dark:opacity-10 transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-500">
                <HiCheckCircle className="w-40 h-40 text-green-600 dark:text-green-500" />
@@ -609,7 +617,7 @@ const Profile: React.FC = () => {
         {/* Secondary Row: Giờ học + Streak - Better typography */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {/* Card 4: Giờ học - Mini Graph */}
-          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 group hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
+          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-lg p-5 group hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
             {/* Background Decoration - Moved to Top Right to avoid content overlap */}
             <div className="absolute -right-8 -top-6 opacity-5 dark:opacity-10 transform -rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-500">
                <HiClock className="w-40 h-40 text-blue-600 dark:text-blue-500" />
@@ -638,7 +646,7 @@ const Profile: React.FC = () => {
           </div>
           
           {/* Card 5: Streak - Visual Dots */}
-          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl p-5 group hover:shadow-xl hover:-translate-y-1 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
+          <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-lg p-5 group hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
             
             {/* Prominent Burning Fire Icon - Moved to empty space */}
             <div className="absolute right-2 top-8 md:right-6 md:top-1/2 md:-translate-y-1/2 group-hover:scale-110 transition-transform duration-500 z-0">
@@ -687,7 +695,7 @@ const Profile: React.FC = () => {
         </div>
 
         {/* Lịch sử 7 ngày - Check-in tracker */}
-        <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-xl p-6 mb-6 shadow-sm">
+        <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">

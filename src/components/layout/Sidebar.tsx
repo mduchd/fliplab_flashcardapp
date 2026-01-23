@@ -8,10 +8,10 @@ import {
   HiUser, 
   HiCog6Tooth, 
   HiBookOpen, 
-  HiClock,
   HiFire,
   HiFlag,
-  HiCheckBadge
+  HiCheckBadge,
+  HiFolderPlus
 } from 'react-icons/hi2';
 
 // Helper to check if two dates are the same day
@@ -121,7 +121,6 @@ const Sidebar: React.FC = () => {
   const links = [
     { to: '/', label: 'Trang chủ', icon: HiHome },
     { to: '/create', label: 'Tạo bộ thẻ', icon: HiPlusCircle },
-    { to: '/profile', label: 'Hồ sơ', icon: HiUser },
   ];
 
   const handleLibraryClick = (action: 'library' | 'recent' | 'settings') => {
@@ -193,6 +192,44 @@ const Sidebar: React.FC = () => {
               {!isCollapsed && <span>{link.label}</span>}
             </NavLink>
           ))}
+
+          {/* Create Folder Button */}
+          <button
+            onClick={() => {
+              navigate('/?tab=folders&create=true');
+              setMobileOpen(false);
+            }}
+            className={
+              isCollapsed
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer`
+                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 w-full text-left cursor-pointer`
+            }
+          >
+            <HiFolderPlus className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Tạo thư mục</span>}
+          </button>
+
+          {/* Profile Link */}
+          <NavLink
+            to="/profile"
+            onClick={() => setMobileOpen(false)}
+            className={({ isActive }) =>
+              isCollapsed
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+            }
+          >
+            <HiUser className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Hồ sơ</span>}
+          </NavLink>
         </div>
 
         {/* Unified Widgets Section - Modern Clean Design */}
@@ -203,8 +240,8 @@ const Sidebar: React.FC = () => {
             className={`
               relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 
-                ? `w-10 h-10 mx-auto rounded-xl flex items-center justify-center bg-white dark:bg-slate-800 border shadow-sm hover:shadow-md ${studiedToday ? 'border-amber-100 dark:border-amber-900/30 hover:border-amber-300' : 'border-slate-200 dark:border-slate-700'}`
-               : `bg-white dark:bg-slate-800 rounded-xl p-3 border shadow-sm hover:shadow-lg hover:-translate-y-0.5 ${studiedToday ? 'border-slate-200 dark:border-slate-700 hover:shadow-amber-500/10 hover:border-amber-200 dark:hover:border-amber-700/50' : 'border-slate-200 dark:border-slate-700'}`}
+                ? `w-10 h-10 mx-auto rounded-lg flex items-center justify-center bg-white dark:bg-slate-800 border shadow-sm ${studiedToday ? 'border-amber-100 dark:border-amber-900/30' : 'border-slate-200 dark:border-slate-700'}`
+               : `bg-white dark:bg-slate-800 rounded-lg p-3 border shadow-sm hover:-translate-y-0.5 ${studiedToday ? 'border-slate-200 dark:border-slate-700' : 'border-slate-200 dark:border-slate-700'}`}
             `}
           >
             {!isCollapsed && studiedToday && <div className="absolute top-0 right-0 w-12 h-12 bg-amber-500/10 dark:bg-amber-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-amber-500/20 duration-500"></div>}
@@ -238,8 +275,8 @@ const Sidebar: React.FC = () => {
             className={`
               relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 
-                ? 'w-10 h-10 mx-auto rounded-xl flex items-center justify-center bg-white dark:bg-slate-800 border border-blue-100 dark:border-blue-900/30 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-500/50' 
-                : 'bg-white dark:bg-slate-800 rounded-xl p-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-200 dark:hover:border-blue-700/50 hover:-translate-y-0.5'}
+                ? 'w-10 h-10 mx-auto rounded-lg flex items-center justify-center bg-white dark:bg-slate-800 border border-blue-100 dark:border-blue-900/30 shadow-sm' 
+                : 'bg-white dark:bg-slate-800 rounded-lg p-3 border border-slate-200 dark:border-slate-700 shadow-sm hover:-translate-y-0.5'}
             `}
           >
             {!isCollapsed && <div className="absolute top-0 right-0 w-12 h-12 bg-blue-500/10 dark:bg-blue-500/5 rounded-full blur-xl -mr-2 -mt-2 pointer-events-none transition-all group-hover:bg-blue-500/20 duration-500"></div>}
@@ -303,25 +340,7 @@ const Sidebar: React.FC = () => {
             <HiBookOpen className="w-6 h-6 flex-shrink-0" />
             {!isCollapsed && <span>Thư viện của tôi</span>}
           </button>
-          <button
-            onClick={() => { handleLibraryClick('recent'); setMobileOpen(false); }}
-            className={
-              isCollapsed
-                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
-                    location.search.includes('filter=recent')
-                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-                  }`
-                : `w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium text-left cursor-pointer ${
-                    location.search.includes('filter=recent')
-                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-500 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-                  }`
-            }
-          >
-            <HiClock className="w-6 h-6 flex-shrink-0" />
-            {!isCollapsed && <span>Đã học gần đây</span>}
-          </button>
+
           <button
             onClick={() => { handleLibraryClick('settings'); setMobileOpen(false); }}
             className={

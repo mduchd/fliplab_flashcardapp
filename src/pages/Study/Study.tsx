@@ -429,7 +429,7 @@ const Study: React.FC = () => {
     return (
       <MainLayout>
         <div className="max-w-2xl mx-auto text-center py-12">
-          <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-3xl p-12 shadow-sm">
+          <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-xl p-12 shadow-sm">
             <div className="flex justify-center mb-6">
               <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-lg shadow-orange-500/20">
                 <Trophy className="text-white" size={48} />
@@ -657,14 +657,14 @@ const Study: React.FC = () => {
                </div>
 
                {!isMatchStarted && !isMatchPlaying ? (
-                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl">
+                 <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-xl">
                     <div className="text-center">
                         <Puzzle size={60} className="mx-auto text-blue-600 mb-4 animate-bounce" />
                         <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Sẵn sàng chưa?</h3>
                         <p className="text-slate-600 dark:text-slate-300 mb-6">Ghép các thẻ tương ứng với nhau trong thời gian ngắn nhất!</p>
                         <button 
                           onClick={startMatchGame}
-                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold rounded-2xl shadow-xl hover:scale-105 transition-transform cursor-pointer active:scale-95 active:shadow-md"
+                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold rounded-xl shadow-xl hover:scale-105 transition-transform cursor-pointer active:scale-95 active:shadow-md"
                         >
                           Bắt đầu ngay
                         </button>
@@ -709,7 +709,7 @@ const Study: React.FC = () => {
                </div>
                
                {!isMatchPlaying && isMatchStarted === false && matchedPairs.size > 0 && (
-                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-2xl animate-in fade-in">
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-xl animate-in fade-in">
                       <h3 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4 animate-bounce">Xuất sắc!</h3>
                       <p className="text-xl text-slate-600 dark:text-slate-300 font-medium mb-8">Thời gian: <span className="text-blue-600 dark:text-blue-400 font-bold text-2xl">{matchTime.toFixed(1)}s</span></p>
                       <button onClick={startMatchGame} className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-500 transition-colors inline-flex items-center gap-2 shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transform cursor-pointer active:translate-y-0">
@@ -724,7 +724,7 @@ const Study: React.FC = () => {
           ) : (
             <div key={`quiz-${studyMode}-${currentIndex}`} className={`flex flex-col gap-6 ${slideDirection === 'right' ? 'slide-in-from-right-mode' : 'slide-in-from-left-mode'} ${isShaking ? 'shake-animation' : ''}`}>
                {/* Question */}
-               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-8 text-center shadow-sm min-h-[200px] flex flex-col items-center justify-center">
+               <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-8 text-center shadow-sm min-h-[200px] flex flex-col items-center justify-center">
                   <span className="block text-blue-600 dark:text-blue-400 text-sm font-semibold mb-4 uppercase tracking-wide">Chọn định nghĩa đúng cho:</span>
                   
                   {currentCard?.image && (

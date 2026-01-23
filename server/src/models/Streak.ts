@@ -1,7 +1,6 @@
 import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface IStreak extends Document {
-  _id: string;
   userId: Types.ObjectId;
   currentStreak: number;
   longestStreak: number;

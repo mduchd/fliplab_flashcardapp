@@ -247,7 +247,7 @@ const Settings: React.FC = () => {
       <div className="space-y-6 max-w-4xl mx-auto">
         
         {/* Learning Goals */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <Target size={18} className="text-blue-500" />
@@ -306,7 +306,7 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Appearance */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <Palette size={18} className="text-blue-500" />
@@ -339,7 +339,7 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Sound & Notifications */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <Bell size={18} className="text-blue-500" />
@@ -369,7 +369,7 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Data Management */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <Download size={18} className="text-blue-500" />
@@ -393,7 +393,7 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Account */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <Shield size={18} className="text-blue-500" />
@@ -423,7 +423,7 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Help & Support */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-slate-200 dark:border-white/10 overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
               <HelpCircle size={18} className="text-blue-500" />
@@ -447,7 +447,7 @@ const Settings: React.FC = () => {
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-white dark:bg-white/5 rounded-2xl border border-red-200 dark:border-red-500/30 overflow-hidden">
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-red-200 dark:border-red-500/30 overflow-hidden">
           <div className="px-4 py-3 border-b border-red-100 dark:border-red-500/20">
             <h2 className="font-semibold text-red-600 dark:text-red-400">Vùng nguy hiểm</h2>
           </div>

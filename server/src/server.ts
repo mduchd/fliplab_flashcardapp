@@ -6,6 +6,7 @@ import { connectDB } from './config/database.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import flashcardRoutes from './routes/flashcardRoutes.js';
+import folderRoutes from './routes/folderRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -40,6 +41,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/flashcards', flashcardRoutes);
+app.use('/api/folders', folderRoutes);
 
 // 404 Handler
 app.use((req, res) => {

@@ -10,7 +10,7 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 // Generate JWT Token
 const generateToken = (userId: string): string => {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN as any });
 };
 
 // @desc    Register new user
@@ -43,7 +43,7 @@ export const register = async (req: AuthRequest, res: Response): Promise<void> =
     await DailyGoal.create({ userId: user._id });
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id as unknown as string);
 
     res.status(201).json({
       success: true,
@@ -101,7 +101,7 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id as unknown as string);
 
     res.json({
       success: true,

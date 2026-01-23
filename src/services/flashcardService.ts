@@ -23,6 +23,7 @@ export interface FlashcardSet {
   updatedAt: string;
   lastStudied?: string;
   totalStudies: number;
+  folderId?: string;
 }
 
 export interface CreateFlashcardSetData {

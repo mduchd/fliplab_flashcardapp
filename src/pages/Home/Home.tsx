@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { flashcardService, FlashcardSet } from '../../services/flashcardService';
+import { folderService, Folder } from '../../services/folderService';
 import MainLayout from '../../components/layout/MainLayout';
 import ConfirmModal from '../../components/ConfirmModal';
+import FolderSection from '../../components/FolderSection';
+import MoveToFolderModal from '../../components/MoveToFolderModal';
 import { 
   HiPlus, 
   HiBookOpen, 
@@ -14,7 +17,8 @@ import {
   HiAcademicCap,
   HiArrowPath,
   HiArrowUpTray,
-  HiMagnifyingGlass
+  HiMagnifyingGlass,
+  HiFolder
 } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
 
@@ -23,7 +27,11 @@ type FilterType = 'all' | 'recent' | 'alphabetical' | 'mostCards';
 const Home: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<'sets' | 'folders'>('sets');
+  const [isCreateFolderModalOpen, setIsCreateFolderModalOpen] = useState(false);
   const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,6 +48,27 @@ const Home: React.FC = () => {
   });
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const toast = useToastContext();
+
+  // Move to Folder Modal state
+  const [moveModal, setMoveModal] = useState<{
+    isOpen: boolean;
+    setId: string | null;
+    currentFolderId?: string | null;
+  }>({ isOpen: false, setId: null });
+
+  const handleMoveToFolder = (e: React.MouseEvent, set: FlashcardSet) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setMoveModal({ 
+      isOpen: true, 
+      setId: set._id,
+      currentFolderId: set.folderId 
+    });
+  };
+
+  const handleMoveSuccess = () => {
+    loadData(); // Reload data to reflect changes
+  };
 
   // Confirm modal state - includes deck info for display
   const [confirmModal, setConfirmModal] = useState<{
@@ -60,20 +89,64 @@ const Home: React.FC = () => {
   }, [activeFilter]);
 
   useEffect(() => {
-    loadFlashcardSets();
+    loadData();
   }, []);
 
-  const loadFlashcardSets = async () => {
+  // Listen for URL params to switch tabs or open modals
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    const create = searchParams.get('create');
+
+    if (tab === 'folders') {
+      setActiveTab('folders');
+      if (create === 'true') {
+        setIsCreateFolderModalOpen(true);
+        // Clean URL after opening modal
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('create');
+        setSearchParams(newParams, { replace: true });
+      }
+    } else if (tab === 'sets') {
+      setActiveTab('sets');
+    }
+  }, [searchParams]);
+
+  const loadData = async () => {
     try {
       setIsLoading(true);
-      const response = await flashcardService.getAll();
-      setFlashcardSets(response.data.flashcardSets);
+      const [setsResponse, foldersResponse] = await Promise.all([
+        flashcardService.getAll(),
+        folderService.getFolders()
+      ]);
+      setFlashcardSets(setsResponse.data.flashcardSets);
+      setFolders(foldersResponse.data.folders);
     } catch (err: any) {
-      setError('Không thể tải danh sách bộ thẻ');
+      setError('Không thể tải dữ liệu');
       console.error(err);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Folder handlers
+  const handleFolderCreated = (folder: Folder) => {
+    setFolders(prev => [folder, ...prev]);
+  };
+
+  const handleFolderUpdated = (folder: Folder) => {
+    setFolders(prev => prev.map(f => f._id === folder._id ? folder : f));
+  };
+
+  const handleFolderDeleted = (folderId: string) => {
+    setFolders(prev => prev.filter(f => f._id !== folderId));
+    if (selectedFolderId === folderId) {
+      setSelectedFolderId(null);
+    }
+  };
+
+  const handleFolderClick = (folderId: string) => {
+    // Toggle selection
+    setSelectedFolderId(prev => prev === folderId ? null : folderId);
   };
 
   const openDeleteConfirm = (e: React.MouseEvent, set: FlashcardSet) => {
@@ -134,6 +207,11 @@ const Home: React.FC = () => {
   const filteredSets = React.useMemo(() => {
     let result = [...flashcardSets];
     
+    // Filter by selected folder
+    if (selectedFolderId) {
+      result = result.filter(set => set.folderId === selectedFolderId);
+    }
+    
     // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -172,7 +250,7 @@ const Home: React.FC = () => {
     }
     
     return result;
-  }, [flashcardSets, activeFilter, searchQuery]);
+  }, [flashcardSets, activeFilter, searchQuery, selectedFolderId]);
 
   const filterButtons = [
     { key: 'all' as FilterType, label: 'Tất cả' },
@@ -203,33 +281,109 @@ const Home: React.FC = () => {
         variant="danger"
       />
 
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-3 leading-tight">
-          <HiBookOpen className="w-7 h-7 text-blue-500 dark:text-blue-400" />
-          Bộ thẻ của bạn
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
-          Quản lý và học các bộ flashcard của bạn
-        </p>
+      {/* Move To Folder Modal */}
+      {moveModal.setId && (
+        <MoveToFolderModal
+          isOpen={moveModal.isOpen}
+          onClose={() => setMoveModal({ ...moveModal, isOpen: false })}
+          folders={folders}
+          setId={moveModal.setId}
+          currentFolderId={moveModal.currentFolderId}
+          onMoveSuccess={handleMoveSuccess}
+        />
+      )}
+
+      {/* Header & Toolbar Area */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-3 leading-tight">
+            <HiBookOpen className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+            Thư viện của bạn
+          </h1>
+          
+          {/* Tabs */}
+          <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg inline-flex">
+            <button
+              onClick={() => setActiveTab('sets')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                activeTab === 'sets'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              Bộ thẻ
+            </button>
+            <button
+              onClick={() => setActiveTab('folders')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                activeTab === 'folders'
+                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              }`}
+            >
+              Thư mục
+            </button>
+          </div>
+        </div>
+
+        {/* Primary Action Button */}
+        <div>
+          {activeTab === 'sets' ? (
+            <Link
+              to="/create"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium shadow-lg shadow-blue-500/25 hover:-translate-y-0.5 transition-all"
+            >
+              <HiPlus className="w-5 h-5" />
+              <span>Tạo bộ thẻ mới</span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => setIsCreateFolderModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium shadow-lg shadow-blue-500/25 hover:-translate-y-0.5 transition-all cursor-pointer"
+            >
+              <HiFolder className="w-5 h-5" />
+              <span>Tạo thư mục mới</span>
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Filters & Sorting */}
-      <div className="flex flex-wrap items-center gap-2 mb-6">
-        {filterButtons.map((btn) => (
-          <button
-            key={btn.key}
-            onClick={() => setActiveFilter(btn.key)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
-              activeFilter === btn.key
-                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
-                : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            {btn.label}
-          </button>
-        ))}
-      </div>
+      {/* Content Area */}
+      {activeTab === 'folders' ? (
+        <FolderSection
+          folders={folders}
+          onFolderCreated={handleFolderCreated}
+          onFolderUpdated={handleFolderUpdated}
+          onFolderDeleted={handleFolderDeleted}
+          onFolderClick={handleFolderClick}
+          selectedFolderId={selectedFolderId}
+          hideHeader={true}
+          isCreateModalOpen={isCreateFolderModalOpen}
+          onCreateModalClose={() => setIsCreateFolderModalOpen(false)}
+        />
+      ) : (
+        <>
+          {/* Filters & Sorting */}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            {/* Folder Filter Dropdown (Optional improvement for later) */}
+            
+            {/* Filter Chips */}
+            {filterButtons.map((btn) => (
+              <button
+                key={btn.key}
+                onClick={() => setActiveFilter(btn.key)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 cursor-pointer ${
+                  activeFilter === btn.key
+                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                    : 'bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white'
+                }`}
+              >
+                {btn.label}
+              </button>
+            ))}
+            
+            {/* Search (if needed to add) */}
+          </div>
 
       {/* Error Message */}
       {error && (
@@ -311,85 +465,107 @@ const Home: React.FC = () => {
             <div
               key={set._id}
               onClick={() => handleCardClick(set._id)}
-              className="group bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg overflow-hidden cursor-pointer hover:border-blue-300 dark:hover:border-blue-500/50 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-blue-500/10 flex flex-col h-full"
+              className="h-full pt-2 cursor-pointer"
             >
-              <div className="p-5 flex flex-col h-full">
-                <div className="flex-1">
-                  {/* Title */}
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                    {set.name}
-                  </h3>
-                  
-                  {/* Description */}
-                  {set.description && (
-                    <p className="text-slate-600 dark:text-slate-400 text-sm mb-3 line-clamp-2 leading-relaxed">
-                      {set.description}
-                    </p>
-                  )}
+              {/* Main Card */}
+              <div className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 flex flex-col h-full relative z-0">
+                
+                {/* Background Watermark Icon - Enhanced Visibility */}
+                <div className="absolute -right-6 -top-6 opacity-[0.25] dark:opacity-[0.2] text-slate-400 dark:text-slate-600 transform rotate-12 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110 pointer-events-none z-0">
+                   <HiRectangleStack className="w-32 h-32" />
+                </div>
 
-                  {/* Metadata */}
-                  <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 mb-3 font-medium">
-                    <span className="flex items-center gap-1">
-                      <HiRectangleStack className="w-3.5 h-3.5" />
-                      {set.cards.length} thẻ
-                    </span>
-                    {set.lastStudied && (
-                      <span className="flex items-center gap-1">
-                        <HiClock className="w-3.5 h-3.5" />
-                        {new Date(set.lastStudied).toLocaleDateString('vi-VN')}
+                <div className="p-5 flex flex-col h-full relative z-10">
+                  <div className="flex-1">
+                    {/* Title */}
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                      {set.name}
+                    </h3>
+                    
+                    {/* Description */}
+                    {set.description && (
+                      <p className="text-slate-600 dark:text-slate-400 text-sm mb-4 line-clamp-2 leading-relaxed h-[2.5em]">
+                        {set.description}
+                      </p>
+                    )}
+
+                    {/* Metadata Badges */}
+                    <div className="flex items-center flex-wrap gap-2 text-xs font-semibold mb-4">
+                      <span className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-md">
+                        <HiRectangleStack className="w-3.5 h-3.5 text-blue-500" />
+                        {set.cards.length} thẻ
                       </span>
+                      {set.lastStudied && (
+                        <span className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-md">
+                          <HiClock className="w-3.5 h-3.5 text-orange-500" />
+                          {new Date(set.lastStudied).toLocaleDateString('vi-VN')}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Tags */}
+                    {set.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mb-2">
+                        {set.tags.slice(0, 3).map((tag, i) => (
+                          <span
+                            key={i}
+                            className="px-2 py-0.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] rounded-md font-bold uppercase tracking-wide border border-blue-100 dark:border-blue-500/20"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
                     )}
                   </div>
 
-                  {/* Tags */}
-                  {set.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {set.tags.slice(0, 3).map((tag, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-0.5 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 text-xs rounded-md font-medium"
-                        >
-                          #{tag}
-                        </span>
-                      ))}
+                  {/* Action Buttons - Floating Style */}
+                  <div className="flex gap-2 pt-4 mt-auto">
+                    <Link
+                      to={`/study/${set._id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex-1 py-2.5 bg-blue-600 text-white text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all z-20"
+                    >
+                      <HiAcademicCap className="w-4 h-4" />
+                      Học ngay
+                    </Link>
+                    <div className="flex gap-1 bg-slate-100 dark:bg-slate-700/50 p-1 rounded-lg">
+                      <button
+                        onClick={(e) => handleMoveToFolder(e, set)}
+                        className="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-600 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md transition-all shadow-sm hover:shadow cursor-pointer"
+                        title="Di chuyển vào thư mục"
+                      >
+                        <HiFolder className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => handleEditClick(e, set._id)}
+                        className="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-600 hover:text-blue-600 dark:hover:text-blue-400 rounded-md transition-all shadow-sm hover:shadow cursor-pointer"
+                        title="Chỉnh sửa"
+                      >
+                        <HiPencilSquare className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => openDeleteConfirm(e, set)}
+                        disabled={deletingId === set._id}
+                        className="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-600 hover:text-red-600 dark:hover:text-red-400 rounded-md transition-all shadow-sm hover:shadow disabled:opacity-50 cursor-pointer"
+                        title="Xóa"
+                      >
+                        {deletingId === set._id ? (
+                          <HiArrowPath className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <HiTrash className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2 pt-4 border-t border-slate-100 dark:border-white/10 mt-auto">
-                  <Link
-                    to={`/study/${set._id}`}
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-1 py-2.5 bg-blue-600 text-white text-center rounded-lg font-medium text-sm flex items-center justify-center gap-2 hover:bg-blue-500 hover:shadow-md hover:shadow-blue-500/25 hover:-translate-y-0.5 active:translate-y-0 transition-all"
-                  >
-                    <HiAcademicCap className="w-4 h-4" />
-                    Học
-                  </Link>
-                  <button
-                    onClick={(e) => handleEditClick(e, set._id)}
-                    className="p-2.5 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-900 dark:hover:text-white hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
-                  >
-                    <HiPencilSquare className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={(e) => openDeleteConfirm(e, set)}
-                    disabled={deletingId === set._id}
-                    className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-500/20 hover:text-red-600 dark:hover:text-red-300 hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-none cursor-pointer"
-                  >
-                    {deletingId === set._id ? (
-                      <HiArrowPath className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <HiTrash className="w-4 h-4" />
-                    )}
-                  </button>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
       )}
-    </MainLayout>
+    </>
+  )}
+</MainLayout>
   );
 };
 

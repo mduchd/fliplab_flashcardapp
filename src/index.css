@@ -171,12 +171,67 @@ body {
 }
 
 @keyframes rainbow-spin {
-  0% {
-    filter: hue-rotate(0deg);
-  }
-  100% {
-    filter: hue-rotate(360deg);
-  }
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+
+/* --- Advanced Avatar Frames --- */
+
+/* Cosmic/Galaxy */
+@keyframes cosmic-spin {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.frame-cosmic {
+  background: linear-gradient(270deg, #6600cc, #9900ff, #00ccff, #6600cc);
+  background-size: 300% 300%;
+  animation: cosmic-spin 4s ease infinite;
+  box-shadow: 0 0 20px rgba(102, 0, 204, 0.6);
+  padding: 4px;
+}
+
+/* Lightning/Electric */
+@keyframes lightning-flash {
+  0%, 100% { box-shadow: 0 0 10px #00ffff, inset 0 0 10px #00ffff; border-color: #00ffff; }
+  50% { box-shadow: 0 0 30px #00ffff, inset 0 0 20px #00ffff; border-color: #ffffff; }
+}
+.frame-lightning {
+  border: 4px solid #00ffff;
+  animation: lightning-flash 1.5s infinite alternate;
+  box-shadow: 0 0 15px #00ffff;
+}
+
+/* Glitch */
+@keyframes glitch-anim {
+  0% { transform: translate(0) }
+  20% { transform: translate(-2px, 2px) }
+  40% { transform: translate(-2px, -2px) }
+  60% { transform: translate(2px, 2px) }
+  80% { transform: translate(2px, -2px) }
+  100% { transform: translate(0) }
+}
+.frame-glitch {
+  border: 4px solid #ff00ff;
+  box-shadow: -3px 0 #00ffff, 3px 0 #ff0000;
+  animation: glitch-anim 2s infinite linear alternate-reverse;
+}
+
+/* Cyberpunk */
+.frame-cyberpunk {
+  border: 4px solid #fcee0a; /* Cyber yellow */
+  box-shadow: 0 0 0 4px #000, 0 0 0 8px #00f3ff; /* Double ring effect */
+}
+
+/* Mystic (Glow Pulse) */
+@keyframes mystic-pulse {
+  0% { box-shadow: 0 0 15px #c084fc, 0 0 30px #c084fc; }
+  50% { box-shadow: 0 0 25px #a855f7, 0 0 50px #a855f7; }
+  100% { box-shadow: 0 0 15px #c084fc, 0 0 30px #c084fc; }
+}
+.frame-mystic {
+  border: 3px solid white;
+  animation: mystic-pulse 3s infinite;
 }
 
 /* Fire/Flame Animation */

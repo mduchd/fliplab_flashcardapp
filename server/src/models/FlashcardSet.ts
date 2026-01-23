@@ -10,7 +10,6 @@ export interface IFlashcard {
 }
 
 export interface IFlashcardSet extends Document {
-  _id: string;
   name: string;
   description?: string;
   cards: IFlashcard[];
@@ -21,6 +20,7 @@ export interface IFlashcardSet extends Document {
   updatedAt: Date;
   lastStudied?: Date;
   totalStudies: number;
+  folderId?: Types.ObjectId;
   color?: string;
 }
 
@@ -99,6 +99,11 @@ const flashcardSetSchema = new Schema<IFlashcardSet>(
     color: {
       type: String,
       default: '#667eea',
+    },
+    folderId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Folder',
+      default: null,
     },
   },
   {

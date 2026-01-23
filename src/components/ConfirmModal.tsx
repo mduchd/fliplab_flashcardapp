@@ -54,7 +54,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         {/* Close button */}
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+          className="absolute top-4 right-4 p-1 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer"
         >
           <HiXMark className="w-5 h-5" />
         </button>
@@ -80,13 +80,13 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-white/20 transition-all"
+            className="flex-1 px-4 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-semibold hover:bg-slate-200 dark:hover:bg-white/20 transition-all cursor-pointer"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all ${styles.button}`}
+            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all cursor-pointer ${styles.button}`}
           >
             {confirmText}
           </button>
