@@ -15,7 +15,6 @@ import {
   HiPlusCircle,
   HiCalendarDays,
   HiBolt,
-  HiSparkles,
   HiAcademicCap,
   HiArrowPath
 } from 'react-icons/hi2';
@@ -749,7 +748,7 @@ const Profile: React.FC = () => {
                      </div>
                   ) : day.isToday ? (
                      <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border-2 border-indigo-500 flex items-center justify-center shadow-md relative text-indigo-500">
-                       <HiSparkles className="w-5 h-5 animate-pulse" />
+                       <HiBookOpen className="w-5 h-5 animate-pulse" />
                      </div>
                   ) : (
                      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-300 dark:text-slate-600">
