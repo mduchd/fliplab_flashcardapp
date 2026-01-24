@@ -15,6 +15,7 @@ export interface FlashcardSet {
   name: string;
   description?: string;
   cards: Flashcard[];
+  cardCount?: number; // Optional: returned when cards array is excluded
   userId: string;
   isPublic: boolean;
   tags: string[];

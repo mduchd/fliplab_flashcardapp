@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { flashcardService, FlashcardSet } from '../../services/flashcardService';
+import { folderService, Folder } from '../../services/folderService';
 import MainLayout from '../../components/layout/MainLayout';
+import ShareModal from '../../components/ShareModal';
+import MoveToFolderModal from '../../components/MoveToFolderModal';
 import { 
   HiArrowLeft as ArrowLeft, 
   HiArrowRight as ArrowRight, 
@@ -19,7 +22,9 @@ import {
   HiCreditCard as CreditCard,
   HiPuzzlePiece as Puzzle,
   HiPencil as Edit2,
-  HiBookmarkSquare as Save
+  HiBookmarkSquare as Save,
+  HiShare,
+  HiFolder
 } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
 import { shuffleArray } from '../../utils/helpers';
@@ -76,6 +81,13 @@ const Study: React.FC = () => {
   const [editTerm, setEditTerm] = useState('');
   const [editDefinition, setEditDefinition] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // Share Modal State
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+
+  // Move to Folder State
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
 
   useEffect(() => {
     if (activeCards.length > 0) {
@@ -218,6 +230,7 @@ const Study: React.FC = () => {
 
   useEffect(() => {
     loadFlashcardSet();
+    loadFolders();
   }, [id]);
 
   const loadFlashcardSet = async () => {
@@ -231,6 +244,15 @@ const Study: React.FC = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadFolders = async () => {
+    try {
+      const response = await folderService.getFolders();
+      setFolders(response.data.folders);
+    } catch (err) {
+      console.error('Failed to load folders:', err);
     }
   };
 
@@ -496,6 +518,20 @@ const Study: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="px-4 py-2 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
+            >
+              <HiShare size={18} />
+              Chia sẻ
+            </button>
+            <button
+              onClick={() => setIsMoveModalOpen(true)}
+              className="px-4 py-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
+            >
+              <HiFolder size={18} />
+              Thêm vào thư mục
+            </button>
+            <button
               onClick={() => navigate(`/create/${id}`)}
               className="px-4 py-2 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
             >
@@ -515,8 +551,11 @@ const Study: React.FC = () => {
         {/* Progress Bar */}
         <div className="h-2 bg-slate-200 dark:bg-white/10 rounded-full mb-8 overflow-hidden">
           <div
-            className="h-full bg-gradient-to-r from-blue-600 to-indigo-600 transition-all duration-300"
-            style={{ width: `${progress}%` }}
+            className="h-full transition-all duration-300"
+            style={{ 
+              width: `${progress}%`,
+              backgroundColor: flashcardSet?.color || '#2563eb'
+            }}
           />
         </div>
 
@@ -919,6 +958,26 @@ const Study: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        flashcardSet={flashcardSet}
+      />
+
+      {/* Move to Folder Modal */}
+      <MoveToFolderModal
+        isOpen={isMoveModalOpen}
+        onClose={() => setIsMoveModalOpen(false)}
+        folders={folders}
+        setId={id || ''}
+        currentFolderId={flashcardSet.folderId}
+        onMoveSuccess={() => {
+          toast.success('Đã thêm vào thư mục');
+          loadFolders();
+        }}
+      />
     </MainLayout>
   );
 };

@@ -7,6 +7,7 @@ import ConfirmModal from '../../components/ConfirmModal';
 import FolderSection from '../../components/FolderSection';
 import MoveToFolderModal from '../../components/MoveToFolderModal';
 import FolderContentModal from '../../components/FolderContentModal';
+import ShareModal from '../../components/ShareModal';
 import { 
   HiPlus, 
   HiBookOpen, 
@@ -19,7 +20,8 @@ import {
   HiArrowPath,
   HiArrowUpTray,
   HiMagnifyingGlass,
-  HiFolder
+  HiFolder,
+  HiShare
 } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
 
@@ -59,6 +61,15 @@ const Home: React.FC = () => {
 
   // Folder Content Viewer State
   const [viewingFolder, setViewingFolder] = useState<Folder | null>(null);
+
+  // Share Modal State
+  const [sharingSet, setSharingSet] = useState<FlashcardSet | null>(null);
+
+  const handleShareClick = (e: React.MouseEvent, set: FlashcardSet) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setSharingSet(set);
+  };
 
   const handleMoveToFolder = (e: React.MouseEvent, set: FlashcardSet) => {
     e.stopPropagation();
@@ -465,17 +476,31 @@ const Home: React.FC = () => {
               className="h-full pt-2 cursor-pointer"
             >
               {/* Main Card */}
-              <div className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 flex flex-col h-full relative z-0">
+              <div 
+                className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/10 rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 flex flex-col h-full relative z-0"
+              >
+                {/* Color Top Bar */}
+                <div 
+                  className="h-1.5 w-full"
+                  style={{ backgroundColor: set.color || '#2563eb' }}
+                />
+                
                 
                 {/* Background Watermark Icon - Enhanced Visibility */}
-                <div className="absolute -right-6 -top-6 opacity-[0.25] dark:opacity-[0.2] text-slate-400 dark:text-slate-600 transform rotate-12 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110 pointer-events-none z-0">
+                <div 
+                  className="absolute -right-6 -top-6 opacity-[0.15] transform rotate-12 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110 pointer-events-none z-0"
+                  style={{ color: set.color || '#2563eb' }}
+                >
                    <HiRectangleStack className="w-32 h-32" />
                 </div>
 
                 <div className="p-5 flex flex-col h-full relative z-10">
                   <div className="flex-1">
                     {/* Title */}
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                    <h3 
+                      className="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-tight transition-colors line-clamp-2 group-hover:opacity-90"
+                      style={{ color: set.color || '#2563eb' }}
+                    >
                       {set.name}
                     </h3>
                     
@@ -489,14 +514,14 @@ const Home: React.FC = () => {
                     {/* Metadata Badges */}
                     <div className="flex items-center flex-wrap gap-2 text-xs font-semibold mb-4">
                       <span className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-md">
-                        <HiRectangleStack className="w-3.5 h-3.5 text-blue-500" />
+                        <HiRectangleStack className="w-3.5 h-3.5" style={{ color: set.color || '#2563eb' }} />
                         {set.cards.length} thẻ
                       </span>
                       <span 
                         className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-md"
                         title={set.lastStudied ? "Lần học cuối" : "Ngày tạo"}
                       >
-                        <HiClock className="w-3.5 h-3.5 text-blue-500" />
+                        <HiClock className="w-3.5 h-3.5" style={{ color: set.color || '#2563eb' }} />
                         {new Date(set.lastStudied || set.createdAt).toLocaleDateString('vi-VN')}
                       </span>
                     </div>
@@ -521,12 +546,20 @@ const Home: React.FC = () => {
                     <Link
                       to={`/study/${set._id}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-1 py-2.5 bg-blue-600 text-white text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:bg-blue-500 hover:-translate-y-0.5 active:translate-y-0 transition-all z-20"
+                      className="flex-1 py-2.5 text-white text-center rounded-lg font-bold text-sm flex items-center justify-center gap-2 hover:saturate-150 hover:-translate-y-0.5 active:translate-y-0 transition-all z-20"
+                      style={{ backgroundColor: set.color || '#2563eb' }}
                     >
                       <HiAcademicCap className="w-4 h-4" />
                       Học ngay
                     </Link>
                     <div className="flex gap-1 bg-slate-100 dark:bg-slate-700/50 p-1 rounded-lg">
+                      <button
+                        onClick={(e) => handleShareClick(e, set)}
+                        className="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-600 hover:text-green-600 dark:hover:text-green-400 rounded-md transition-all shadow-sm hover:shadow cursor-pointer"
+                        title="Chia sẻ"
+                      >
+                        <HiShare className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={(e) => handleMoveToFolder(e, set)}
                         className="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-600 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md transition-all shadow-sm hover:shadow cursor-pointer"
@@ -564,12 +597,45 @@ const Home: React.FC = () => {
     </>
   )}
   
+  {/* Confirm Delete Modal */}
+  <ConfirmModal
+    isOpen={confirmModal.isOpen}
+    title="Xóa bộ thẻ"
+    message={confirmModal.set 
+      ? `Bạn có chắc muốn xóa bộ thẻ "${confirmModal.set.name}"? Hành động này không thể hoàn tác.`
+      : 'Bạn có chắc muốn xóa bộ thẻ này?'
+    }
+    confirmText="Xóa bộ thẻ"
+    cancelText="Hủy"
+    onConfirm={handleDeleteConfirm}
+    onCancel={handleDeleteCancel}
+    variant="danger"
+  />
+
+  {/* Move to Folder Modal */}
+  <MoveToFolderModal 
+    isOpen={moveModal.isOpen}
+    onClose={() => setMoveModal({ isOpen: false, setId: null })}
+    folders={folders}
+    setId={moveModal.setId || ''}
+    currentFolderId={moveModal.currentFolderId}
+    onMoveSuccess={handleMoveSuccess}
+  />
+  
   <FolderContentModal 
     isOpen={!!viewingFolder}
     onClose={() => setViewingFolder(null)}
     folder={viewingFolder}
-    sets={flashcardSets.filter(set => set.folderId === viewingFolder?._id)}
   />
+
+  {/* Share Modal */}
+  {sharingSet && (
+    <ShareModal 
+      isOpen={!!sharingSet}
+      onClose={() => setSharingSet(null)}
+      flashcardSet={sharingSet}
+    />
+  )}
 </MainLayout>
   );
 };

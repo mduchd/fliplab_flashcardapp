@@ -77,14 +77,30 @@ export const getFolder = async (req: AuthRequest, res: Response): Promise<void> 
     }
 
     const flashcardSets = await FlashcardSet.find({ folderId: folder._id, userId: req.userId })
-      .select('-cards')
       .sort({ updatedAt: -1 });
+
+    // Map to include cardCount since we want to show card count but not send entire cards array
+    const flashcardSetsWithCount = flashcardSets.map(set => ({
+      _id: set._id,
+      name: set.name,
+      description: set.description,
+      cardCount: set.cards?.length || 0,
+      userId: set.userId,
+      isPublic: set.isPublic,
+      tags: set.tags,
+      color: set.color,
+      createdAt: set.createdAt,
+      updatedAt: set.updatedAt,
+      lastStudied: set.lastStudied,
+      totalStudies: set.totalStudies,
+      folderId: set.folderId,
+    }));
 
     res.json({
       success: true,
       data: { 
         folder,
-        flashcardSets,
+        flashcardSets: flashcardSetsWithCount,
       },
     });
   } catch (error: any) {

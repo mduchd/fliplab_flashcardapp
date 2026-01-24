@@ -25,18 +25,24 @@ const Create: React.FC = () => {
     { id: '2', term: '', definition: '', image: '' },
   ]);
   const [tags, setTags] = useState('');
-  const [color, setColor] = useState('#667eea');
+  const [color, setColor] = useState('#2563eb');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState('');
 
   const colors = [
-    '#667eea', // purple
-    '#f472b6', // pink
-    '#34d399', // green
-    '#fbbf24', // yellow
-    '#60a5fa', // blue
-    '#f87171', // red
+    '#2563eb', // blue (default)
+    '#6366f1', // indigo
+    '#8b5cf6', // violet
+    '#a855f7', // purple muted
+    '#ec4899', // pink muted
+    '#ef4444', // red muted
+    '#f97316', // orange muted
+    '#eab308', // yellow muted
+    '#22c55e', // green muted
+    '#14b8a6', // teal muted
+    '#0ea5e9', // sky blue
+    '#6b7280', // gray
   ];
 
   useEffect(() => {
@@ -59,7 +65,7 @@ const Create: React.FC = () => {
         image: c.image || '',
       })));
       setTags(set.tags.join(', '));
-      setColor(set.color || '#667eea');
+      setColor(set.color || '#2563eb');
     } catch (err) {
       setError('Không thể tải bộ thẻ');
       console.error(err);
