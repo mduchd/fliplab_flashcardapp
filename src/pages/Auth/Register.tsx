@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { HiBolt, HiArrowPath, HiEye, HiEyeSlash, HiFire, HiTrophy, HiPuzzlePiece, HiUserCircle, HiSquares2X2, HiAcademicCap } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
-import { FaGoogle, FaFacebook, FaApple } from 'react-icons/fa';
+import { FaFacebook, FaApple } from 'react-icons/fa';
+import { FcGoogle } from 'react-icons/fc';
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -78,11 +79,68 @@ const Register: React.FC = () => {
     <div className="min-h-screen h-screen flex overflow-hidden bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900">
       {/* Left Side - Marketing/Promo - STICKY */}
       <div className={`hidden lg:flex lg:w-1/2 sticky top-0 h-screen relative overflow-hidden opacity-90 transition-all duration-700 ${leftPanelVisible ? 'translate-x-0' : '-translate-x-8'}`}>
-        {/* Background decoration - More vibrant */}
+        {/* Background decoration - More vibrant with patterns */}
         <div className="absolute inset-0">
+          {/* Animated gradient orbs */}
           <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
           <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          
+          {/* Floating geometric shapes - at edges */}
+          <div className="absolute top-10 right-10 w-32 h-32 border-2 border-white/10 rounded-2xl rotate-12 animate-float"></div>
+          <div className="absolute bottom-20 left-8 w-24 h-24 border-2 border-blue-300/10 rounded-full animate-float-delayed"></div>
+          <div className="absolute top-16 left-16 w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-lg rotate-45 animate-float-slow"></div>
+          <div className="absolute bottom-16 right-16 w-20 h-20 border-2 border-purple-300/10 rounded-lg rotate-12 animate-float"></div>
+          
+          {/* Grid pattern overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,black,transparent)]"></div>
+          
+          {/* Animated floating cards - at far edges */}
+          <div className="absolute top-20 left-8 w-20 h-28 bg-white/5 backdrop-blur-sm rounded-xl shadow-xl animate-float-card border border-white/10">
+            <div className="absolute inset-2 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-lg"></div>
+          </div>
+          <div className="absolute bottom-20 right-8 w-16 h-24 bg-white/5 backdrop-blur-sm rounded-xl shadow-xl animate-float-card-delayed border border-white/10">
+            <div className="absolute inset-2 bg-gradient-to-br from-pink-400/20 to-orange-400/20 rounded-lg"></div>
+          </div>
+          
+          {/* Sparkle effects - scattered at edges */}
+          <div className="absolute top-24 left-24 w-2 h-2 bg-white rounded-full animate-sparkle"></div>
+          <div className="absolute top-1/3 right-20 w-1.5 h-1.5 bg-blue-200 rounded-full animate-sparkle" style={{ animationDelay: '0.5s' }}></div>
+          <div className="absolute bottom-24 left-32 w-1 h-1 bg-purple-200 rounded-full animate-sparkle" style={{ animationDelay: '1.5s' }}></div>
+          <div className="absolute bottom-1/3 right-24 w-1.5 h-1.5 bg-pink-200 rounded-full animate-sparkle" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-40 left-40 w-1 h-1 bg-blue-300 rounded-full animate-sparkle" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/4 right-16 w-1.5 h-1.5 bg-white rounded-full animate-sparkle" style={{ animationDelay: '2.5s' }}></div>
+          <div className="absolute bottom-40 right-32 w-1 h-1 bg-purple-300 rounded-full animate-sparkle" style={{ animationDelay: '0.8s' }}></div>
+          
+          {/* Light beams from corners */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-white/5 to-transparent rotate-12 blur-2xl opacity-40"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-400/10 to-transparent -rotate-12 blur-2xl opacity-30"></div>
+          
+          {/* Rotating subtle rings */}
+          <div className="absolute top-1/4 right-1/4 w-40 h-40 border border-white/5 rounded-full animate-spin" style={{ animationDuration: '20s' }}></div>
+          <div className="absolute bottom-1/3 left-1/4 w-32 h-32 border border-blue-300/5 rounded-full animate-spin" style={{ animationDuration: '25s', animationDirection: 'reverse' }}></div>
+          
+          {/* Floating glassmorphic cards with icons - hidden on smaller screens */}
+          <div className="hidden xl:block absolute top-16 left-8 w-16 h-20 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg animate-float-card rotate-12" style={{ animationDelay: '0.5s' }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <HiAcademicCap className="w-8 h-8 text-blue-300/40" />
+            </div>
+          </div>
+          <div className="hidden xl:block absolute top-12 right-8 w-14 h-18 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg animate-float-card-delayed -rotate-6" style={{ animationDelay: '1s' }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <HiFire className="w-7 h-7 text-orange-300/40" />
+            </div>
+          </div>
+          <div className="hidden xl:block absolute bottom-24 left-6 w-15 h-19 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg animate-float-card rotate-6" style={{ animationDelay: '1.5s' }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <HiTrophy className="w-7 h-7 text-yellow-300/40" />
+            </div>
+          </div>
+          <div className="hidden xl:block absolute bottom-16 right-6 w-13 h-17 bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl shadow-lg animate-float-card-delayed -rotate-12" style={{ animationDelay: '2s' }}>
+            <div className="w-full h-full flex items-center justify-center">
+              <HiBolt className="w-6 h-6 text-purple-300/40" />
+            </div>
+          </div>
         </div>
 
         {/* Content with stagger animation */}
@@ -90,7 +148,7 @@ const Register: React.FC = () => {
           {/* Logo */}
           <div className={`mb-3 transition-all duration-700 delay-100 ${leftPanelVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.1)_inset]">
+              <div className="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.12),0_0_0_1px_rgba(255,255,255,0.1)_inset]">
                 <HiBolt className="w-8 h-8 text-white drop-shadow-lg" />
               </div>
               <h1 className="text-5xl font-extrabold text-white drop-shadow-lg">FlipLab</h1>
@@ -99,7 +157,7 @@ const Register: React.FC = () => {
           </div>
 
           {/* Features Container - Grouped for visual weight */}
-          <div className={`mb-6 bg-white/8 backdrop-blur-md border border-white/12 rounded-2xl p-6 transition-all duration-700 delay-200 ${leftPanelVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className={`mb-6 bg-white/8 backdrop-blur-md border border-white/12 rounded-lg p-6 transition-all duration-700 delay-200 ${leftPanelVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div className="grid grid-cols-2 gap-x-6 gap-y-4">
               {[
                 { 
@@ -156,7 +214,7 @@ const Register: React.FC = () => {
                   className={`transition-all duration-700 ${leftPanelVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'} ${feature.delay}`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-10 h-10 ${feature.color} backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg`}>
+                    <div className={`w-10 h-10 ${feature.color} backdrop-blur-sm rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg`}>
                       <feature.icon className={`w-5 h-5 ${feature.iconColor} drop-shadow-lg`} />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -171,15 +229,15 @@ const Register: React.FC = () => {
 
           {/* Stats with counter animation effect - More prominent */}
           <div className={`grid grid-cols-3 gap-6 transition-all duration-700 delay-500 ${leftPanelVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-            <div className="text-center bg-white/12 backdrop-blur-sm border border-white/15 rounded-xl p-4 shadow-lg">
+            <div className="text-center bg-white/12 backdrop-blur-sm border border-white/15 rounded-lg p-4 shadow-lg">
               <div className="text-4xl font-extrabold text-white mb-1 drop-shadow-xl bg-gradient-to-br from-blue-400 to-white bg-clip-text text-transparent">10K+</div>
               <div className="text-xs text-blue-200/80 font-medium">Người dùng</div>
             </div>
-            <div className="text-center bg-white/12 backdrop-blur-sm border border-white/15 rounded-xl p-4 shadow-lg">
+            <div className="text-center bg-white/12 backdrop-blur-sm border border-white/15 rounded-lg p-4 shadow-lg">
               <div className="text-4xl font-extrabold text-white mb-1 drop-shadow-xl bg-gradient-to-br from-purple-400 to-white bg-clip-text text-transparent">50K+</div>
               <div className="text-xs text-blue-200/80 font-medium">Bộ thẻ</div>
             </div>
-            <div className="text-center bg-white/12 backdrop-blur-sm border border-white/15 rounded-xl p-4 shadow-lg">
+            <div className="text-center bg-white/12 backdrop-blur-sm border border-white/15 rounded-lg p-4 shadow-lg">
               <div className="text-4xl font-extrabold text-white mb-1 drop-shadow-xl bg-gradient-to-br from-pink-400 to-white bg-clip-text text-transparent">1M+</div>
               <div className="text-xs text-blue-200/80 font-medium">Lượt học</div>
             </div>
@@ -212,7 +270,7 @@ const Register: React.FC = () => {
           </div>
 
           {/* Register Card - Premium Design */}
-          <div className="relative bg-gradient-to-b from-slate-50/97 via-white/90 to-slate-100/92 backdrop-blur-2xl rounded-2xl p-6 sm:p-7 border-2 border-slate-300/60 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.4),0_20px_50px_-10px_rgba(0,0,0,0.2),0_10px_20px_-5px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)_inset,0_0_40px_0_rgba(59,130,246,0.08)] mt-12">
+          <div className="relative bg-gradient-to-b from-slate-50/97 via-white/90 to-slate-100/92 backdrop-blur-2xl rounded-lg p-6 sm:p-7 border-2 border-slate-300/60 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.4),0_20px_50px_-10px_rgba(0,0,0,0.2),0_10px_20px_-5px_rgba(0,0,0,0.15),0_0_0_1px_rgba(255,255,255,0.8)_inset,0_0_40px_0_rgba(59,130,246,0.08)] mt-12">
             <div className="mb-5">
               <h2 className="text-4xl font-extrabold text-slate-900">
                 Đăng ký
@@ -220,7 +278,7 @@ const Register: React.FC = () => {
             </div>
 
             {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-lg mb-4">
+              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 px-4 py-3 rounded-md mb-4">
                 <p className="text-sm font-medium">{error}</p>
               </div>
             )}
@@ -235,7 +293,7 @@ const Register: React.FC = () => {
                   name="displayName"
                   value={formData.displayName}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 lg:py-2 bg-white border-2 border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
+                  className="w-full px-4 py-2.5 lg:py-2 bg-white border-2 border-slate-200 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
                   placeholder="Nguyễn Văn A"
                 />
               </div>
@@ -249,7 +307,7 @@ const Register: React.FC = () => {
                   name="username"
                   value={formData.username}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 lg:py-2 bg-white border-2 border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
+                  className="w-full px-4 py-2.5 lg:py-2 bg-white border-2 border-slate-200 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
                   placeholder="username"
                   required
                 />
@@ -264,7 +322,7 @@ const Register: React.FC = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 lg:py-2 bg-white border-2 border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
+                  className="w-full px-4 py-2.5 lg:py-2 bg-white border-2 border-slate-200 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
                   placeholder="email@example.com"
                   required
                 />
@@ -280,7 +338,7 @@ const Register: React.FC = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 lg:py-2 pr-12 bg-white border-2 border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
+                    className="w-full px-4 py-2.5 lg:py-2 pr-12 bg-white border-2 border-slate-200 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
                     placeholder="••••••••"
                     required
                   />
@@ -308,7 +366,7 @@ const Register: React.FC = () => {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 lg:py-2 pr-12 bg-white border-2 border-slate-200 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
+                    className="w-full px-4 py-2.5 lg:py-2 pr-12 bg-white border-2 border-slate-200 rounded-md text-slate-900 placeholder-slate-400 focus:outline-none focus:border-blue-500 hover:border-slate-300 transition-all"
                     placeholder="••••••••"
                     required
                   />
@@ -329,7 +387,7 @@ const Register: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 lg:py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-3 lg:py-2.5 bg-blue-600 text-white rounded-md font-semibold hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -357,9 +415,9 @@ const Register: React.FC = () => {
               <button
                 type="button"
                 onClick={() => handleSocialLogin('Google')}
-                className="w-full flex items-center justify-center gap-3 py-2.5 bg-white border-2 border-slate-200 hover:border-blue-500/30 rounded-lg transition-all cursor-pointer"
+                className="w-full flex items-center justify-center gap-3 py-2.5 bg-white border-2 border-slate-200 hover:border-blue-500/30 rounded-md transition-all cursor-pointer"
               >
-                <FaGoogle className="w-4 h-4 text-red-500" />
+                <FcGoogle className="w-5 h-5" />
                 <span className="text-slate-700 font-semibold text-sm">Tiếp tục với Google</span>
               </button>
               
@@ -367,7 +425,7 @@ const Register: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleSocialLogin('Facebook')}
-                  className="flex items-center justify-center gap-2 py-2.5 bg-white border-2 border-slate-200 hover:border-slate-300 rounded-lg transition-all cursor-pointer"
+                  className="flex items-center justify-center gap-2 py-2.5 bg-white border-2 border-slate-200 hover:border-slate-300 rounded-md transition-all cursor-pointer"
                 >
                   <FaFacebook className="w-4 h-4 text-blue-600" />
                   <span className="text-slate-700 font-medium text-sm">Facebook</span>
@@ -375,7 +433,7 @@ const Register: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleSocialLogin('Apple')}
-                  className="flex items-center justify-center gap-2 py-2.5 bg-white border-2 border-slate-200 hover:border-slate-300 rounded-lg transition-all cursor-pointer"
+                  className="flex items-center justify-center gap-2 py-2.5 bg-white border-2 border-slate-200 hover:border-slate-300 rounded-md transition-all cursor-pointer"
                 >
                   <FaApple className="w-5 h-5 text-slate-800" />
                   <span className="text-slate-700 font-medium text-sm">Apple</span>
