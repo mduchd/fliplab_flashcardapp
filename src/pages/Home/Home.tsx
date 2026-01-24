@@ -6,6 +6,7 @@ import MainLayout from '../../components/layout/MainLayout';
 import ConfirmModal from '../../components/ConfirmModal';
 import FolderSection from '../../components/FolderSection';
 import MoveToFolderModal from '../../components/MoveToFolderModal';
+import FolderContentModal from '../../components/FolderContentModal';
 import { 
   HiPlus, 
   HiBookOpen, 
@@ -55,6 +56,9 @@ const Home: React.FC = () => {
     setId: string | null;
     currentFolderId?: string | null;
   }>({ isOpen: false, setId: null });
+
+  // Folder Content Viewer State
+  const [viewingFolder, setViewingFolder] = useState<Folder | null>(null);
 
   const handleMoveToFolder = (e: React.MouseEvent, set: FlashcardSet) => {
     e.stopPropagation();
@@ -137,8 +141,10 @@ const Home: React.FC = () => {
   };
 
   const handleFolderClick = (folderId: string) => {
-    // Toggle selection
-    setSelectedFolderId(prev => prev === folderId ? null : folderId);
+    const folder = folders.find(f => f._id === folderId);
+    if (folder) {
+      setViewingFolder(folder);
+    }
   };
 
   const openDeleteConfirm = (e: React.MouseEvent, set: FlashcardSet) => {
@@ -486,12 +492,13 @@ const Home: React.FC = () => {
                         <HiRectangleStack className="w-3.5 h-3.5 text-blue-500" />
                         {set.cards.length} thẻ
                       </span>
-                      {set.lastStudied && (
-                        <span className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-md">
-                          <HiClock className="w-3.5 h-3.5 text-orange-500" />
-                          {new Date(set.lastStudied).toLocaleDateString('vi-VN')}
-                        </span>
-                      )}
+                      <span 
+                        className="flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300 rounded-md"
+                        title={set.lastStudied ? "Lần học cuối" : "Ngày tạo"}
+                      >
+                        <HiClock className="w-3.5 h-3.5 text-blue-500" />
+                        {new Date(set.lastStudied || set.createdAt).toLocaleDateString('vi-VN')}
+                      </span>
                     </div>
 
                     {/* Tags */}
@@ -556,6 +563,13 @@ const Home: React.FC = () => {
       )}
     </>
   )}
+  
+  <FolderContentModal 
+    isOpen={!!viewingFolder}
+    onClose={() => setViewingFolder(null)}
+    folder={viewingFolder}
+    sets={flashcardSets.filter(set => set.folderId === viewingFolder?._id)}
+  />
 </MainLayout>
   );
 };

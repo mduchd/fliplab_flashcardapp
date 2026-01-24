@@ -199,7 +199,7 @@ const Create: React.FC = () => {
         <div className="mb-8">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 transition-colors cursor-pointer"
           >
             <HiArrowLeft className="w-6 h-6 text-slate-600 dark:text-slate-300" />
           </button>
@@ -256,15 +256,15 @@ const Create: React.FC = () => {
                 <label className="block text-slate-700 dark:text-blue-200 text-sm mb-2">Màu sắc</label>
                 <div className="flex gap-3">
                   {colors.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setColor(c)}
-                      className={`w-10 h-10 rounded-full transition-all ${
-                        color === c ? 'ring-4 ring-blue-500 dark:ring-white ring-offset-2 ring-offset-white dark:ring-offset-slate-900' : ''
-                      }`}
-                      style={{ backgroundColor: c }}
-                    />
+                      <button
+                        key={c}
+                        type="button"
+                        onClick={() => setColor(c)}
+                        className={`w-10 h-10 rounded-full transition-all cursor-pointer ${
+                          color === c ? 'ring-4 ring-blue-500 dark:ring-white ring-offset-2 ring-offset-white dark:ring-offset-slate-900' : 'hover:scale-110'
+                        }`}
+                        style={{ backgroundColor: c }}
+                      />
                   ))}
                 </div>
               </div>
@@ -278,7 +278,7 @@ const Create: React.FC = () => {
               <button
                 type="button"
                 onClick={addCard}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-all flex items-center gap-2"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <HiPlus className="w-[18px] h-[18px]" />
                 Thêm thẻ

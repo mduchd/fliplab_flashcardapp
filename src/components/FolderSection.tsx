@@ -27,73 +27,72 @@ import { useToastContext } from '../contexts/ToastContext';
 import ConfirmModal from './ConfirmModal';
 
 // Icon Map
-const ICON_MAP: Record<string, React.ElementType> = {
+export const ICON_MAP: Record<string, React.ElementType> = {
   'folder': HiFolder,
-  'academic': HiAcademicCap,
-  'work': HiBriefcase,
-  'science': HiBeaker,
-  'math': HiCalculator,
-  'code': HiCodeBracket,
-  'music': HiMusicalNote,
-  'art': HiPaintBrush,
-  'globe': HiGlobeAmericas,
-  'health': HiHeart,
+  'academic-cap': HiAcademicCap,
+  'briefcase': HiBriefcase,
+  'beaker': HiBeaker,
+  'calculator': HiCalculator,
+  'code-bracket': HiCodeBracket,
+  'musical-note': HiMusicalNote,
+  'paint-brush': HiPaintBrush,
+  'globe-americas': HiGlobeAmericas,
+  'heart': HiHeart,
   'star': HiStar,
-  'idea': HiLightBulb,
-  'rocket': HiRocketLaunch,
-  'game': HiPuzzlePiece,
+  'light-bulb': HiLightBulb,
+  'rocket-launch': HiRocketLaunch,
+  'puzzle-piece': HiPuzzlePiece,
   'gift': HiGift,
-  'money': HiCurrencyDollar,
+  'currency-dollar': HiCurrencyDollar,
   'trophy': HiTrophy,
-  'group': HiUserGroup,
-  'tag': HiHashtag,
+  'user-group': HiUserGroup,
+  'hashtag': HiHashtag,
   'bookmark': HiBookmark,
   'camera': HiCamera,
-  'chat': HiChatBubbleLeftRight,
+  'chat-bubble-left-right': HiChatBubbleLeftRight,
   'cloud': HiCloud,
-  'terminal': HiCommandLine,
-  // Additional Map
+  'command-line': HiCommandLine,
   'sun': HiSun,
   'moon': HiMoon,
   'fire': HiFire,
   'cake': HiCake,
-  'cart': HiShoppingCart,
-  'phone': HiDevicePhoneMobile,
-  'computer': HiComputerDesktop,
+  'shopping-cart': HiShoppingCart,
+  'device-phone-mobile': HiDevicePhoneMobile,
+  'computer-desktop': HiComputerDesktop,
   'server': HiServer,
   'wifi': HiWifi,
-  'archive': HiArchiveBox,
-  'clipboard': HiClipboardDocument,
-  'calendar': HiCalendarDays,
+  'archive-box': HiArchiveBox,
+  'clipboard-document': HiClipboardDocument,
+  'calendar-days': HiCalendarDays,
   'clock': HiClock,
   'map': HiMap,
   'link': HiLink,
   'bell': HiBell,
-  'settings': HiCog6Tooth,
-  'lock': HiLockClosed,
+  'cog-6-tooth': HiCog6Tooth,
+  'lock-closed': HiLockClosed,
   'key': HiKey,
-  'shield': HiShieldCheck,
+  'shield-check': HiShieldCheck,
   'user': HiUser,
   'home': HiHome,
-  'bank': HiBanknotes,
-  'library': HiBuildingLibrary,
-  'office': HiBuildingOffice,
+  'banknotes': HiBanknotes,
+  'building-library': HiBuildingLibrary,
+  'building-office': HiBuildingOffice,
   'film': HiFilm,
-  'fingerprint': HiFingerPrint,
-  'like': HiHandThumbUp,
-  'mic': HiMicrophone,
-  'send': HiPaperAirplane,
-  'qr': HiQrCode,
+  'finger-print': HiFingerPrint,
+  'hand-thumb-up': HiHandThumbUp,
+  'microphone': HiMicrophone,
+  'paper-airplane': HiPaperAirplane,
+  'qr-code': HiQrCode,
   'ticket': HiTicket,
   'truck': HiTruck,
   'wallet': HiWallet,
   'wrench': HiWrench
 };
 
-const ICON_KEYS = Object.keys(ICON_MAP);
+export const ICON_KEYS = Object.keys(ICON_MAP);
 
 // Folder color options
-const FOLDER_COLORS = [
+export const FOLDER_COLORS = [
   { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
   { id: 'indigo', class: 'bg-indigo-500', ring: 'ring-indigo-200' },
   { id: 'purple', class: 'bg-purple-500', ring: 'ring-purple-200' },
@@ -107,15 +106,6 @@ const FOLDER_COLORS = [
 ];
 
 // Folder icons
-// Helper to render icon (supports both new keys and legacy emojis)
-const renderFolderIcon = (icon: string, className: string = "w-6 h-6") => {
-  if (ICON_MAP[icon]) {
-    const IconComponent = ICON_MAP[icon];
-    return <IconComponent className={className} />;
-  }
-  // Fallback for legacy emojis
-  return <span className={className === "w-6 h-6" ? "text-xl" : "text-lg"}>{icon}</span>;
-};
 
 
 interface FolderSectionProps {
@@ -158,9 +148,7 @@ const FolderSection: React.FC<FolderSectionProps> = ({
   const [formColor, setFormColor] = useState('blue');
   const [formIcon, setFormIcon] = useState('folder');
 
-  const getColorClass = (colorId: string) => {
-    return FOLDER_COLORS.find(c => c.id === colorId)?.class || 'bg-blue-500';
-  };
+
 
   const openEditModal = (e: React.MouseEvent, folder: Folder) => {
     e.stopPropagation();
@@ -284,55 +272,76 @@ const FolderSection: React.FC<FolderSectionProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-            {folders.map((folder) => (
+            {folders.map((folder) => {
+              const folderColor = FOLDER_COLORS.find(c => c.id === folder.color) || FOLDER_COLORS[0];
+              const IconComp = ICON_MAP[folder.icon || 'folder'] || HiFolder;
+
+              return (
               <div
                 key={folder._id}
                 onClick={() => onFolderClick(folder._id)}
-                className={`group relative bg-white dark:bg-slate-800 rounded-lg p-3 border cursor-pointer transition-all flex items-center gap-3 ${
-                  selectedFolderId === folder._id
-                    ? 'border-blue-500 ring-1 ring-blue-500 bg-blue-50/50 dark:bg-blue-900/10'
-                    : 'border-slate-200 dark:border-slate-700'
-                }`}
+                className="group relative perspective-1000 cursor-pointer"
               >
-                {/* Folder Icon */}
-                <div className={`w-10 h-10 rounded-lg ${getColorClass(folder.color || 'blue')} flex-shrink-0 flex items-center justify-center text-xl shadow-sm`}>
-                  {renderFolderIcon(folder.icon || 'folder')}
-                </div>
-                
-                {/* Folder Info */}
-                <div className="flex-1 min-w-0">
-                  <h3 className={`text-sm font-semibold truncate ${selectedFolderId === folder._id ? 'text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-200'}`}>
-                    {folder.name}
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    {folder.setCount || 0} bộ thẻ
-                  </p>
-                </div>
+                <div className={`relative w-full aspect-[4/3] transition-transform duration-300 ${selectedFolderId === folder._id ? 'scale-95' : 'group-hover:scale-105'}`}>
+                   
+                   {/* 1. Back Folder Layer (Darker Tab) */}
+                   <div className={`absolute left-0 top-0 w-[40%] h-8 rounded-t-xl transition-colors duration-300 ${folderColor.class.replace('bg-', 'bg-')} brightness-75 -translate-y-1.5 translate-x-1`}></div>
+                   <div className={`absolute inset-0 rounded-xl transition-colors duration-300 ${folderColor.class} brightness-75`}></div>
 
-                {/* Selected indicator */}
-                {selectedFolderId === folder._id && (
-                  <div className="absolute top-2 right-2">
-                    <HiCheck className="w-4 h-4 text-blue-500" />
-                  </div>
-                )}
+                   {/* 2. Papers (Simulating Content) */}
+                   <div className="absolute inset-x-4 top-2 bottom-0 bg-white opacity-40 rounded-t-md -rotate-1 origin-bottom transition-all duration-500 group-hover:-translate-y-1 group-hover:-rotate-2"></div>
+                   <div className="absolute inset-x-4 top-2 bottom-0 bg-white opacity-60 rounded-t-md rotate-0.5 origin-bottom transition-all duration-500 group-hover:-translate-y-2 group-hover:rotate-1"></div>
 
-                {/* Action buttons - show on hover */}
-                <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white dark:bg-slate-800 shadow-sm rounded-lg p-0.5 border border-slate-100 dark:border-slate-700">
-                  <button
-                    onClick={(e) => openEditModal(e, folder)}
-                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-                  >
-                    <HiPencilSquare className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={(e) => handleDelete(e, folder)}
-                    className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
-                  >
-                    <HiTrash className="w-3.5 h-3.5" />
-                  </button>
+                   {/* 3. Main Folder Body (Front) */}
+                   <div className={`absolute inset-0 top-3 rounded-xl shadow-md group-hover:shadow-xl transition-all duration-300 overflow-hidden border-t border-white/20 flex flex-col items-center justify-center text-center p-4 ${folderColor.class} ${selectedFolderId === folder._id ? 'ring-4 ring-offset-2 ring-blue-500 dark:ring-offset-slate-900' : ''}`}>
+                      
+                      {/* Icon Circle */}
+                      <div className="relative z-10 w-12 h-12 bg-white/20 backdrop-blur-md rounded-xl flex items-center justify-center mb-2 shadow-[0_4px_8px_rgba(0,0,0,0.1)] border border-white/30 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
+                         <IconComp className="w-6 h-6 text-white drop-shadow-md relative z-10" />
+                      </div>
+                      
+                      {/* Folder Name */}
+                      <div className="relative z-10 w-full px-1">
+                         <h3 className="text-sm font-bold text-white drop-shadow-md truncate w-full tracking-tight">
+                           {folder.name}
+                         </h3>
+                         <div className="inline-flex items-center gap-1 mt-1.5 px-2 py-0.5 bg-black/10 rounded-full backdrop-blur-sm border border-white/10">
+                            <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse"></span>
+                            <p className="text-white/90 text-[9px] font-bold uppercase tracking-wider">
+                              {folder.setCount || 0} bộ
+                            </p>
+                         </div>
+                      </div>
+                      
+                      {/* Selected indicator */}
+                      {selectedFolderId === folder._id && (
+                        <div className="absolute top-2 right-2 z-20 bg-white text-blue-500 rounded-full p-0.5 shadow-sm">
+                          <HiCheck className="w-4 h-4" />
+                        </div>
+                      )}
+
+                      {/* Action buttons - show on hover */}
+                      <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 z-20">
+                        <button
+                          onClick={(e) => openEditModal(e, folder)}
+                          className="p-1.5 bg-white/90 hover:bg-white text-slate-500 hover:text-blue-600 rounded-lg shadow-sm transition-colors cursor-pointer"
+                          title="Chỉnh sửa"
+                        >
+                          <HiPencilSquare className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => handleDelete(e, folder)}
+                          className="p-1.5 bg-white/90 hover:bg-white text-slate-500 hover:text-red-500 rounded-lg shadow-sm transition-colors cursor-pointer"
+                          title="Xóa"
+                        >
+                          <HiTrash className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         )}
       </div>

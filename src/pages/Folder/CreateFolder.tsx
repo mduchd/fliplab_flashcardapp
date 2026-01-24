@@ -158,7 +158,7 @@ const CreateFolder: React.FC = () => {
         <div className="mb-8">
           <button 
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white mb-4 transition-colors cursor-pointer"
           >
             <HiArrowLeft className="w-6 h-6 text-slate-600 dark:text-slate-300" />
             <span className="font-medium">Quay lại</span>
@@ -247,7 +247,7 @@ const CreateFolder: React.FC = () => {
                      </label>
                      
                      {/* 3D Folder Card Preview */}
-                     <div className="relative group perspective-1000 w-full aspect-[4/3] max-h-[220px] mx-auto">
+                     <div className="relative group perspective-1000 w-full aspect-[4/3] max-h-[220px] mx-auto cursor-pointer">
                         
                         {/* 1. Back Folder Layer (Darker Tab) */}
                         <div className={`absolute left-0 top-0 w-[40%] h-10 rounded-t-2xl transition-colors duration-300 ${FOLDER_COLORS.find(c => c.id === color)?.class.replace('bg-', 'bg-') || 'bg-blue-500'} brightness-75 -translate-y-2 translate-x-1`}></div>
@@ -260,15 +260,8 @@ const CreateFolder: React.FC = () => {
                         {/* 3. Main Folder Body (Front) */}
                         <div className={`absolute inset-0 top-5 rounded-2xl shadow-2xl transition-all duration-300 overflow-hidden border-t border-white/20 flex flex-col items-center justify-center text-center p-6 ${FOLDER_COLORS.find(c => c.id === color)?.class || 'bg-blue-500'}`}>
                            
-                           {/* Texture Overlay (Dot Pattern) */}
-                           <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '12px 12px' }}></div>
-                           
-                           {/* Glass Sheen */}
-                           <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-black/10 pointer-events-none"></div>
-                           
                            {/* Icon Circle */}
                            <div className="relative z-10 w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center mb-4 shadow-[0_8px_16px_rgba(0,0,0,0.1)] border border-white/30 transform group-hover:scale-110 group-hover:rotate-3 transition-all duration-300">
-                              <div className="absolute inset-0 bg-gradient-to-tr from-white/20 to-transparent rounded-2xl opacity-50"></div>
                               {React.createElement(ICON_MAP[icon] || HiFolder, { className: "w-10 h-10 text-white drop-shadow-md relative z-10" })}
                            </div>
                            
