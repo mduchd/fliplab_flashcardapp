@@ -12,6 +12,7 @@ interface User {
   totalStudyTime?: number;
   totalCardsStudied?: number;
   createdAt?: string;
+  currentStreak?: number;
 }
 
 interface LoginData {

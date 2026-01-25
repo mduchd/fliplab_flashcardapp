@@ -22,28 +22,7 @@ import ActivityStats from '../../components/profile/ActivityStats';
 import { authService } from '../../services/authService';
 import { flashcardService } from '../../services/flashcardService';
 import { useToastContext } from '../../contexts/ToastContext';
-
-// Preset Animal Avatars
-const ANIMAL_AVATARS = [
-  '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼',
-  '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦄',
-  '🦆', '🐧', '🦉', '🦅', '🐺', '🦇', '🦋', '🐝'
-];
-
-// Avatar Frames Definitions - Reduced Glow/Shadow
-const AVATAR_FRAMES = [
-  { id: 'none', name: 'Mặc định', class: 'ring-4 ring-white dark:ring-slate-700' },
-  { id: 'gold', name: 'Vàng kim', class: 'ring-[4px] ring-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.3)]' },
-  { id: 'neon', name: 'Neon', class: 'ring-[4px] ring-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]' },
-  { id: 'fire', name: 'Lửa thiêng', class: 'ring-[4px] ring-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.4)]' },
-  { id: 'rose', name: 'Hồng phấn', class: 'ring-[4px] ring-pink-400 shadow-[0_0_10px_rgba(244,114,182,0.3)]' },
-  { id: 'rainbow', name: 'Cầu vồng', class: 'rainbow-frame' }, 
-  { id: 'cosmic', name: 'Vũ trụ', class: 'frame-cosmic' },
-  { id: 'lightning', name: 'Sấm sét', class: 'frame-lightning' },
-  { id: 'mystic', name: 'Huyền bí', class: 'frame-mystic' },
-  { id: 'cyberpunk', name: 'Cyberpunk', class: 'frame-cyberpunk' },
-  { id: 'glitch', name: 'Glitch', class: 'frame-glitch' },
-];
+import { ANIMAL_AVATARS, AVATAR_FRAMES } from '../../constants/avatarConstants';
 
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -87,16 +66,31 @@ const Profile: React.FC = () => {
     const savedGoal = localStorage.getItem('settings_dailyGoal');
     const goal = savedGoal ? parseInt(savedGoal) : 20;
 
-    // 2. Load Streak
-    let currentStreak = 0;
-    const streakData = localStorage.getItem('streakData');
-    if (streakData) {
-      const { currentStreak: savedStreak, lastStudyDate } = JSON.parse(streakData);
-      const lastDate = new Date(lastStudyDate);
-      const today = new Date();
-      if (lastDate.toDateString() === today.toDateString() || 
-          new Date(today.setDate(today.getDate() - 1)).toDateString() === lastDate.toDateString()) {
-        currentStreak = savedStreak;
+    // 2. Load Streak (Prefer backend data if available, fallback to localStorage)
+    let currentStreak = user?.currentStreak || 0;
+    
+    // Only use localStorage if backend data is 0 or missing (and we have local data)
+    // OR if we want to sync local data. 
+    // Actually, let's trust the User object we just refreshed or passed in context.
+    // If user.currentStreak is undefined/0, check localStorage as fallback
+    if (!currentStreak) {
+      const streakData = localStorage.getItem('streakData');
+      if (streakData) {
+        try {
+          const { currentStreak: savedStreak, lastStudyDate } = JSON.parse(streakData);
+          const lastDate = new Date(lastStudyDate);
+          const today = new Date();
+          // Check if streak is valid (today or yesterday)
+          const yesterday = new Date(today);
+          yesterday.setDate(today.getDate() - 1);
+          
+          if (lastDate.toDateString() === today.toDateString() || 
+              lastDate.toDateString() === yesterday.toDateString()) {
+            currentStreak = savedStreak;
+          }
+        } catch (e) {
+          console.error("Error parsing local streak data", e);
+        }
       }
     }
 
@@ -180,14 +174,18 @@ const Profile: React.FC = () => {
       let lastStudyDate: Date | null = null;
       if (studiedToday) {
         lastStudyDate = new Date(today);
-      } else if (streakData) {
-        try {
-          const parsed = JSON.parse(streakData);
-          lastStudyDate = new Date(parsed.lastStudyDate);
-          // Normalize to midnight
-          lastStudyDate = new Date(lastStudyDate.getFullYear(), lastStudyDate.getMonth(), lastStudyDate.getDate());
-        } catch (e) {
-          console.error('Error parsing streak data', e);
+      } else {
+        // Safe check for streakData
+        const localStreakData = localStorage.getItem('streakData');
+        if (localStreakData) {
+          try {
+            const parsed = JSON.parse(localStreakData);
+            lastStudyDate = new Date(parsed.lastStudyDate);
+            // Normalize to midnight
+            lastStudyDate = new Date(lastStudyDate.getFullYear(), lastStudyDate.getMonth(), lastStudyDate.getDate());
+          } catch (e) {
+            console.error('Error parsing streak data', e);
+          }
         }
       }
       
@@ -647,7 +645,7 @@ const Profile: React.FC = () => {
                 <span className="text-sm font-bold text-slate-500 dark:text-slate-300 uppercase tracking-wider">Thời gian học</span>
               </div>
               <div className="text-4xl font-black text-slate-900 dark:text-slate-100 mb-1">
-                {Math.floor((user?.totalStudyTime || 0) / 60)} <span className="text-lg font-bold text-slate-400 dark:text-slate-500">phút</span>
+                {Math.round(user?.totalStudyTime || 0)} <span className="text-lg font-bold text-slate-400 dark:text-slate-500">phút</span>
               </div>
               <div className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-4">
                 Tổng cộng toàn thời gian

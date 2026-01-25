@@ -8,6 +8,7 @@ import FolderSection from '../../components/FolderSection';
 import MoveToFolderModal from '../../components/MoveToFolderModal';
 import FolderContentModal from '../../components/FolderContentModal';
 import ShareModal from '../../components/ShareModal';
+import ImportModal from '../../components/ImportModal';
 import { 
   HiPlus, 
   HiBookOpen, 
@@ -64,6 +65,9 @@ const Home: React.FC = () => {
 
   // Share Modal State
   const [sharingSet, setSharingSet] = useState<FlashcardSet | null>(null);
+
+  // Import Modal State
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const handleShareClick = (e: React.MouseEvent, set: FlashcardSet) => {
     e.stopPropagation();
@@ -335,8 +339,17 @@ const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Primary Action Button */}
-        <div>
+        {/* Primary Action Buttons */}
+        <div className="flex gap-2">
+          {activeTab === 'sets' && (
+            <button
+              onClick={() => setIsImportModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300 rounded-lg font-medium transition-all cursor-pointer"
+            >
+              <HiArrowUpTray className="w-5 h-5" />
+              <span className="hidden sm:inline">Import</span>
+            </button>
+          )}
           {activeTab === 'sets' ? (
             <Link
               to="/create"
@@ -440,7 +453,8 @@ const Home: React.FC = () => {
               <span>Tạo bộ thẻ mới</span>
             </Link>
             <button
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-sm"
+              onClick={() => setIsImportModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-white/20 transition-all text-sm cursor-pointer"
             >
               <HiArrowUpTray className="w-[18px] h-[18px]" />
               <span>Import từ file</span>
@@ -636,6 +650,13 @@ const Home: React.FC = () => {
       flashcardSet={sharingSet}
     />
   )}
+
+  {/* Import Modal */}
+  <ImportModal
+    isOpen={isImportModalOpen}
+    onClose={() => setIsImportModalOpen(false)}
+    onSuccess={() => loadData()}
+  />
 </MainLayout>
   );
 };

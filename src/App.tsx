@@ -11,6 +11,8 @@ import CreateFolder from './pages/Folder/CreateFolder';
 import Study from './pages/Study/Study';
 import Profile from './pages/Profile/Profile';
 import Settings from './pages/Settings/Settings';
+import Groups from './pages/Groups/Groups';
+import GroupDetail from './pages/Groups/GroupDetail';
 
 // Components
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -109,6 +111,22 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Settings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/groups"
+        element={
+          <ProtectedRoute>
+            <Groups />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/groups/:id"
+        element={
+          <ProtectedRoute>
+            <GroupDetail />
           </ProtectedRoute>
         }
       />

@@ -11,7 +11,8 @@ import {
   HiFire,
   HiFlag,
   HiCheckBadge,
-  HiFolderPlus
+  HiFolderPlus,
+  HiUserGroup
 } from 'react-icons/hi2';
 
 // Helper to check if two dates are the same day
@@ -32,59 +33,91 @@ const Sidebar: React.FC = () => {
   const { isCollapsed, isMobileOpen, setMobileOpen } = useSidebar();
   
   // Streak state
-  const [streak, setStreak] = useState(0);
-  const [studiedToday, setStudiedToday] = useState(false);
-  
-  // Daily goal state
-  const [dailyGoal, setDailyGoal] = useState(20);
-  const [todayProgress, setTodayProgress] = useState(0);
-
-  // Load streak and daily goal data from localStorage
-  useEffect(() => {
-    // Load daily goal setting
-    const savedGoal = localStorage.getItem('settings_dailyGoal');
-    if (savedGoal) {
-      setDailyGoal(parseInt(savedGoal));
-    }
-
-    // Load streak data
+  const [streak, setStreak] = useState(() => {
     const streakData = localStorage.getItem('streakData');
     if (streakData) {
-      const { currentStreak, lastStudyDate } = JSON.parse(streakData);
-      const lastDate = new Date(lastStudyDate);
-      const today = new Date();
-      
-      if (isSameDay(lastDate, today)) {
-        // Studied today - keep streak
-        setStreak(currentStreak);
-        setStudiedToday(true);
-      } else if (isYesterday(lastDate, today)) {
-        // Studied yesterday - streak continues but needs study today
-        setStreak(currentStreak);
-        setStudiedToday(false);
-      } else {
-        // Streak broken
-        setStreak(0);
-        setStudiedToday(false);
+      try {
+        const { currentStreak, lastStudyDate } = JSON.parse(streakData);
+        const lastDate = new Date(lastStudyDate);
+        const today = new Date();
+        
+        if (isSameDay(lastDate, today)) {
+          return currentStreak;
+        } else if (isYesterday(lastDate, today)) {
+          return currentStreak;
+        } else {
+          return 0;
+        }
+      } catch (e) {
+        return 0;
       }
     }
+    return 0;
+  });
 
-    // Load today's progress
+  const [studiedToday, setStudiedToday] = useState(() => {
+    const streakData = localStorage.getItem('streakData');
+    if (streakData) {
+      try {
+        const { lastStudyDate } = JSON.parse(streakData);
+        const lastDate = new Date(lastStudyDate);
+        const today = new Date();
+        return isSameDay(lastDate, today);
+      } catch (e) {
+        return false;
+      }
+    }
+    return false;
+  });
+  
+  // Daily goal state
+  const [dailyGoal, setDailyGoal] = useState(() => {
+    const savedGoal = localStorage.getItem('settings_dailyGoal');
+    return savedGoal ? parseInt(savedGoal) : 20;
+  });
+
+  const [todayProgress, setTodayProgress] = useState(() => {
     const progressData = localStorage.getItem('dailyProgress');
     if (progressData) {
-      const { date, cardsStudied } = JSON.parse(progressData);
+      try {
+        const { date, cardsStudied } = JSON.parse(progressData);
+        const savedDate = new Date(date);
+        const today = new Date();
+        
+        if (isSameDay(savedDate, today)) {
+          return cardsStudied;
+        } else {
+          // If different day, we should technically reset, but we can't write to localStorage here easily.
+          // Returning 0 is correct for display. The useEffect will handle the persistent reset if needed,
+          // but for instant display, 0 is correct.
+          return 0;
+        }
+      } catch (e) {
+        return 0;
+      }
+    }
+    return 0;
+  });
+
+  // Effect to handle day change resets if component stays mounted across days, 
+  // or strictly to sync logic if needed, but primary load is now lazy.
+  // We still need to check and reset 'dailyProgress' in localStorage if it's a new day
+  // to ensure consistency for other components reading it.
+  useEffect(() => {
+    // Check daily progress expiry
+    const progressData = localStorage.getItem('dailyProgress');
+    if (progressData) {
+      const { date } = JSON.parse(progressData);
       const savedDate = new Date(date);
       const today = new Date();
       
-      if (isSameDay(savedDate, today)) {
-        setTodayProgress(cardsStudied);
-      } else {
+      if (!isSameDay(savedDate, today)) {
         // Reset progress for new day
-        setTodayProgress(0);
         localStorage.setItem('dailyProgress', JSON.stringify({
           date: today.toISOString(),
           cardsStudied: 0
         }));
+        // setTodayProgress(0); // Already initialized to 0 by lazy init logic
       }
     }
   }, []);
@@ -121,6 +154,7 @@ const Sidebar: React.FC = () => {
   const links = [
     { to: '/', label: 'Trang chủ', icon: HiHome },
     { to: '/create', label: 'Tạo bộ thẻ', icon: HiPlusCircle },
+    { to: '/groups', label: 'Nhóm học tập', icon: HiUserGroup },
   ];
 
   const handleLibraryClick = (action: 'library' | 'recent' | 'settings') => {
@@ -237,6 +271,10 @@ const Sidebar: React.FC = () => {
           
           {/* Streak Card */}
           <div 
+            onClick={() => {
+              navigate('/');
+              setMobileOpen(false);
+            }}
             className={`
               relative overflow-hidden transition-all duration-300 group cursor-pointer
               ${isCollapsed 

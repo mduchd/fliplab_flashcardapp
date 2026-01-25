@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { flashcardService, FlashcardSet } from '../../services/flashcardService';
 import { folderService, Folder } from '../../services/folderService';
+import { authService } from '../../services/authService';
 import MainLayout from '../../components/layout/MainLayout';
 import ShareModal from '../../components/ShareModal';
 import MoveToFolderModal from '../../components/MoveToFolderModal';
@@ -111,6 +112,43 @@ const Study: React.FC = () => {
     }
     return () => clearInterval(interval);
   }, [isMatchPlaying, isMatchStarted, studyMode]);
+
+  // Track Study Time
+  const startTimeRef = React.useRef<number>(Date.now());
+
+  useEffect(() => {
+    startTimeRef.current = Date.now();
+
+    const saveTime = () => {
+      const now = Date.now();
+      const elapsedSeconds = (now - startTimeRef.current) / 1000;
+      
+      // Update local ref
+      startTimeRef.current = now;
+
+      // Only save if significant time passed (> 2 seconds) to avoid spam
+      if (elapsedSeconds > 2) {
+         // Send minutes (float)
+         const minutes = elapsedSeconds / 60;
+         authService.updateStats({ studyTime: minutes });
+      }
+    };
+
+    const handleVisibilityChange = () => {
+       if (document.hidden) {
+         saveTime();
+       } else {
+         startTimeRef.current = Date.now();
+       }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      saveTime();
+    };
+  }, []);
 
   const startMatchGame = () => {
     // Take up to 6 cards

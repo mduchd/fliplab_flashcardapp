@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useSidebar } from '../../contexts/SidebarContext';
+import Avatar from '../Avatar';
 import { 
   HiUser, 
   HiArrowRightOnRectangle, 
@@ -165,9 +166,13 @@ const Navbar: React.FC = () => {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-2 group focus:outline-none p-1 rounded-full hover:bg-slate-100 dark:hover:bg-white/5 transition-colors"
             >
-              <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 flex items-center justify-center text-slate-600 dark:text-slate-200 font-medium transition-colors">
-                {user?.displayName?.charAt(0).toUpperCase() || 'U'}
-              </div>
+              <Avatar 
+                avatarUrl={user?.avatar}
+                displayName={user?.displayName}
+                frameId={user?.avatarFrame}
+                size="xs"
+                className="transition-transform group-hover:scale-105"
+              />
               <HiChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 

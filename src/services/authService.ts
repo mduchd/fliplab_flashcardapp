@@ -23,6 +23,7 @@ export interface User {
   totalStudyTime?: number;
   totalCardsStudied?: number;
   createdAt?: string;
+  currentStreak?: number;
 }
 
 export interface AuthResponse {
@@ -56,6 +57,12 @@ export const authService = {
   // Update profile
   async updateProfile(data: { displayName?: string; avatar?: string; avatarFrame?: string; bio?: string }): Promise<{ success: boolean; data: { user: User } }> {
     const response = await api.put('/auth/profile', data);
+    return response.data;
+  },
+
+  // Update study stats
+  async updateStats(data: { studyTime?: number; cardsStudied?: number }): Promise<{ success: boolean; data: { totalStudyTime: number } }> {
+    const response = await api.put('/auth/stats', data);
     return response.data;
   },
 
