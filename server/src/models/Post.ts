@@ -21,6 +21,14 @@ export interface IPost extends Document {
     createdAt: Date;
   }[];
   isPinned: boolean;
+  poll?: {
+    question: string;
+    options: {
+      _id: Types.ObjectId;
+      text: string;
+      votes: Types.ObjectId[];
+    }[];
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,6 +56,13 @@ const postSchema = new Schema<IPost>(
     sharedFlashcardSet: {
       type: Schema.Types.ObjectId,
       ref: 'FlashcardSet',
+    },
+    poll: {
+      question: { type: String },
+      options: [{
+        text: { type: String, required: true },
+        votes: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+      }],
     },
     likes: [{
       type: Schema.Types.ObjectId,

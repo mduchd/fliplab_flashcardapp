@@ -32,7 +32,7 @@ const Create: React.FC = () => {
 
   const colors = [
     '#2563eb', // blue (default)
-    '#6366f1', // indigo
+    '#6366f1', // blue
     '#8b5cf6', // violet
     '#a855f7', // purple muted
     '#ec4899', // pink muted

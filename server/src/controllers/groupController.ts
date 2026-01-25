@@ -313,7 +313,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
       return;
     }
 
-    const { content, images, sharedFlashcardSet } = req.body;
+    const { content, images, sharedFlashcardSet, poll } = req.body;
 
     const post = await Post.create({
       groupId: group._id,
@@ -321,6 +321,10 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
       content,
       images: images || [],
       sharedFlashcardSet,
+      poll: poll && poll.question && poll.options?.length >= 2 ? {
+        question: poll.question,
+        options: poll.options.map((text: string) => ({ text, votes: [] }))
+      } : undefined,
     });
 
     await post.populate('author', 'username displayName avatar');
@@ -618,3 +622,104 @@ export const addReply = async (req: AuthRequest, res: Response): Promise<void> =
   }
 };
 
+
+// @desc    Toggle pin post
+// @route   POST /api/groups/:groupId/posts/:postId/pin
+// @access  Private (Admin only)
+export const togglePinPost = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bài viết',
+      });
+      return;
+    }
+
+    const group = await Group.findById(post.groupId);
+    const isAdmin = group?.admins.some((a) => a.toString() === req.userId);
+
+    if (!isAdmin) {
+      res.status(403).json({
+        success: false,
+        message: 'Chỉ quản trị viên mới có thể ghim bài viết',
+      });
+      return;
+    }
+
+    post.isPinned = !post.isPinned;
+    await post.save();
+
+    res.json({
+      success: true,
+      message: post.isPinned ? 'Đã ghim bài viết' : 'Đã bỏ ghim bài viết',
+      data: { isPinned: post.isPinned },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi ghim bài viết',
+    });
+  }
+};
+
+// @desc    Vote in poll
+// @route   POST /api/groups/:groupId/posts/:postId/vote
+// @access  Private (Member)
+export const votePoll = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const { optionIndex } = req.body;
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bài viết',
+      });
+      return;
+    }
+
+    if (!post.poll) {
+      res.status(400).json({
+        success: false,
+        message: 'Bài viết không có bình chọn',
+      });
+      return;
+    }
+
+    // Check if user is member
+    const group = await Group.findById(post.groupId);
+    if (!group?.members.some(m => m.toString() === req.userId)) {
+      res.status(403).json({
+        success: false,
+        message: 'Bạn phải là thành viên nhóm để bình chọn',
+      });
+      return;
+    }
+
+    // Remove old vote (single choice)
+    post.poll.options.forEach(opt => {
+      const idx = opt.votes.findIndex(v => v.toString() === req.userId);
+      if (idx > -1) opt.votes.splice(idx, 1);
+    });
+
+    // Add new vote if valid index (if optionIndex is -1, it means just unvote)
+    if (typeof optionIndex === 'number' && optionIndex >= 0 && optionIndex < post.poll.options.length) {
+      post.poll.options[optionIndex].votes.push(new Types.ObjectId(req.userId));
+    }
+
+    await post.save();
+    
+    res.json({
+      success: true,
+      data: { poll: post.poll },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi bình chọn',
+    });
+  }
+};

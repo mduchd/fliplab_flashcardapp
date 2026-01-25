@@ -172,8 +172,8 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
         {/* Header */}
         <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-700">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg">
-              <HiArrowUpTray className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+            <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg">
+              <HiArrowUpTray className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Import từ file</h2>
@@ -202,8 +202,8 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                 className={`
                   relative border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all
                   ${isDragging 
-                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10' 
-                    : 'border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-500/10' 
+                    : 'border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                   }
                 `}
               >
@@ -217,13 +217,13 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                 
                 {isLoading ? (
                   <div className="flex flex-col items-center">
-                    <HiArrowPath className="w-12 h-12 text-indigo-500 animate-spin mb-4" />
+                    <HiArrowPath className="w-12 h-12 text-blue-500 animate-spin mb-4" />
                     <p className="text-slate-600 dark:text-slate-300 font-medium">Đang xử lý file...</p>
                   </div>
                 ) : (
                   <>
-                    <div className="w-16 h-16 mx-auto mb-4 bg-indigo-100 dark:bg-indigo-500/20 rounded-full flex items-center justify-center">
-                      <HiArrowUpTray className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
+                    <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 dark:bg-blue-500/20 rounded-full flex items-center justify-center">
+                      <HiArrowUpTray className="w-8 h-8 text-blue-600 dark:text-blue-400" />
                     </div>
                     <p className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
                       Kéo thả file vào đây
@@ -301,14 +301,14 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
               {/* Preview Cards */}
               <div>
                 <h4 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
-                  <HiRectangleStack className="w-4 h-4 text-indigo-500" />
+                  <HiRectangleStack className="w-4 h-4 text-blue-500" />
                   Xem trước ({Math.min(previewData.preview.length, 5)} thẻ đầu tiên)
                 </h4>
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {previewData.preview.slice(0, 5).map((card, idx) => (
                     <div key={idx} className="flex gap-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-slate-100 dark:border-slate-700">
                       <div className="flex-1">
-                        <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase mb-1">Thuật ngữ</p>
+                        <p className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase mb-1">Thuật ngữ</p>
                         <p className="text-sm text-slate-900 dark:text-white font-medium line-clamp-2">{card.term}</p>
                       </div>
                       <div className="w-px bg-slate-200 dark:bg-slate-700" />
@@ -331,7 +331,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                 </button>
                 <button
                   onClick={() => setStep('customize')}
-                  className="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <HiPencilSquare className="w-4 h-4" />
                   Tiếp tục
@@ -353,7 +353,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                   value={setName}
                   onChange={(e) => setSetName(e.target.value)}
                   placeholder="Nhập tên bộ thẻ..."
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -367,7 +367,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                   onChange={(e) => setSetDescription(e.target.value)}
                   placeholder="Mô tả ngắn về bộ thẻ..."
                   rows={2}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-none text-slate-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all resize-none text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -381,7 +381,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                   value={setTags}
                   onChange={(e) => setSetTags(e.target.value)}
                   placeholder="ví dụ: tiếng anh, từ vựng, IELTS"
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
+                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all text-slate-900 dark:text-white"
                 />
               </div>
 
@@ -424,7 +424,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                 <button
                   onClick={handleImport}
                   disabled={isLoading || !setName.trim()}
-                  className="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
+                  className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                 >
                   {isLoading ? (
                     <>
@@ -468,7 +468,7 @@ const ImportModal: React.FC<ImportModalProps> = ({ isOpen, onClose, onSuccess })
                       navigate(`/study/${createdSetId}`);
                     }
                   }}
-                  className="py-3 px-6 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition-colors cursor-pointer"
+                  className="py-3 px-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors cursor-pointer"
                 >
                   Học ngay
                 </button>

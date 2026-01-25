@@ -353,7 +353,7 @@ const Home: React.FC = () => {
           {activeTab === 'sets' ? (
             <Link
               to="/create"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium hover:-translate-y-0.5 transition-all"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white rounded-lg font-medium hover:-translate-y-0.5 transition-all"
             >
               <HiPlus className="w-5 h-5" />
               <span>Tạo bộ thẻ mới</span>
@@ -361,7 +361,7 @@ const Home: React.FC = () => {
           ) : (
             <button
               onClick={() => navigate('/create-folder')}
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-medium hover:-translate-y-0.5 transition-all cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-600 hover:from-blue-700 hover:to-blue-700 text-white rounded-lg font-medium hover:-translate-y-0.5 transition-all cursor-pointer"
             >
               <HiFolder className="w-5 h-5" />
               <span>Tạo thư mục mới</span>
@@ -447,7 +447,7 @@ const Home: React.FC = () => {
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               to="/create"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5 transition-all text-sm"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/25 hover:-translate-y-0.5 transition-all text-sm"
             >
               <HiPlus className="w-[18px] h-[18px]" />
               <span>Tạo bộ thẻ mới</span>
@@ -576,7 +576,7 @@ const Home: React.FC = () => {
                       </button>
                       <button
                         onClick={(e) => handleMoveToFolder(e, set)}
-                        className="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-600 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-md transition-all shadow-sm hover:shadow cursor-pointer"
+                        className="p-2 text-slate-500 dark:text-slate-400 hover:bg-white dark:hover:bg-slate-600 hover:text-blue-600 dark:hover:text-blue-400 rounded-md transition-all shadow-sm hover:shadow cursor-pointer"
                         title="Di chuyển vào thư mục"
                       >
                         <HiFolder className="w-4 h-4" />

@@ -103,6 +103,42 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
     // Generate token
     const token = generateToken(user._id as unknown as string);
 
+    // Fetch Streak Data
+    let streak = await Streak.findOne({ userId: user._id });
+    
+    // Create streak record if not exists
+    if (!streak) {
+      streak = await Streak.create({ 
+        userId: user._id,
+        currentStreak: 0,
+        longestStreak: 0,
+        studyDates: []
+      });
+    }
+
+    // CHECK STREAK LOGIC
+    // If last study date was before yesterday (missed a day), reset streak to 0
+    if (streak.lastStudyDate) {
+      const lastDate = new Date(streak.lastStudyDate);
+      const today = new Date();
+      
+      // Reset hours to compare dates only
+      lastDate.setHours(0, 0, 0, 0);
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      yesterday.setHours(0, 0, 0, 0);
+
+      // If last study was before yesterday, streak is broken -> reset to 0
+      // BUT if we studied today, keep it.
+      const isToday = lastDate.getTime() === new Date().setHours(0,0,0,0);
+      const isYesterday = lastDate.getTime() === yesterday.getTime();
+      
+      if (!isToday && !isYesterday) {
+         streak.currentStreak = 0;
+         await streak.save();
+      }
+    }
+
     res.json({
       success: true,
       message: 'Login successful',
@@ -115,6 +151,16 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
           avatar: user.avatar,
           avatarFrame: user.avatarFrame,
           bio: user.bio,
+          totalStudyTime: user.totalStudyTime,
+          totalCardsStudied: user.totalCardsStudied,
+          createdAt: user.createdAt,
+          currentStreak: streak.currentStreak,
+        },
+        streak: {
+            currentStreak: streak.currentStreak,
+            longestStreak: streak.longestStreak,
+            studyDates: streak.studyDates,
+            lastStudyDate: streak.lastStudyDate
         },
         token,
       },

@@ -24,6 +24,11 @@ import {
   HiPaperAirplane,
   HiBookOpen,
   HiCamera,
+  HiEllipsisHorizontal,
+  HiTrash,
+  HiMapPin,
+  HiPlus,
+  HiCheckCircle,
 } from 'react-icons/hi2';
 
 const GroupDetail: React.FC = () => {
@@ -45,6 +50,11 @@ const GroupDetail: React.FC = () => {
   const [isPosting, setIsPosting] = useState(false);
   const [userFlashcardSets, setUserFlashcardSets] = useState<FlashcardSet[]>([]);
   const [showFlashcardPicker, setShowFlashcardPicker] = useState(false);
+  
+  // Poll creation
+  const [isPollMode, setIsPollMode] = useState(false);
+  const [pollQuestion, setPollQuestion] = useState('');
+  const [pollOptions, setPollOptions] = useState<string[]>(['', '']);
 
   // Settings modal
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
@@ -56,6 +66,10 @@ const GroupDetail: React.FC = () => {
 
   // Comment visibility state
   const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+  
+  // Post menu state
+  const [activePostMenu, setActivePostMenu] = useState<string | null>(null);
+  const postMenuRef = useRef<HTMLDivElement>(null);
 
   // Image viewer state
   const [viewingImage, setViewingImage] = useState<string | null>(null);
@@ -63,6 +77,17 @@ const GroupDetail: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (postMenuRef.current && !postMenuRef.current.contains(event.target as Node)) {
+        setActivePostMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (id) {
@@ -100,30 +125,40 @@ const GroupDetail: React.FC = () => {
     }
   };
 
-  const loadUserFlashcardSets = async () => {
-    try {
-      const response = await flashcardService.getAll();
-      if (response.success) {
-        setUserFlashcardSets(response.data.flashcardSets);
-      }
-    } catch (error) {
-      console.error('Failed to load flashcard sets:', error);
-    }
-  };
+  // ... (previous code)
 
   const handleCreatePost = async () => {
-    if (!newPostContent.trim() && !selectedFlashcardSet) {
+    if (isPollMode) {
+      if (!pollQuestion.trim()) {
+        toast.error('Vui lòng nhập câu hỏi');
+        return;
+      }
+      const validOptions = pollOptions.filter(o => o.trim());
+      if (validOptions.length < 2) {
+        toast.error('Vui lòng nhập ít nhất 2 lựa chọn');
+        return;
+      }
+    } else if (!newPostContent.trim() && !selectedFlashcardSet) {
       toast.error('Vui lòng nhập nội dung hoặc chia sẻ bộ thẻ');
       return;
     }
 
     setIsPosting(true);
     try {
-      const response = await groupService.createPost(id!, {
-        content: newPostContent.trim(),
-        images: newPostImages,
-        sharedFlashcardSet: selectedFlashcardSet || undefined,
-      });
+      const postData: any = {
+        content: isPollMode ? pollQuestion.trim() : newPostContent.trim(),
+        images: isPollMode ? [] : newPostImages,
+        sharedFlashcardSet: isPollMode ? undefined : (selectedFlashcardSet || undefined),
+      };
+
+      if (isPollMode) {
+        postData.poll = {
+          question: pollQuestion.trim(),
+          options: pollOptions.filter(o => o.trim()),
+        };
+      }
+
+      const response = await groupService.createPost(id!, postData);
 
       if (response.success) {
         toast.success('Đăng bài thành công!');
@@ -131,6 +166,12 @@ const GroupDetail: React.FC = () => {
         setNewPostImages([]);
         setSelectedFlashcardSet(null);
         setIsCreatePostOpen(false);
+        
+        // Reset poll
+        setPollQuestion('');
+        setPollOptions(['', '']);
+        setIsPollMode(false);
+        
         loadPosts();
       }
     } catch (error: any) {
@@ -140,6 +181,43 @@ const GroupDetail: React.FC = () => {
     }
   };
 
+  const handleVote = async (postId: string, optionIndex: number) => {
+    try {
+      const response = await groupService.votePoll(id!, postId, optionIndex);
+      if (response.success) {
+        setPosts(posts.map(p => p._id === postId ? { ...p, poll: response.data.poll } : p));
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Lỗi khi bình chọn');
+    }
+  };
+  
+  const handleTogglePin = async (postId: string) => {
+    try {
+      const response = await groupService.togglePinPost(id!, postId);
+      if (response.success) {
+        toast.success(response.message);
+        loadPosts();
+        setActivePostMenu(null);
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Lỗi');
+    }
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return;
+    try {
+      await groupService.deletePost(id!, postId);
+      toast.success('Đã xóa bài viết');
+      loadPosts();
+      setActivePostMenu(null);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Lỗi');
+    }
+  };
+
+  // ... (toggle like code)
   const handleToggleLike = async (postId: string) => {
     try {
       const response = await groupService.toggleLike(id!, postId);
@@ -201,7 +279,6 @@ const GroupDetail: React.FC = () => {
   const handleToggleCommentLike = async (postId: string, commentId: string) => {
     try {
       await groupService.toggleCommentLike(id!, postId, commentId);
-      // Reload posts to get updated likes
       loadPosts();
     } catch (error) {
       console.error('Failed to toggle comment like:', error);
@@ -212,7 +289,6 @@ const GroupDetail: React.FC = () => {
     try {
       const response = await groupService.addComment(id!, postId, content);
       if (response.success) {
-        // Update the specific post with new comments
         setPosts(posts.map(p => p._id === postId ? { ...p, comments: response.data.comments } : p));
         toast.success('Đã thêm bình luận');
       }
@@ -224,7 +300,6 @@ const GroupDetail: React.FC = () => {
   const handleAddReply = async (postId: string, commentId: string, content: string) => {
     try {
       await groupService.addReply(id!, postId, commentId, content);
-      // Reload posts to get updated replies
       loadPosts();
       toast.success('Đã thêm trả lời');
     } catch (error: any) {
@@ -266,11 +341,22 @@ const GroupDetail: React.FC = () => {
     }
   };
 
+  const loadUserFlashcardSets = async () => {
+    try {
+      const response = await flashcardService.getAll();
+      if (response.success) {
+        setUserFlashcardSets(response.data.flashcardSets);
+      }
+    } catch (error) {
+      console.error('Failed to load flashcard sets:', error);
+    }
+  };
+
   if (isLoading) {
     return (
       <MainLayout>
         <div className="flex items-center justify-center h-64">
-          <HiArrowPath className="w-8 h-8 text-indigo-500 animate-spin" />
+          <HiArrowPath className="w-8 h-8 text-blue-500 animate-spin" />
         </div>
       </MainLayout>
     );
@@ -293,10 +379,8 @@ const GroupDetail: React.FC = () => {
   return (
     <MainLayout>
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden mb-6 border border-slate-200 dark:border-slate-700">
-          {/* Cover */}
-          <div className="h-56 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative bg-cover bg-center" 
+          <div className="h-56 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 relative bg-cover bg-center" 
             style={group.coverImage ? { backgroundImage: `url(${group.coverImage})` } : {}}
           >
             <div className="absolute inset-0 bg-black/10"></div>
@@ -317,11 +401,9 @@ const GroupDetail: React.FC = () => {
             )}
           </div>
 
-          {/* Info */}
           <div className="p-5 -mt-10 relative">
             <div className="flex items-end gap-4 mb-4">
-              {/* Group Image */}
-              <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden">
+              <div className="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden">
                 {group.image ? (
                   <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
                 ) : (
@@ -341,7 +423,6 @@ const GroupDetail: React.FC = () => {
               <p className="text-slate-600 dark:text-slate-400 text-sm mb-4">{group.description}</p>
             )}
 
-            {/* Tabs */}
             <div className="flex gap-1 border-t border-slate-200 dark:border-slate-700 pt-4 -mx-5 px-5">
               {[
                 { key: 'posts', label: 'Bài viết' },
@@ -352,7 +433,7 @@ const GroupDetail: React.FC = () => {
                   onClick={() => setActiveTab(key as any)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                     activeTab === key
-                      ? 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400'
+                      ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400'
                       : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
@@ -372,10 +453,8 @@ const GroupDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* Content */}
         {activeTab === 'posts' && (
           <div className="space-y-4">
-            {/* Create Post */}
             {isMember && (
               <div className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-slate-200 dark:border-slate-700">
                 <button
@@ -385,55 +464,125 @@ const GroupDetail: React.FC = () => {
                   }}
                   className="w-full flex items-center gap-3 text-left cursor-pointer group"
                 >
-                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
-                    <HiPencilSquare className="w-5 h-5 text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
+                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-500/20 transition-colors">
+                    <HiPencilSquare className="w-5 h-5 text-slate-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
                   </div>
                   <span className="text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Viết bài mới...</span>
                 </button>
               </div>
             )}
 
-            {/* Posts */}
             {posts.length === 0 ? (
               <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
                 <p className="text-slate-600 dark:text-slate-400">Chưa có bài viết nào</p>
               </div>
             ) : (
               posts.map((post) => (
-                <div key={post._id} className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
-                  {/* Post Header */}
-                  <div className="p-4 flex items-center gap-3">
-                    <Avatar 
-                      avatarUrl={post.author.avatar}
-                      displayName={post.author.displayName}
-                      frameId={(post.author as any).avatarFrame}
-                      size="sm"
-                    />
-                    <div className="flex-1">
-                      <p className="font-semibold text-slate-900 dark:text-white text-sm">{post.author.displayName}</p>
-                      <p className="text-xs text-slate-500">{new Date(post.createdAt).toLocaleDateString('vi-VN')}</p>
+                <div key={post._id} className={`bg-white dark:bg-slate-800 rounded-xl border ${post.isPinned ? 'border-blue-200 dark:border-blue-900 ring-1 ring-blue-100 dark:ring-blue-900' : 'border-slate-200 dark:border-slate-700'} overflow-hidden relative transition-all`}>
+                  
+                  {/* Pin Indicator */}
+                  {post.isPinned && (
+                    <div className="absolute top-0 right-0 p-2">
+                       <HiMapPin className="w-5 h-5 text-blue-500 rotate-45" />
                     </div>
+                  )}
+
+                  {/* Post Header */}
+                  <div className="p-4 flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-1">
+                      <Avatar 
+                        avatarUrl={post.author.avatar}
+                        displayName={post.author.displayName}
+                        frameId={(post.author as any).avatarFrame}
+                        size="sm"
+                      />
+                      <div>
+                        <p className="font-semibold text-slate-900 dark:text-white text-sm flex items-center gap-2">
+                          {post.author.displayName}
+                          {post.isPinned && <span className="text-xs font-normal text-blue-500 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded-full flex items-center gap-1"><HiMapPin className="w-3 h-3" /> Đã ghim</span>}
+                        </p>
+                        <p className="text-xs text-slate-500">{new Date(post.createdAt).toLocaleDateString('vi-VN')}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Post Menu */}
+                    {(isAdmin || post.author._id === user?.id) && (
+                      <div className="relative">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActivePostMenu(activePostMenu === post._id ? null : post._id);
+                          }}
+                          className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-full text-slate-500 transition-colors cursor-pointer"
+                        >
+                          <HiEllipsisHorizontal className="w-6 h-6" />
+                        </button>
+                        
+                        {activePostMenu === post._id && (
+                          <div ref={postMenuRef} className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-100">
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleTogglePin(post._id)}
+                                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 text-left cursor-pointer"
+                              >
+                                <HiMapPin className="w-4 h-4" />
+                                {post.isPinned ? 'Bỏ ghim' : 'Ghim bài'}
+                              </button>
+                            )}
+                            <button
+                              onClick={() => handleDeletePost(post._id)}
+                              className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 text-left cursor-pointer"
+                            >
+                              <HiTrash className="w-4 h-4" />
+                              Xóa bài
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
 
-                  {/* Post Content */}
-                  <div className="px-4 pb-3">
-                    <p className="text-slate-800 dark:text-slate-200 whitespace-pre-wrap">{post.content}</p>
-                  </div>
+                  {/* Post Content / Poll */}
+                  {post.poll ? (
+                    <div className="px-4 pb-3">
+                      <h3 className="font-medium text-lg mb-3 dark:text-white">{post.poll.question}</h3>
+                      <div className="space-y-2">
+                        {post.poll.options.map((option, idx) => {
+                          const totalVotes = post.poll!.options.reduce((acc, curr) => acc + curr.votes.length, 0);
+                          const percent = totalVotes === 0 ? 0 : Math.round((option.votes.length / totalVotes) * 100);
+                          const isVoted = option.votes.includes(user!.id);
+                          return (
+                            <div key={idx} onClick={() => handleVote(post._id, idx)} className="relative h-10 rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors group">
+                              <div className={`absolute left-0 top-0 bottom-0 transition-all duration-500 ${isVoted ? 'bg-blue-200 dark:bg-blue-900/50' : 'bg-slate-200 dark:bg-slate-600'}`} style={{ width: `${percent}%` }} />
+                              <div className="absolute inset-0 flex items-center justify-between px-3">
+                                <span className="font-medium text-sm text-slate-800 dark:text-slate-200 z-10">{option.text}</span>
+                                <span className="text-xs font-medium text-slate-500 dark:text-slate-400 z-10">{percent}% ({option.votes.length}) {isVoted && <HiCheckCircle className="inline text-blue-500"/>}</span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="px-4 pb-3">
+                      <p className="text-slate-800 dark:text-slate-200 whitespace-pre-wrap">{post.content}</p>
+                    </div>
+                  )}
 
                   {/* Shared Flashcard Set */}
                   {post.sharedFlashcardSet && (
                     <Link
                       to={`/study/${post.sharedFlashcardSet._id}`}
-                      className="mx-4 mb-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-lg border border-indigo-200 dark:border-indigo-500/30 flex items-center gap-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group"
+                      className="mx-4 mb-3 p-4 bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-500/10 dark:to-blue-500/10 rounded-lg border border-blue-200 dark:border-blue-500/30 flex items-center gap-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group"
                     >
                       <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110" style={{ backgroundColor: post.sharedFlashcardSet.color }}>
                         <HiRectangleStack className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{post.sharedFlashcardSet.name}</p>
+                        <p className="font-semibold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{post.sharedFlashcardSet.name}</p>
                         <p className="text-sm text-slate-600 dark:text-slate-400">{post.sharedFlashcardSet.cards?.length || 0} thẻ</p>
                       </div>
-                      <HiBookOpen className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" />
+                      <HiBookOpen className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
                     </Link>
                   )}
 
@@ -471,7 +620,7 @@ const GroupDetail: React.FC = () => {
                     </button>
                     <button 
                       onClick={() => setShowComments({ ...showComments, [post._id]: !showComments[post._id] })}
-                      className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-500 transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-blue-500 transition-colors cursor-pointer"
                     >
                       <HiChatBubbleLeft className="w-5 h-5" />
                       {post.comments.length > 0 && post.comments.length}
@@ -510,7 +659,7 @@ const GroupDetail: React.FC = () => {
                     <p className="text-sm text-slate-500">@{member.username}</p>
                   </div>
                   {group.admins.some(a => a._id === member._id) && (
-                    <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 text-xs font-medium rounded-full">
+                    <span className="px-2 py-1 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 text-xs font-medium rounded-full">
                       Admin
                     </span>
                   )}
@@ -529,24 +678,82 @@ const GroupDetail: React.FC = () => {
         {isCreatePostOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
             <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Tạo bài viết</h2>
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700">
+                <div className="flex flex-1">
+                  <button 
+                    onClick={() => setIsPollMode(false)}
+                    className={`flex-1 p-4 text-sm font-bold transition-colors border-b-2 ${!isPollMode ? 'text-blue-600 border-blue-600' : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300'}`}
+                  >
+                    Bài viết
+                  </button>
+                  <button 
+                    onClick={() => setIsPollMode(true)}
+                    className={`flex-1 p-4 text-sm font-bold transition-colors border-b-2 ${isPollMode ? 'text-blue-600 border-blue-600' : 'text-slate-500 dark:text-slate-400 border-transparent hover:text-slate-700 dark:hover:text-slate-300'}`}
+                  >
+                    Bình chọn
+                  </button>
+                </div>
                 <button
                   onClick={() => setIsCreatePostOpen(false)}
-                  className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
+                  className="p-3 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   <HiXMark className="w-5 h-5 text-slate-500" />
                 </button>
               </div>
 
               <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto">
-                <textarea
-                  value={newPostContent}
-                  onChange={(e) => setNewPostContent(e.target.value)}
-                  placeholder="Viết gì đó..."
-                  rows={4}
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-slate-900 dark:text-white"
-                />
+                {isPollMode ? (
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Câu hỏi</label>
+                       <input
+                          value={pollQuestion}
+                          onChange={(e) => setPollQuestion(e.target.value)}
+                          placeholder="Đặt câu hỏi của bạn..."
+                          className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 dark:text-white"
+                       />
+                    </div>
+                    <div className="space-y-3">
+                       <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Các lựa chọn</label>
+                       {pollOptions.map((opt, idx) => (
+                          <div key={idx} className="flex gap-2">
+                             <input
+                                value={opt}
+                                onChange={(e) => {
+                                   const newOptions = [...pollOptions];
+                                   newOptions[idx] = e.target.value;
+                                   setPollOptions(newOptions);
+                                }}
+                                placeholder={`Lựa chọn ${idx + 1}`}
+                                className="flex-1 px-4 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 dark:text-white"
+                             />
+                             {pollOptions.length > 2 && (
+                                <button 
+                                  onClick={() => setPollOptions(pollOptions.filter((_, i) => i !== idx))}
+                                  className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg cursor-pointer"
+                                >
+                                  <HiXMark className="w-5 h-5" />
+                                </button>
+                             )}
+                          </div>
+                       ))}
+                       <button
+                          onClick={() => setPollOptions([...pollOptions, ''])}
+                          className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline p-1 cursor-pointer"
+                       >
+                          <HiPlus className="w-4 h-4" /> Thêm lựa chọn
+                       </button>
+                    </div>
+                  </div>
+                ) : (
+                  <textarea
+                    value={newPostContent}
+                    onChange={(e) => setNewPostContent(e.target.value)}
+                    placeholder="Viết gì đó..."
+                    rows={4}
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none text-slate-900 dark:text-white"
+                  />
+                )}
 
                 {/* Image Preview */}
                 {newPostImages.length > 0 && (
@@ -567,13 +774,13 @@ const GroupDetail: React.FC = () => {
 
                 {/* Selected Flashcard Set */}
                 {selectedFlashcardSet && (
-                  <div className="p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded-lg flex items-center justify-between">
-                    <span className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-500/10 rounded-lg flex items-center justify-between">
+                    <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
                       Chia sẻ: {userFlashcardSets.find(s => s._id === selectedFlashcardSet)?.name}
                     </span>
                     <button
                       onClick={() => setSelectedFlashcardSet(null)}
-                      className="text-indigo-500 hover:text-indigo-600 cursor-pointer"
+                      className="text-blue-500 hover:text-blue-600 cursor-pointer"
                     >
                       <HiXMark className="w-4 h-4" />
                     </button>
@@ -609,36 +816,38 @@ const GroupDetail: React.FC = () => {
                 )}
 
                 {/* Actions */}
-                <div className="flex gap-2">
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                  >
-                    <HiPhoto className="w-4 h-4" />
-                    Ảnh
-                  </button>
-                  <button
-                    onClick={() => setShowFlashcardPicker(!showFlashcardPicker)}
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
-                  >
-                    <HiRectangleStack className="w-4 h-4" />
-                    Chia sẻ thẻ
-                  </button>
-                </div>
+                {!isPollMode && (
+                  <div className="flex gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                    >
+                      <HiPhoto className="w-4 h-4" />
+                      Ảnh
+                    </button>
+                    <button
+                      onClick={() => setShowFlashcardPicker(!showFlashcardPicker)}
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                    >
+                      <HiRectangleStack className="w-4 h-4" />
+                      Chia sẻ thẻ
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="p-4 border-t border-slate-200 dark:border-slate-700">
                 <button
                   onClick={handleCreatePost}
-                  disabled={isPosting || (!newPostContent.trim() && !selectedFlashcardSet)}
-                  className="w-full py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                  disabled={isPosting || (isPollMode ? (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) : (!newPostContent.trim() && !selectedFlashcardSet))}
+                  className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isPosting ? (
                     <>
@@ -681,7 +890,7 @@ const GroupDetail: React.FC = () => {
                     {editCoverImage ? (
                       <img src={editCoverImage} alt="Cover" className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+                      <div className="w-full h-full bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500" />
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                       <HiCamera className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -699,7 +908,7 @@ const GroupDetail: React.FC = () => {
                 {/* Edit Avatar */}
                 <div className="flex justify-center -mt-4">
                   <div className="relative">
-                    <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden cursor-pointer group"
+                    <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden cursor-pointer group"
                       onClick={() => avatarInputRef.current?.click()}
                     >
                       {editImage ? (
@@ -727,7 +936,7 @@ const GroupDetail: React.FC = () => {
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 dark:text-white"
                   />
                 </div>
 
@@ -737,7 +946,7 @@ const GroupDetail: React.FC = () => {
                     value={editDescription}
                     onChange={(e) => setEditDescription(e.target.value)}
                     rows={3}
-                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-slate-900 dark:text-white"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none text-slate-900 dark:text-white"
                   />
                 </div>
               </div>
@@ -752,7 +961,7 @@ const GroupDetail: React.FC = () => {
                 <button
                   onClick={handleSaveSettings}
                   disabled={isSaving}
-                  className="flex-1 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isSaving ? (
                     <HiArrowPath className="w-4 h-4 animate-spin" />

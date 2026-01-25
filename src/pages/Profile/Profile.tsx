@@ -305,7 +305,7 @@ const Profile: React.FC = () => {
       if (avatarUrl) {
         if (isEmojiAvatar(avatarUrl)) {
           return (
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-bl from-white/40 to-transparent pointer-events-none" />
               <span className={`${textSize} drop-shadow-sm z-10`}>{avatarUrl}</span>
             </div>
@@ -322,7 +322,7 @@ const Profile: React.FC = () => {
       }
       // Default initial
       return (
-        <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center font-bold text-white text-4xl">
+        <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-bold text-white text-4xl">
           {displayName?.charAt(0).toUpperCase() || <HiUser className="w-10 h-10" />}
         </div>
       );
@@ -392,7 +392,7 @@ const Profile: React.FC = () => {
               {/* Big Numbers - Inline compact */}
               <div className="flex items-center justify-center gap-4 mb-3 text-center">
                 <div className="group cursor-pointer transition-transform hover:scale-110 duration-200">
-                  <div className="text-xl font-black text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{user?.totalCardsStudied || 0}</div>
+                  <div className="text-xl font-black text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{user?.totalCardsStudied || 0}</div>
                   <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Thẻ</div>
                 </div>
                 <div className="w-px h-6 bg-slate-200 dark:bg-slate-700"></div>
@@ -410,11 +410,11 @@ const Profile: React.FC = () => {
               {/* Level & Badges - Compact & Optimized with Tooltips */}
               <div className="w-full px-2 mb-3">
                 <div className="flex justify-between items-center text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  <span className="text-indigo-700 dark:text-indigo-300">Lv.5 Học giả</span>
+                  <span className="text-blue-700 dark:text-blue-300">Lv.5 Học giả</span>
                   <span>340/500 XP</span>
                 </div>
                 <div className="h-1.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden mb-3">
-                  <div className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-[68%]" />
+                  <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-[68%]" />
                 </div>
                 
                 {/* Simplified Badges - Informative Tooltips */}
@@ -546,7 +546,7 @@ const Profile: React.FC = () => {
               
               <button 
                 onClick={() => recentDeck ? navigate(`/study/${recentDeck.id}`) : navigate('/')}
-                className="w-full py-2.5 bg-indigo-600 dark:bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 dark:hover:bg-indigo-500 transition-all flex items-center justify-center gap-2 group-hover:-translate-y-0.5 cursor-pointer"
+                className="w-full py-2.5 bg-blue-600 dark:bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 dark:hover:bg-blue-500 transition-all flex items-center justify-center gap-2 group-hover:-translate-y-0.5 cursor-pointer"
               >
                 Bắt đầu ôn ngay <span className="opacity-70">→</span>
               </button>
@@ -559,7 +559,7 @@ const Profile: React.FC = () => {
           <div className="bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-lg p-5 group hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between relative overflow-hidden cursor-pointer">
              {/* Background Decoration - Moved to Top Right to avoid content overlap */}
             <div className="absolute -right-6 -top-6 opacity-5 dark:opacity-10 transform rotate-12 group-hover:rotate-0 group-hover:scale-110 transition-all duration-500">
-               <HiBookOpen className="w-32 h-32 text-slate-900 dark:text-indigo-400" />
+               <HiBookOpen className="w-32 h-32 text-slate-900 dark:text-blue-400" />
             </div>
 
             <div className="relative z-10">
@@ -573,16 +573,16 @@ const Profile: React.FC = () => {
             {/* Quick Action Preview */}
             <div className="relative z-10 mt-2">
               {recentDeck ? (
-                <div onClick={() => navigate(`/study/${recentDeck.id}`)} className="bg-slate-50 dark:bg-slate-700/40 p-3 rounded-lg border border-slate-100 dark:border-slate-600/50 cursor-pointer hover:border-indigo-300 dark:hover:border-indigo-500/50 transition-colors group/deck">
+                <div onClick={() => navigate(`/study/${recentDeck.id}`)} className="bg-slate-50 dark:bg-slate-700/40 p-3 rounded-lg border border-slate-100 dark:border-slate-600/50 cursor-pointer hover:border-blue-300 dark:hover:border-blue-500/50 transition-colors group/deck">
                   <div className="text-xs font-semibold text-slate-400 dark:text-slate-400 mb-1">Học tiếp:</div>
-                  <div className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover/deck:text-indigo-600 dark:group-hover/deck:text-indigo-300 transition-colors">
+                  <div className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate group-hover/deck:text-blue-600 dark:group-hover/deck:text-blue-300 transition-colors">
                     {recentDeck.name}
                   </div>
                 </div>
               ) : (
                 <button 
                   onClick={() => navigate('/')}
-                  className="w-full py-2 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-2 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-300 hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <HiPlusCircle className="w-4 h-4" />
                   Tạo bộ thẻ mới
@@ -722,7 +722,7 @@ const Profile: React.FC = () => {
             </div>
             <span className="text-sm font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
               {stats.studiedToday >= stats.dailyGoal 
-                ? '✓ Hoàn thành!' 
+                ? '✁EHoàn thành!' 
                 : weekHistory.filter(d => d.studied).length > 0
                   ? `${weekHistory.filter(d => d.studied).length}/7 ngày`
                   : '0/7 ngày'}
@@ -741,11 +741,11 @@ const Profile: React.FC = () => {
               >
                 {/* Circle Indicator */}
                   {day.studied ? (
-                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 flex items-center justify-center scale-110">
+                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center scale-110">
                        <HiCheckCircle className="w-6 h-6" />
                      </div>
                   ) : day.isToday ? (
-                     <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border-2 border-indigo-500 flex items-center justify-center shadow-md relative text-indigo-500">
+                     <div className="w-10 h-10 rounded-full bg-white dark:bg-slate-800 border-2 border-blue-500 flex items-center justify-center shadow-md relative text-blue-500">
                        <HiBookOpen className="w-5 h-5 animate-pulse" />
                      </div>
                   ) : (
@@ -757,7 +757,7 @@ const Profile: React.FC = () => {
                 {/* Day Label */}
                 <span className={`text-xs font-bold uppercase tracking-wider ${
                   day.studied || day.isToday
-                    ? 'text-indigo-600 dark:text-indigo-400' 
+                    ? 'text-blue-600 dark:text-blue-400' 
                     : 'text-slate-400 dark:text-slate-500'
                 }`}>
                   {day.day}

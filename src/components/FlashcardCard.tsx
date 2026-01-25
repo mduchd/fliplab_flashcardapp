@@ -38,23 +38,23 @@ export const FlashcardCard: React.FC<FlashcardCardProps> = ({
             <button
               className="btn-icon"
               onClick={handleEdit}
-              aria-label="Chỉnh sửa"
+              aria-label="Ch盻穎h s盻ｭa"
             >
-              ✏️
+              笨擾ｸ・
             </button>
             <button
               className="btn-icon"
               onClick={handleDelete}
-              aria-label="Xóa"
+              aria-label="Xﾃｳa"
             >
-              🗑️
+              �卵・・
             </button>
           </div>
         </div>
         <p className="set-description">{set.description}</p>
         <div className="set-footer">
           <span className="set-category">{set.category}</span>
-          <span className="set-cards-count">{set.cards.length} thẻ</span>
+          <span className="set-cards-count">{set.cards.length} th蘯ｻ</span>
         </div>
       </div>
     </div>

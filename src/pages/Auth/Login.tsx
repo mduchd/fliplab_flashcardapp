@@ -51,14 +51,14 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-blue-900 via-indigo-900 to-slate-900">
+    <div className="min-h-screen flex bg-gradient-to-br from-blue-900 via-blue-900 to-slate-900">
       {/* Left Side - Marketing/Promo - More Vibrant */}
       <div className={`hidden lg:flex lg:w-1/2 relative overflow-hidden opacity-90 transition-all duration-700 ${leftPanelVisible ? 'translate-x-0' : '-translate-x-8'}`}>
         {/* Background decoration - More vibrant with patterns */}
         <div className="absolute inset-0">
           {/* Animated gradient orbs */}
           <div className="absolute -top-40 -left-40 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-400/30 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
           <div className="absolute top-1/3 right-1/4 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
           
           {/* Floating geometric shapes - at edges */}
@@ -229,7 +229,7 @@ const Login: React.FC = () => {
         {/* Mobile background decoration */}
         <div className="absolute inset-0 lg:hidden overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-600/30 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/30 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/30 rounded-full blur-3xl"></div>
         </div>
 
         <div className={`relative w-full max-w-md transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
@@ -325,7 +325,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3 lg:py-2.5 bg-blue-600 text-white rounded-md font-semibold hover:bg-gradient-to-r hover:from-blue-600 hover:to-indigo-600 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="w-full py-3 lg:py-2.5 bg-blue-600 text-white rounded-md font-semibold hover:bg-gradient-to-r hover:from-blue-600 hover:to-blue-600 focus:outline-none transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {isLoading ? (
                   <span className="flex items-center justify-center gap-2">

@@ -15,6 +15,8 @@ import {
   deletePost,
   toggleCommentLike,
   addReply,
+  togglePinPost,
+  votePoll,
 } from '../controllers/groupController.js';
 
 const router = express.Router();
@@ -34,6 +36,8 @@ router.get('/:id/posts', authMiddleware, getPosts);
 router.post('/:groupId/posts/:postId/like', authMiddleware, toggleLike);
 router.post('/:groupId/posts/:postId/comments', authMiddleware, addComment);
 router.delete('/:groupId/posts/:postId', authMiddleware, deletePost);
+router.post('/:groupId/posts/:postId/pin', authMiddleware, togglePinPost);
+router.post('/:groupId/posts/:postId/vote', authMiddleware, votePoll);
 
 // Comment routes
 router.post('/:groupId/posts/:postId/comments/:commentId/like', authMiddleware, toggleCommentLike);

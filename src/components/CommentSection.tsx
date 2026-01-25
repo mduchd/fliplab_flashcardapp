@@ -59,12 +59,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                 onChange={(e) => setNewComment(e.target.value)}
                 placeholder="Viết bình luận..."
                 onKeyDown={(e) => e.key === 'Enter' && handleAddComment()}
-                className="flex-1 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="flex-1 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
               />
               <button
                 onClick={handleAddComment}
                 disabled={!newComment.trim()}
-                className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <HiPaperAirplane className="w-4 h-4" />
               </button>
@@ -105,7 +105,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                     </button>
                     <button
                       onClick={() => setReplyingTo(replyingTo === comment._id ? null : comment._id)}
-                      className="text-xs font-medium text-slate-500 hover:text-indigo-500 transition-colors cursor-pointer hover:underline"
+                      className="text-xs font-medium text-slate-500 hover:text-blue-500 transition-colors cursor-pointer hover:underline"
                     >
                       Trả lời
                     </button>
@@ -115,7 +115,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                     {comment.replies.length > 0 && (
                       <button
                         onClick={() => setShowReplies({ ...showReplies, [comment._id]: !showReplies[comment._id] })}
-                        className="text-xs font-medium text-indigo-500 hover:text-indigo-600 transition-colors cursor-pointer hover:underline"
+                        className="text-xs font-medium text-blue-500 hover:text-blue-600 transition-colors cursor-pointer hover:underline"
                       >
                         {showReplies[comment._id] ? 'Ẩn' : 'Xem'} {comment.replies.length} trả lời
                       </button>
@@ -131,12 +131,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                         onChange={(e) => setReplyContent(e.target.value)}
                         placeholder="Viết trả lời..."
                         onKeyDown={(e) => e.key === 'Enter' && handleAddReply(comment._id)}
-                        className="flex-1 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                        className="flex-1 px-3 py-2 bg-slate-100 dark:bg-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                       />
                       <button
                         onClick={() => handleAddReply(comment._id)}
                         disabled={!replyContent.trim()}
-                        className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 disabled:opacity-50"
+                        className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50"
                       >
                         <HiPaperAirplane className="w-4 h-4" />
                       </button>

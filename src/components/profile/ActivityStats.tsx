@@ -122,7 +122,7 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
             </div>
             Huy hiệu & Thành tích
           </h3>
-          <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer">Xem tất cả</span>
+          <span className="text-sm font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer">Xem tất cả</span>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
@@ -169,17 +169,17 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData }) => {
              <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Tiến độ cấp độ</span>
              </div>
-             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Lv.5 Học giả</span>
+             <span className="text-xs font-bold text-blue-600 dark:text-blue-400">Lv.5 Học giả</span>
           </div>
           
           <div className="flex items-center gap-4">
              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
                   <HiSparkles className="w-5 h-5" />
                 </div>
                 <div>
                    <div className="text-xs text-slate-500 dark:text-slate-400">Gần đạt cấp mới</div>
-                   <div className="text-sm font-bold text-slate-800 dark:text-white">Còn <span className="text-indigo-600 dark:text-indigo-400">160 XP</span></div>
+                   <div className="text-sm font-bold text-slate-800 dark:text-white">Còn <span className="text-blue-600 dark:text-blue-400">160 XP</span></div>
                 </div>
              </div>
              

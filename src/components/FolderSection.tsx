@@ -94,7 +94,7 @@ export const ICON_KEYS = Object.keys(ICON_MAP);
 // Folder color options
 export const FOLDER_COLORS = [
   { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
-  { id: 'indigo', class: 'bg-indigo-500', ring: 'ring-indigo-200' },
+  { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
   { id: 'purple', class: 'bg-purple-500', ring: 'ring-purple-200' },
   { id: 'pink', class: 'bg-pink-500', ring: 'ring-pink-200' },
   { id: 'red', class: 'bg-red-500', ring: 'ring-red-200' },

@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
           <div className="p-1.5 bg-blue-600 rounded-lg">
             <HiBolt className="w-6 h-6 text-white" />
           </div>
-          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 group-hover:scale-105 transition-all duration-300">
+          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-blue-600 dark:from-blue-400 dark:to-blue-400 group-hover:scale-105 transition-all duration-300">
             FlipLab
           </span>
         </Link>

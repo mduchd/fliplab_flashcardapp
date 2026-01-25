@@ -73,6 +73,14 @@ export interface Post {
     createdAt: string;
   }[];
   isPinned: boolean;
+  poll?: {
+    question: string;
+    options: {
+      _id: string;
+      text: string;
+      votes: string[];
+    }[];
+  };
   createdAt: string;
   updatedAt: string;
 }
@@ -153,6 +161,10 @@ export const groupService = {
     content: string;
     images?: string[];
     sharedFlashcardSet?: string;
+    poll?: {
+      question: string;
+      options: string[];
+    };
   }): Promise<{ success: boolean; data: { post: Post } }> {
     const response = await api.post(`/groups/${groupId}/posts`, data);
     return response.data;
@@ -197,6 +209,18 @@ export const groupService = {
     data: { replies: Post['comments'][0]['replies'] };
   }> {
     const response = await api.post(`/groups/${groupId}/posts/${postId}/comments/${commentId}/replies`, { content });
+    return response.data;
+  },
+
+  // Toggle pin post
+  async togglePinPost(groupId: string, postId: string): Promise<{ success: boolean; message: string; data: { isPinned: boolean } }> {
+    const response = await api.post(`/groups/${groupId}/posts/${postId}/pin`);
+    return response.data;
+  },
+
+  // Vote poll
+  async votePoll(groupId: string, postId: string, optionIndex: number): Promise<{ success: boolean; data: { poll: Post['poll'] } }> {
+    const response = await api.post(`/groups/${groupId}/posts/${postId}/vote`, { optionIndex });
     return response.data;
   },
 };

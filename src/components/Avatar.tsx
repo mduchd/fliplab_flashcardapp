@@ -45,7 +45,7 @@ const Avatar: React.FC<AvatarProps> = ({
     if (avatarUrl) {
       if (isEmojiAvatar(avatarUrl)) {
         return (
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
+          <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-bl from-white/40 to-transparent pointer-events-none" />
             <span className={`${textSize} drop-shadow-sm z-10`}>{avatarUrl}</span>
           </div>
@@ -62,7 +62,7 @@ const Avatar: React.FC<AvatarProps> = ({
     }
     // Default initial
     return (
-      <div className="w-full h-full rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center font-bold text-white">
+      <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-bold text-white">
         <span className={textSize}>
           {displayName?.charAt(0).toUpperCase() || <HiUser className={size === 'xs' ? 'w-4 h-4' : size === 'sm' ? 'w-5 h-5' : size === 'md' ? 'w-6 h-6' : 'w-10 h-10'} />}
         </span>

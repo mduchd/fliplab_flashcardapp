@@ -26,12 +26,20 @@ export interface User {
   currentStreak?: number;
 }
 
+export interface StreakData {
+  currentStreak: number;
+  longestStreak: number;
+  studyDates: string[];
+  lastStudyDate?: string;
+}
+
 export interface AuthResponse {
   success: boolean;
   message: string;
   data: {
     user: User;
     token: string;
+    streak?: StreakData;
   };
 }
 
@@ -70,6 +78,7 @@ export const authService = {
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('userStreak'); // Also clear streak
   },
 
   // Check if user is authenticated
@@ -84,8 +93,11 @@ export const authService = {
   },
 
   // Store auth data
-  storeAuthData(token: string, user: User): void {
+  storeAuthData(token: string, user: User, streak?: StreakData): void {
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
+    if (streak) {
+      localStorage.setItem('userStreak', JSON.stringify(streak));
+    }
   },
 };

@@ -88,7 +88,7 @@ const ICON_KEYS = Object.keys(ICON_MAP);
 // Folder color options
 const FOLDER_COLORS = [
   { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
-  { id: 'indigo', class: 'bg-indigo-500', ring: 'ring-indigo-200' },
+  { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
   { id: 'purple', class: 'bg-purple-500', ring: 'ring-purple-200' },
   { id: 'pink', class: 'bg-pink-500', ring: 'ring-pink-200' },
   { id: 'red', class: 'bg-red-500', ring: 'ring-red-200' },
@@ -324,7 +324,7 @@ const CreateFolder: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="flex-1 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
+              className="flex-1 py-3.5 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-xl font-bold hover:from-blue-700 hover:to-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
             >
               {isLoading ? (
                 <>

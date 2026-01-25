@@ -527,7 +527,7 @@ const Study: React.FC = () => {
             <div className="flex gap-4 justify-center">
               <button
                 onClick={handleRestart}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-semibold hover:from-blue-500 hover:to-indigo-500 transition-all flex items-center gap-2"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-600 text-white rounded-lg font-semibold hover:from-blue-500 hover:to-blue-500 transition-all flex items-center gap-2"
               >
                 <RotateCcw size={20} />
                 Học lại
@@ -564,7 +564,7 @@ const Study: React.FC = () => {
             </button>
             <button
               onClick={() => setIsMoveModalOpen(true)}
-              className="px-4 py-2 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-200 dark:hover:bg-indigo-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
+              className="px-4 py-2 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
             >
               <HiFolder size={18} />
               Thêm vào thư mục
@@ -741,7 +741,7 @@ const Study: React.FC = () => {
                         <p className="text-slate-600 dark:text-slate-300 mb-6">Ghép các thẻ tương ứng với nhau trong thời gian ngắn nhất!</p>
                         <button 
                           onClick={startMatchGame}
-                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-lg font-bold rounded-xl shadow-xl hover:scale-105 transition-transform cursor-pointer active:scale-95 active:shadow-md"
+                          className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-600 text-white text-lg font-bold rounded-xl shadow-xl hover:scale-105 transition-transform cursor-pointer active:scale-95 active:shadow-md"
                         >
                           Bắt đầu ngay
                         </button>
@@ -787,7 +787,7 @@ const Study: React.FC = () => {
                
                {!isMatchPlaying && isMatchStarted === false && matchedPairs.size > 0 && (
                   <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white dark:bg-slate-900 rounded-xl animate-in fade-in">
-                      <h3 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-4 animate-bounce">Xuất sắc!</h3>
+                      <h3 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-600 mb-4 animate-bounce">Xuất sắc!</h3>
                       <p className="text-xl text-slate-600 dark:text-slate-300 font-medium mb-8">Thời gian: <span className="text-blue-600 dark:text-blue-400 font-bold text-2xl">{matchTime.toFixed(1)}s</span></p>
                       <button onClick={startMatchGame} className="px-8 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-500 transition-colors inline-flex items-center gap-2 shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 transform cursor-pointer active:translate-y-0">
                         <RotateCcw size={20} /> Chơi lại

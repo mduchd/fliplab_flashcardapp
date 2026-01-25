@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (data: LoginData): Promise<void> => {
     const response = await authService.login(data);
     if (response.success) {
-      authService.storeAuthData(response.data.token, response.data.user);
+      authService.storeAuthData(response.data.token, response.data.user, response.data.streak);
       setUser(response.data.user);
     } else {
       throw new Error(response.message);
@@ -95,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (data: RegisterData): Promise<void> => {
     const response = await authService.register(data);
     if (response.success) {
-      authService.storeAuthData(response.data.token, response.data.user);
+      authService.storeAuthData(response.data.token, response.data.user, response.data.streak);
       setUser(response.data.user);
     } else {
       throw new Error(response.message);
