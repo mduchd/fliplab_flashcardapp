@@ -13,6 +13,8 @@ import {
   toggleLike,
   addComment,
   deletePost,
+  toggleCommentLike,
+  addReply,
 } from '../controllers/groupController.js';
 
 const router = express.Router();
@@ -33,4 +35,9 @@ router.post('/:groupId/posts/:postId/like', authMiddleware, toggleLike);
 router.post('/:groupId/posts/:postId/comments', authMiddleware, addComment);
 router.delete('/:groupId/posts/:postId', authMiddleware, deletePost);
 
+// Comment routes
+router.post('/:groupId/posts/:postId/comments/:commentId/like', authMiddleware, toggleCommentLike);
+router.post('/:groupId/posts/:postId/comments/:commentId/replies', authMiddleware, addReply);
+
 export default router;
+

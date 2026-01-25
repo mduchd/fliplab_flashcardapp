@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import MainLayout from '../../components/layout/MainLayout';
 import Avatar from '../../components/Avatar';
+import CommentSection from '../../components/CommentSection';
+import ImageViewerModal from '../../components/ImageViewerModal';
 import { groupService, Group, Post } from '../../services/groupService';
 import { flashcardService, FlashcardSet } from '../../services/flashcardService';
 import { useAuth } from '../../contexts/AuthContext';
@@ -21,6 +23,7 @@ import {
   HiArrowPath,
   HiPaperAirplane,
   HiBookOpen,
+  HiCamera,
 } from 'react-icons/hi2';
 
 const GroupDetail: React.FC = () => {
@@ -48,9 +51,18 @@ const GroupDetail: React.FC = () => {
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editImage, setEditImage] = useState('');
+  const [editCoverImage, setEditCoverImage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
+  // Comment visibility state
+  const [showComments, setShowComments] = useState<Record<string, boolean>>({});
+
+  // Image viewer state
+  const [viewingImage, setViewingImage] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (id) {
@@ -67,6 +79,7 @@ const GroupDetail: React.FC = () => {
         setEditName(response.data.group.name);
         setEditDescription(response.data.group.description || '');
         setEditImage(response.data.group.image || '');
+        setEditCoverImage(response.data.group.coverImage || '');
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Lỗi khi tải nhóm');
@@ -156,6 +169,7 @@ const GroupDetail: React.FC = () => {
         name: editName,
         description: editDescription,
         image: editImage,
+        coverImage: editCoverImage,
       });
 
       if (response.success) {
@@ -184,6 +198,40 @@ const GroupDetail: React.FC = () => {
     }
   };
 
+  const handleToggleCommentLike = async (postId: string, commentId: string) => {
+    try {
+      await groupService.toggleCommentLike(id!, postId, commentId);
+      // Reload posts to get updated likes
+      loadPosts();
+    } catch (error) {
+      console.error('Failed to toggle comment like:', error);
+    }
+  };
+
+  const handleAddComment = async (postId: string, content: string) => {
+    try {
+      const response = await groupService.addComment(id!, postId, content);
+      if (response.success) {
+        // Update the specific post with new comments
+        setPosts(posts.map(p => p._id === postId ? { ...p, comments: response.data.comments } : p));
+        toast.success('Đã thêm bình luận');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Lỗi khi thêm bình luận');
+    }
+  };
+
+  const handleAddReply = async (postId: string, commentId: string, content: string) => {
+    try {
+      await groupService.addReply(id!, postId, commentId, content);
+      // Reload posts to get updated replies
+      loadPosts();
+      toast.success('Đã thêm trả lời');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Lỗi khi thêm trả lời');
+    }
+  };
+
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -191,6 +239,28 @@ const GroupDetail: React.FC = () => {
       reader.onloadend = () => {
         const base64 = reader.result as string;
         setNewPostImages([...newPostImages, base64]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCoverUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setEditCoverImage(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -222,11 +292,15 @@ const GroupDetail: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="bg-white dark:bg-slate-800 rounded-xl overflow-hidden mb-6 border border-slate-200 dark:border-slate-700">
           {/* Cover */}
-          <div className="h-32 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative">
+          <div className="h-56 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 relative bg-cover bg-center" 
+            style={group.coverImage ? { backgroundImage: `url(${group.coverImage})` } : {}}
+          >
+            <div className="absolute inset-0 bg-black/10"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             <button
               onClick={() => navigate('/groups')}
               className="absolute top-4 left-4 p-2 bg-black/20 hover:bg-black/40 rounded-lg transition-colors cursor-pointer"
@@ -309,12 +383,12 @@ const GroupDetail: React.FC = () => {
                     setIsCreatePostOpen(true);
                     loadUserFlashcardSets();
                   }}
-                  className="w-full flex items-center gap-3 text-left cursor-pointer"
+                  className="w-full flex items-center gap-3 text-left cursor-pointer group"
                 >
-                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center">
-                    <HiPencilSquare className="w-5 h-5 text-slate-500" />
+                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-colors">
+                    <HiPencilSquare className="w-5 h-5 text-slate-500 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors" />
                   </div>
-                  <span className="text-slate-500 dark:text-slate-400">Viết bài mới...</span>
+                  <span className="text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-200 transition-colors">Viết bài mới...</span>
                 </button>
               </div>
             )}
@@ -350,16 +424,16 @@ const GroupDetail: React.FC = () => {
                   {post.sharedFlashcardSet && (
                     <Link
                       to={`/study/${post.sharedFlashcardSet._id}`}
-                      className="mx-4 mb-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-lg border border-indigo-200 dark:border-indigo-500/30 flex items-center gap-3 hover:shadow-md transition-shadow"
+                      className="mx-4 mb-3 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 rounded-lg border border-indigo-200 dark:border-indigo-500/30 flex items-center gap-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group"
                     >
-                      <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: post.sharedFlashcardSet.color }}>
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110" style={{ backgroundColor: post.sharedFlashcardSet.color }}>
                         <HiRectangleStack className="w-6 h-6 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900 dark:text-white">{post.sharedFlashcardSet.name}</p>
+                        <p className="font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{post.sharedFlashcardSet.name}</p>
                         <p className="text-sm text-slate-600 dark:text-slate-400">{post.sharedFlashcardSet.cards?.length || 0} thẻ</p>
                       </div>
-                      <HiBookOpen className="w-5 h-5 text-indigo-500" />
+                      <HiBookOpen className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" />
                     </Link>
                   )}
 
@@ -368,7 +442,15 @@ const GroupDetail: React.FC = () => {
                     <div className="px-4 pb-3">
                       <div className={`grid gap-2 ${post.images.length === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}>
                         {post.images.map((img, idx) => (
-                          <img key={idx} src={img} alt="" className="rounded-lg w-full object-cover max-h-80" />
+                          <img 
+                            key={idx} 
+                            src={img} 
+                            alt="" 
+                            onClick={() => setViewingImage(img)}
+                            className={`rounded-lg w-full object-cover cursor-pointer hover:opacity-95 transition-opacity hover:shadow-lg ${
+                              post.images.length === 1 ? 'max-h-[500px]' : 'max-h-96'
+                            }`}
+                          />
                         ))}
                       </div>
                     </div>
@@ -387,11 +469,24 @@ const GroupDetail: React.FC = () => {
                       <HiHeart className={`w-5 h-5 ${post.likes.includes(user!.id) ? 'fill-current' : ''}`} />
                       {post.likes.length > 0 && post.likes.length}
                     </button>
-                    <button className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-500 transition-colors cursor-pointer">
+                    <button 
+                      onClick={() => setShowComments({ ...showComments, [post._id]: !showComments[post._id] })}
+                      className="flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-indigo-500 transition-colors cursor-pointer"
+                    >
                       <HiChatBubbleLeft className="w-5 h-5" />
                       {post.comments.length > 0 && post.comments.length}
                     </button>
                   </div>
+
+                  {/* Comments Section */}
+                  <CommentSection
+                    post={post}
+                    currentUserId={user!.id}
+                    showComments={!!showComments[post._id]}
+                    onToggleCommentLike={handleToggleCommentLike}
+                    onAddReply={handleAddReply}
+                    onAddComment={handleAddComment}
+                  />
                 </div>
               ))
             )}
@@ -403,7 +498,7 @@ const GroupDetail: React.FC = () => {
             <h3 className="font-bold text-slate-900 dark:text-white mb-4">Thành viên ({group.members.length})</h3>
             <div className="space-y-3">
               {group.members.map((member) => (
-                <div key={member._id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                <div key={member._id} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors cursor-default group">
                   <Avatar 
                     avatarUrl={member.avatar}
                     displayName={member.displayName}
@@ -577,15 +672,53 @@ const GroupDetail: React.FC = () => {
               </div>
 
               <div className="p-4 space-y-4">
+                {/* Edit Cover Image */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Ảnh nhóm (URL)</label>
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Ảnh bìa</label>
+                  <div className="relative h-40 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 group cursor-pointer"
+                    onClick={() => coverInputRef.current?.click()}
+                  >
+                    {editCoverImage ? (
+                      <img src={editCoverImage} alt="Cover" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500" />
+                    )}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                      <HiCamera className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                    </div>
+                  </div>
                   <input
-                    type="text"
-                    value={editImage}
-                    onChange={(e) => setEditImage(e.target.value)}
-                    placeholder="https://..."
-                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none text-slate-900 dark:text-white"
+                    ref={coverInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleCoverUpload}
+                    className="hidden"
                   />
+                </div>
+
+                {/* Edit Avatar */}
+                <div className="flex justify-center -mt-4">
+                  <div className="relative">
+                    <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-lg overflow-hidden cursor-pointer group"
+                      onClick={() => avatarInputRef.current?.click()}
+                    >
+                      {editImage ? (
+                        <img src={editImage} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <HiUserGroup className="w-10 h-10 text-white" />
+                      )}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                        <HiCamera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
+                    </div>
+                    <input
+                      ref={avatarInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      className="hidden"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -631,6 +764,13 @@ const GroupDetail: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Image Viewer Modal */}
+        <ImageViewerModal
+          isOpen={!!viewingImage}
+          imageUrl={viewingImage || ''}
+          onClose={() => setViewingImage(null)}
+        />
       </div>
     </MainLayout>
   );

@@ -73,10 +73,10 @@ const Navbar: React.FC = () => {
         
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group min-w-fit ml-4 md:ml-0">
-          <div className="p-1.5 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-lg">
+          <div className="p-1.5 bg-blue-600 rounded-lg">
             <HiBolt className="w-6 h-6 text-white" />
           </div>
-          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 dark:from-blue-400 dark:via-indigo-400 dark:to-purple-400 group-hover:scale-105 transition-all duration-300">
+          <span className="hidden sm:block text-2xl font-black tracking-wider font-logo bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400 group-hover:scale-105 transition-all duration-300">
             FlipLab
           </span>
         </Link>
@@ -124,7 +124,7 @@ const Navbar: React.FC = () => {
           <div className="relative" ref={createMenuRef}>
             <button 
               onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)}
-              className={`p-2 bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-full hover:from-blue-500 hover:to-indigo-500 transition-all flex items-center justify-center ${isCreateMenuOpen ? 'ring-2 ring-offset-2 ring-blue-500 dark:ring-offset-slate-900' : ''}`}
+              className={`p-2 bg-blue-600 text-white rounded-full hover:bg-blue-500 transition-all flex items-center justify-center cursor-pointer ${isCreateMenuOpen ? 'ring-2 ring-offset-2 ring-blue-500 dark:ring-offset-slate-900' : ''}`}
             >
               <HiPlus className={`w-5 h-5 transition-transform duration-200 ${isCreateMenuOpen ? 'rotate-45' : ''}`} />
             </button>

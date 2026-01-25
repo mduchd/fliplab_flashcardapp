@@ -58,6 +58,18 @@ export interface Post {
       avatar?: string;
     };
     content: string;
+    likes: string[];
+    replies: {
+      _id: string;
+      author: {
+        _id: string;
+        username: string;
+        displayName: string;
+        avatar?: string;
+      };
+      content: string;
+      createdAt: string;
+    }[];
     createdAt: string;
   }[];
   isPinned: boolean;
@@ -167,6 +179,24 @@ export const groupService = {
   // Delete post
   async deletePost(groupId: string, postId: string): Promise<{ success: boolean }> {
     const response = await api.delete(`/groups/${groupId}/posts/${postId}`);
+    return response.data;
+  },
+
+  // Toggle like on comment
+  async toggleCommentLike(groupId: string, postId: string, commentId: string): Promise<{
+    success: boolean;
+    data: { liked: boolean; likesCount: number };
+  }> {
+    const response = await api.post(`/groups/${groupId}/posts/${postId}/comments/${commentId}/like`);
+    return response.data;
+  },
+
+  // Add reply to comment
+  async addReply(groupId: string, postId: string, commentId: string, content: string): Promise<{
+    success: boolean;
+    data: { replies: Post['comments'][0]['replies'] };
+  }> {
+    const response = await api.post(`/groups/${groupId}/posts/${postId}/comments/${commentId}/replies`, { content });
     return response.data;
   },
 };

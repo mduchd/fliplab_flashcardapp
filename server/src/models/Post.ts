@@ -8,8 +8,16 @@ export interface IPost extends Document {
   sharedFlashcardSet?: Types.ObjectId;
   likes: Types.ObjectId[];
   comments: {
+    _id?: Types.ObjectId;
     author: Types.ObjectId;
     content: string;
+    likes: Types.ObjectId[];
+    replies: {
+      _id?: Types.ObjectId;
+      author: Types.ObjectId;
+      content: string;
+      createdAt: Date;
+    }[];
     createdAt: Date;
   }[];
   isPinned: boolean;
@@ -56,6 +64,26 @@ const postSchema = new Schema<IPost>(
         required: true,
         maxlength: 1000,
       },
+      likes: [{
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+      }],
+      replies: [{
+        author: {
+          type: Schema.Types.ObjectId,
+          ref: 'User',
+          required: true,
+        },
+        content: {
+          type: String,
+          required: true,
+          maxlength: 500,
+        },
+        createdAt: {
+          type: Date,
+          default: Date.now,
+        },
+      }],
       createdAt: {
         type: Date,
         default: Date.now,

@@ -459,6 +459,8 @@ export const addComment = async (req: AuthRequest, res: Response): Promise<void>
     post.comments.push({
       author: new Types.ObjectId(req.userId),
       content,
+      likes: [],
+      replies: [],
       createdAt: new Date(),
     });
 
@@ -518,3 +520,101 @@ export const deletePost = async (req: AuthRequest, res: Response): Promise<void>
     });
   }
 };
+
+// @desc    Toggle like on comment
+// @route   POST /api/groups/:groupId/posts/:postId/comments/:commentId/like
+// @access  Private (Member)
+export const toggleCommentLike = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bài viết',
+      });
+      return;
+    }
+
+    const comment = (post.comments as any).id(req.params.commentId);
+    if (!comment) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bình luận',
+      });
+      return;
+    }
+
+    const likeIndex = comment.likes.findIndex((l: Types.ObjectId) => l.toString() === req.userId);
+    
+    if (likeIndex > -1) {
+      comment.likes.splice(likeIndex, 1);
+    } else {
+      comment.likes.push(new Types.ObjectId(req.userId));
+    }
+
+    await post.save();
+
+    res.json({
+      success: true,
+      data: { 
+        liked: likeIndex === -1,
+        likesCount: comment.likes.length,
+      },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi',
+    });
+  }
+};
+
+// @desc    Add reply to comment
+// @route   POST /api/groups/:groupId/posts/:postId/comments/:commentId/replies
+// @access  Private (Member)
+export const addReply = async (req: AuthRequest, res: Response): Promise<void> => {
+  try {
+    const post = await Post.findById(req.params.postId);
+
+    if (!post) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bài viết',
+      });
+      return;
+    }
+
+    const comment = (post.comments as any).id(req.params.commentId);
+    if (!comment) {
+      res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy bình luận',
+      });
+      return;
+    }
+
+    const { content } = req.body;
+
+    comment.replies.push({
+      author: new Types.ObjectId(req.userId),
+      content,
+      createdAt: new Date(),
+    });
+
+    await post.save();
+    await post.populate('comments.replies.author', 'username displayName avatar avatarFrame');
+
+    res.status(201).json({
+      success: true,
+      message: 'Đã thêm trả lời',
+      data: { replies: comment.replies },
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Lỗi khi thêm trả lời',
+    });
+  }
+};
+

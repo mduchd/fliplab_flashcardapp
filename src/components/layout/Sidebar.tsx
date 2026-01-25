@@ -12,7 +12,9 @@ import {
   HiFlag,
   HiCheckBadge,
   HiFolderPlus,
-  HiUserGroup
+  HiUserGroup,
+  HiBell,
+  HiPlus
 } from 'react-icons/hi2';
 
 // Helper to check if two dates are the same day
@@ -31,9 +33,28 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isCollapsed, isMobileOpen, setMobileOpen } = useSidebar();
-  
+  const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
+  const createMenuRef = React.useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (createMenuRef.current && !createMenuRef.current.contains(event.target as Node)) {
+        setIsCreateMenuOpen(false);
+      }
+    };
+
+    if (isCreateMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isCreateMenuOpen]);
+
   // Streak state
   const [streak, setStreak] = useState(() => {
+    // ... code truncated ...
     const streakData = localStorage.getItem('streakData');
     if (streakData) {
       try {
@@ -71,7 +92,7 @@ const Sidebar: React.FC = () => {
   });
   
   // Daily goal state
-  const [dailyGoal, setDailyGoal] = useState(() => {
+  const [dailyGoal] = useState(() => {
     const savedGoal = localStorage.getItem('settings_dailyGoal');
     return savedGoal ? parseInt(savedGoal) : 20;
   });
@@ -150,12 +171,6 @@ const Sidebar: React.FC = () => {
       window.removeEventListener('cardStudied', handleCardStudied);
     };
   }, [streak, studiedToday, todayProgress]);
-  
-  const links = [
-    { to: '/', label: 'Trang chủ', icon: HiHome },
-    { to: '/create', label: 'Tạo bộ thẻ', icon: HiPlusCircle },
-    { to: '/groups', label: 'Nhóm học tập', icon: HiUserGroup },
-  ];
 
   const handleLibraryClick = (action: 'library' | 'recent' | 'settings') => {
     switch (action) {
@@ -192,7 +207,7 @@ const Sidebar: React.FC = () => {
           will-change-[width]
           ${isCollapsed ? 'w-[72px]' : 'w-64'}
           ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0 flex flex-col overflow-hidden p-3
+          md:translate-x-0 flex flex-col overflow-visible p-3
         `}
       >
         
@@ -203,45 +218,122 @@ const Sidebar: React.FC = () => {
               Menu
             </p>
           </div>
-          {links.map((link) => (
-            <NavLink
-              key={link.to}
-              to={link.to}
-              onClick={() => setMobileOpen(false)}
-              className={({ isActive }) =>
-                isCollapsed
-                  ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
-                      isActive
-                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                        : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-                    }`
-                  : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden ${
-                      isActive
-                        ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                        : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
-                    }`
-              }
-            >
-              <link.icon className="w-6 h-6 flex-shrink-0" />
-              {!isCollapsed && <span>{link.label}</span>}
-            </NavLink>
-          ))}
 
-          {/* Create Folder Button */}
-          <button
-            onClick={() => {
-              navigate('/create-folder');
-              setMobileOpen(false);
-            }}
-            className={
+          <NavLink
+            to="/"
+            onClick={() => setMobileOpen(false)}
+            className={({ isActive }) =>
               isCollapsed
-                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 cursor-pointer`
-                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 w-full text-left cursor-pointer`
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
             }
           >
-            <HiFolderPlus className="w-6 h-6 flex-shrink-0" />
-            {!isCollapsed && <span>Tạo thư mục</span>}
-          </button>
+            <HiHome className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Trang chủ</span>}
+          </NavLink>
+
+          {/* Create Menu Button */}
+          <div className="relative" ref={createMenuRef}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsCreateMenuOpen(!isCreateMenuOpen);
+              }}
+              className={
+                isCollapsed
+                  ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${isCreateMenuOpen ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`
+                  : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden w-full text-left cursor-pointer ${isCreateMenuOpen ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`
+              }
+            >
+              <HiPlus className="w-6 h-6 flex-shrink-0" />
+              {!isCollapsed && <span>Tạo mới</span>}
+            </button>
+
+            {/* Dropdown Menu */}
+            {isCreateMenuOpen && (
+              <div className="absolute left-full top-0 ml-2 z-[100] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden animate-fadeIn w-60 origin-top-left">
+                <button
+                  onClick={() => {
+                    navigate('/create');
+                    setIsCreateMenuOpen(false);
+                    setMobileOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 text-left transition-colors cursor-pointer"
+                >
+                  <HiPlusCircle className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Bộ thẻ mới</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Tạo bộ flashcard để học</p>
+                  </div>
+                </button>
+                <div className="h-px bg-slate-100 dark:bg-slate-700 mx-2" />
+                <button
+                  onClick={() => {
+                    navigate('/create-folder');
+                    setIsCreateMenuOpen(false);
+                    setMobileOpen(false);
+                  }}
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 text-left transition-colors cursor-pointer"
+                >
+                  <HiFolderPlus className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">Thư mục mới</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">Tổ chức các bộ thẻ</p>
+                  </div>
+                </button>
+              </div>
+            )}
+          </div>
+
+          <NavLink
+            to="/groups"
+            onClick={() => setMobileOpen(false)}
+            className={({ isActive }) =>
+              isCollapsed
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+            }
+          >
+            <HiUserGroup className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Nhóm học tập</span>}
+          </NavLink>
+
+          <NavLink
+            to="/notifications"
+            onClick={() => setMobileOpen(false)}
+            className={({ isActive }) =>
+              isCollapsed
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
+                    isActive
+                      ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
+                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                  }`
+            }
+          >
+            <HiBell className="w-6 h-6 flex-shrink-0" />
+            {!isCollapsed && <span>Thông báo</span>}
+          </NavLink>
 
           {/* Profile Link */}
           <NavLink
@@ -249,12 +341,12 @@ const Sidebar: React.FC = () => {
             onClick={() => setMobileOpen(false)}
             className={({ isActive }) =>
               isCollapsed
-                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
+                ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
                       : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
-                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden ${
+                : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
