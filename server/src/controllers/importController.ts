@@ -8,7 +8,7 @@ import * as pdfParseModule from 'pdf-parse';
 const parsePdf = async (buffer: Buffer): Promise<string> => {
   try {
     // pdf-parse v2 exports parsePdf as a named export
-    const { parsePdf: parse } = pdfParseModule;
+    const { parsePdf: parse } = pdfParseModule as any;
     if (typeof parse === 'function') {
       const result = await parse(buffer);
       return result.text || '';

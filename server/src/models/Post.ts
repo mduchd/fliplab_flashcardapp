@@ -18,9 +18,12 @@ export interface IPost extends Document {
       content: string;
       createdAt: Date;
     }[];
+    isAnonymous?: boolean;
     createdAt: Date;
   }[];
   isPinned: boolean;
+  status: 'approved' | 'pending' | 'rejected';
+  isAnonymous: boolean;
   poll?: {
     question: string;
     options: {
@@ -103,8 +106,21 @@ const postSchema = new Schema<IPost>(
         type: Date,
         default: Date.now,
       },
+      isAnonymous: {
+        type: Boolean,
+        default: false,
+      },
     }],
     isPinned: {
+      type: Boolean,
+      default: false,
+    },
+    status: {
+      type: String,
+      enum: ['approved', 'pending', 'rejected'],
+      default: 'approved',
+    },
+    isAnonymous: {
       type: Boolean,
       default: false,
     },

@@ -28,6 +28,10 @@ export interface Group {
   tags: string[];
   createdAt: string;
   updatedAt: string;
+  settings?: {
+    allowAnonymousPosts: boolean;
+    requireApproval: boolean;
+  };
 }
 
 export interface Post {
@@ -71,6 +75,7 @@ export interface Post {
       createdAt: string;
     }[];
     createdAt: string;
+    isAnonymous?: boolean;
   }[];
   isPinned: boolean;
   poll?: {
@@ -81,6 +86,8 @@ export interface Post {
       votes: string[];
     }[];
   };
+  status?: 'approved' | 'pending' | 'rejected';
+  isAnonymous?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -121,6 +128,10 @@ export const groupService = {
     coverImage?: string;
     isPublic?: boolean;
     tags?: string[];
+    settings?: {
+      allowAnonymousPosts?: boolean;
+      requireApproval?: boolean;
+    };
   }): Promise<{ success: boolean; data: { group: Group } }> {
     const response = await api.put(`/groups/${id}`, data);
     return response.data;
@@ -145,14 +156,16 @@ export const groupService = {
   },
 
   // Get posts in group
-  async getPosts(groupId: string, page = 1): Promise<{
+  async getPosts(groupId: string, page = 1, status?: 'approved' | 'pending' | 'rejected'): Promise<{
     success: boolean;
     data: {
       posts: Post[];
       pagination: { page: number; limit: number; total: number; pages: number };
     };
   }> {
-    const response = await api.get(`/groups/${groupId}/posts?page=${page}`);
+    let url = `/groups/${groupId}/posts?page=${page}`;
+    if (status) url += `&status=${status}`;
+    const response = await api.get(url);
     return response.data;
   },
 
@@ -165,6 +178,7 @@ export const groupService = {
       question: string;
       options: string[];
     };
+    isAnonymous?: boolean;
   }): Promise<{ success: boolean; data: { post: Post } }> {
     const response = await api.post(`/groups/${groupId}/posts`, data);
     return response.data;
@@ -180,11 +194,11 @@ export const groupService = {
   },
 
   // Add comment
-  async addComment(groupId: string, postId: string, content: string): Promise<{
+  async addComment(groupId: string, postId: string, content: string, isAnonymous?: boolean): Promise<{
     success: boolean;
     data: { comments: Post['comments'] };
   }> {
-    const response = await api.post(`/groups/${groupId}/posts/${postId}/comments`, { content });
+    const response = await api.post(`/groups/${groupId}/posts/${postId}/comments`, { content, isAnonymous });
     return response.data;
   },
 
@@ -221,6 +235,30 @@ export const groupService = {
   // Vote poll
   async votePoll(groupId: string, postId: string, optionIndex: number): Promise<{ success: boolean; data: { poll: Post['poll'] } }> {
     const response = await api.post(`/groups/${groupId}/posts/${postId}/vote`, { optionIndex });
+    return response.data;
+  },
+
+  // Delete comment
+  async deleteComment(groupId: string, postId: string, commentId: string): Promise<{ success: boolean; data: { comments: Post['comments'] } }> {
+    const response = await api.delete(`/groups/${groupId}/posts/${postId}/comments/${commentId}`);
+    return response.data;
+  },
+
+  // Approve post
+  async approvePost(groupId: string, postId: string): Promise<{ success: boolean; data: { post: Post } }> {
+    const response = await api.post(`/groups/${groupId}/posts/${postId}/approve`);
+    return response.data;
+  },
+
+  // Reject post
+  async rejectPost(groupId: string, postId: string): Promise<{ success: boolean; data: { post: Post } }> {
+    const response = await api.post(`/groups/${groupId}/posts/${postId}/reject`);
+    return response.data;
+  },
+
+  // Explore content
+  async exploreContent(): Promise<{ success: boolean; data: { groups: Group[] } }> {
+    const response = await api.get('/groups/explore/all');
     return response.data;
   },
 };

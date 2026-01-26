@@ -12,6 +12,10 @@ export interface IGroup extends Document {
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
+  settings: {
+    allowAnonymousPosts: boolean;
+    requireApproval: boolean;
+  };
 }
 
 const groupSchema = new Schema<IGroup>(
@@ -57,6 +61,16 @@ const groupSchema = new Schema<IGroup>(
       type: String,
       trim: true,
     }],
+    settings: {
+      allowAnonymousPosts: {
+        type: Boolean,
+        default: false,
+      },
+      requireApproval: {
+        type: Boolean,
+        default: false,
+      },
+    },
   },
   {
     timestamps: true,

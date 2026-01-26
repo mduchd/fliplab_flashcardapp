@@ -62,6 +62,8 @@ const GroupDetail: React.FC = () => {
   const [editDescription, setEditDescription] = useState('');
   const [editImage, setEditImage] = useState('');
   const [editCoverImage, setEditCoverImage] = useState('');
+  const [allowAnonymous, setAllowAnonymous] = useState(false);
+  const [requireApproval, setRequireApproval] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   // Comment visibility state
@@ -77,6 +79,23 @@ const GroupDetail: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
+  
+  // Heart animation state
+  const [heartAnimations, setHeartAnimations] = useState<{postId: string, id: number}[]>([]);
+
+  const handlePostDoubleClick = (postId: string) => {
+    const post = posts.find(p => p._id === postId);
+    if (post && !post.likes.includes(user!.id)) {
+      handleToggleLike(postId);
+    }
+    
+    // Add heart animation
+    const id = Date.now();
+    setHeartAnimations(prev => [...prev, { postId, id }]);
+    setTimeout(() => {
+      setHeartAnimations(prev => prev.filter(h => h.id !== id));
+    }, 1000);
+  };
   
   // Close menu when clicking outside
   useEffect(() => {
@@ -105,6 +124,8 @@ const GroupDetail: React.FC = () => {
         setEditDescription(response.data.group.description || '');
         setEditImage(response.data.group.image || '');
         setEditCoverImage(response.data.group.coverImage || '');
+        setAllowAnonymous(response.data.group.settings?.allowAnonymousPosts || false);
+        setRequireApproval(response.data.group.settings?.requireApproval || false);
       }
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Lỗi khi tải nhóm');
@@ -248,6 +269,10 @@ const GroupDetail: React.FC = () => {
         description: editDescription,
         image: editImage,
         coverImage: editCoverImage,
+        settings: {
+          allowAnonymousPosts: allowAnonymous,
+          requireApproval: requireApproval,
+        },
       });
 
       if (response.success) {
@@ -478,7 +503,17 @@ const GroupDetail: React.FC = () => {
               </div>
             ) : (
               posts.map((post) => (
-                <div key={post._id} className={`bg-white dark:bg-slate-800 rounded-xl border ${post.isPinned ? 'border-blue-200 dark:border-blue-900 ring-1 ring-blue-100 dark:ring-blue-900' : 'border-slate-200 dark:border-slate-700'} overflow-hidden relative transition-all`}>
+                <div 
+                  key={post._id} 
+                  onDoubleClick={() => handlePostDoubleClick(post._id)}
+                  className={`bg-white dark:bg-slate-800 rounded-xl border ${post.isPinned ? 'border-blue-200 dark:border-blue-900 ring-1 ring-blue-100 dark:ring-blue-900' : 'border-slate-200 dark:border-slate-700'} overflow-hidden relative transition-all select-none cursor-pointer hover:shadow-md`}
+                >
+                  {/* Heart Animation Layer */}
+                  {heartAnimations.filter(h => h.postId === post._id).map(h => (
+                    <div key={h.id} className="absolute inset-0 z-50 flex items-center justify-center pointer-events-none">
+                      <HiHeart className="w-24 h-24 text-red-500 fill-current animate-ping opacity-75 drop-shadow-xl" />
+                    </div>
+                  ))}
                   
                   {/* Pin Indicator */}
                   {post.isPinned && (
@@ -948,6 +983,56 @@ const GroupDetail: React.FC = () => {
                     rows={3}
                     className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none resize-none text-slate-900 dark:text-white"
                   />
+                </div>
+
+                {/* Divider */}
+                <div className="border-t border-slate-200 dark:border-slate-700 my-2"></div>
+
+                {/* Privacy & Moderation Settings */}
+                <div className="space-y-4">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Quyền riêng tư & Kiểm duyệt</h3>
+                  
+                  {/* Allow Anonymous Posts */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Cho phép đăng ẩn danh</label>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Thành viên có thể đăng bài và bình luận mà không hiện tên</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAllowAnonymous(!allowAnonymous)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        allowAnonymous ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          allowAnonymous ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  {/* Require Approval */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Yêu cầu phê duyệt bài viết</label>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Bài viết phải được quản trị viên duyệt trước khi hiển thị</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setRequireApproval(!requireApproval)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                        requireApproval ? 'bg-blue-600' : 'bg-slate-300 dark:bg-slate-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                          requireApproval ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
 
