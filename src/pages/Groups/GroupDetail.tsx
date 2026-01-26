@@ -139,6 +139,7 @@ const GroupDetail: React.FC = () => {
     try {
       const response = await groupService.getPosts(id!);
       if (response.success) {
+        console.log('Posts loaded from API:', response.data.posts.map(p => ({ id: p._id, content: p.content, hasImages: p.images.length > 0 })));
         setPosts(response.data.posts);
       }
     } catch (error) {
@@ -149,6 +150,13 @@ const GroupDetail: React.FC = () => {
   // ... (previous code)
 
   const handleCreatePost = async () => {
+    // Debug log
+    console.log('Preparing to create post:', { 
+      isPollMode, 
+      contentLength: newPostContent.length, 
+      imagesCount: newPostImages.length 
+    });
+
     if (isPollMode) {
       if (!pollQuestion.trim()) {
         toast.error('Vui lòng nhập câu hỏi');
@@ -159,15 +167,24 @@ const GroupDetail: React.FC = () => {
         toast.error('Vui lòng nhập ít nhất 2 lựa chọn');
         return;
       }
-    } else if (!newPostContent.trim() && !selectedFlashcardSet) {
-      toast.error('Vui lòng nhập nội dung hoặc chia sẻ bộ thẻ');
-      return;
+    } else {
+      // Normal post validation
+      const hasContent = newPostContent.trim().length > 0;
+      const hasSet = !!selectedFlashcardSet;
+      const hasImages = newPostImages.length > 0;
+      
+      if (!hasContent && !hasSet && !hasImages) {
+        toast.error('Vui lòng nhập nội dung, chọn ảnh hoặc chia sẻ bộ thẻ');
+        return;
+      }
     }
 
     setIsPosting(true);
     try {
+      const contentToSend = isPollMode ? pollQuestion.trim() : newPostContent.trim();
+      
       const postData: any = {
-        content: isPollMode ? pollQuestion.trim() : newPostContent.trim(),
+        content: contentToSend,
         images: isPollMode ? [] : newPostImages,
         sharedFlashcardSet: isPollMode ? undefined : (selectedFlashcardSet || undefined),
       };
@@ -178,6 +195,8 @@ const GroupDetail: React.FC = () => {
           options: pollOptions.filter(o => o.trim()),
         };
       }
+
+      console.log('Sending post data:', postData); // Debug log
 
       const response = await groupService.createPost(id!, postData);
 
@@ -196,6 +215,7 @@ const GroupDetail: React.FC = () => {
         loadPosts();
       }
     } catch (error: any) {
+      console.error('Create post error:', error);
       toast.error(error.response?.data?.message || 'Lỗi khi đăng bài');
     } finally {
       setIsPosting(false);
@@ -577,8 +597,17 @@ const GroupDetail: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Post Content / Poll */}
-                  {post.poll ? (
+                  {/* Post Content - Computed to ensure visibility */}
+                  {post.content && (
+                    <div className="px-4 pb-3">
+                      <p className="text-slate-900 dark:text-gray-100 whitespace-pre-wrap break-words text-[15px] leading-relaxed">
+                        {post.content}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Poll Display */}
+                  {post.poll && (
                     <div className="px-4 pb-3">
                       <h3 className="font-medium text-lg mb-3 dark:text-white">{post.poll.question}</h3>
                       <div className="space-y-2">
@@ -597,10 +626,6 @@ const GroupDetail: React.FC = () => {
                           );
                         })}
                       </div>
-                    </div>
-                  ) : (
-                    <div className="px-4 pb-3">
-                      <p className="text-slate-800 dark:text-slate-200 whitespace-pre-wrap">{post.content}</p>
                     </div>
                   )}
 

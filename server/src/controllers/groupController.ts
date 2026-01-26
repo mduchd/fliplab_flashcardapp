@@ -326,6 +326,9 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
 
     const { content, images, sharedFlashcardSet, poll, isAnonymous } = req.body;
 
+    // Debug log
+    console.log('Create post received:', { content, imagesCount: images?.length || 0, hasPoll: !!poll });
+
     // Check approval setting
     const isAdmin = group.admins.some(a => a.toString() === req.userId);
     const requireApproval = group.settings?.requireApproval && !isAdmin;
@@ -334,7 +337,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<void>
     const post = await Post.create({
       groupId: group._id,
       author: req.userId,
-      content,
+      content: content || '',
       images: images || [],
       sharedFlashcardSet,
       poll: poll && poll.question && poll.options?.length >= 2 ? {
@@ -948,13 +951,14 @@ export const rejectPost = async (req: AuthRequest, res: Response): Promise<void>
 // @access  Private
 export const exploreContent = async (req: AuthRequest, res: Response): Promise<void> => {
    try {
-      // Suggest groups: Public groups, sorted by member count, limit 10
-      const suggestedGroups = await Group.find({ isPublic: true })
-         .sort({ members: -1 }) // Sort by number of members descending (simplified assumption for now, or just createdAt)
-         .limit(10)
-         .select('name description image members tags');
-
-      // Note: to sort by member count size we need aggregation usually, or just store memberCount in model
+      // Suggest groups: Public groups that user hasn't joined yet
+      const suggestedGroups = await Group.find({ 
+         isPublic: true,
+         members: { $ne: req.userId } 
+      })
+         .sort({ createdAt: -1 }) // Sort by newest first
+         .limit(20)
+         .populate('members', 'username displayName avatar'); // Populate members to show count correctly
       // For now, let's just show newest or random public groups
 
       res.json({

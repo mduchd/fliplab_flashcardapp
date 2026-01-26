@@ -8,7 +8,7 @@ import FolderSection from '../../components/FolderSection';
 import MoveToFolderModal from '../../components/MoveToFolderModal';
 import FolderContentModal from '../../components/FolderContentModal';
 import ShareModal from '../../components/ShareModal';
-import ImportModal from '../../components/ImportModal';
+import ImportModalV2 from '../../components/ImportModalV2';
 import { 
   HiPlus, 
   HiBookOpen, 
@@ -652,9 +652,10 @@ const Home: React.FC = () => {
   )}
 
   {/* Import Modal */}
-  <ImportModal
+  <ImportModalV2
     isOpen={isImportModalOpen}
     onClose={() => setIsImportModalOpen(false)}
+    directCreate={true}
     onSuccess={() => loadData()}
   />
 </MainLayout>

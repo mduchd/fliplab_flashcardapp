@@ -4,6 +4,8 @@ import MainLayout from '../../components/layout/MainLayout';
 import { groupService, Group } from '../../services/groupService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToastContext } from '../../contexts/ToastContext';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import { getRelativeTime, getActivityStatus, estimateActiveMembers } from '../../utils/groupUtils';
 import {
   HiPlus,
   HiUserGroup,
@@ -14,6 +16,7 @@ import {
   HiArrowPath,
   HiCheck,
   HiXMark,
+  HiClock,
 } from 'react-icons/hi2';
 
 const Groups: React.FC = () => {
@@ -40,10 +43,18 @@ const Groups: React.FC = () => {
   const loadGroups = async () => {
     setIsLoading(true);
     try {
-      const filterParam = filter === 'all' ? undefined : filter;
-      const response = await groupService.getGroups(filterParam, searchQuery || undefined);
-      if (response.success) {
-        setGroups(response.data.groups);
+      if (filter === 'all' && !searchQuery) {
+        // Use explore endpoint for "Discover" tab to show groups user hasn't joined
+        const response = await groupService.exploreContent();
+        if (response.success) {
+          setGroups(response.data.groups);
+        }
+      } else {
+        const filterParam = filter === 'all' ? undefined : filter;
+        const response = await groupService.getGroups(filterParam, searchQuery || undefined);
+        if (response.success) {
+          setGroups(response.data.groups);
+        }
       }
     } catch (error) {
       console.error('Failed to load groups:', error);
@@ -100,8 +111,9 @@ const Groups: React.FC = () => {
   };
 
   return (
-    <MainLayout>
-      <div className="max-w-6xl mx-auto">
+    <Tooltip.Provider delayDuration={300}>
+      <MainLayout>
+        <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
@@ -129,9 +141,9 @@ const Groups: React.FC = () => {
           {/* Filter Tabs */}
           <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
             {[
-              { key: 'all', label: 'Tất cả', icon: HiGlobeAlt },
-              { key: 'my', label: 'Nhóm của tôi', icon: HiUsers },
-              { key: 'created', label: 'Đã tạo', icon: HiUserGroup },
+              { key: 'all', label: 'Khám phá', icon: HiGlobeAlt },
+              { key: 'my', label: 'Đã tham gia', icon: HiUsers },
+              { key: 'created', label: 'Tôi tạo', icon: HiUserGroup },
             ].map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
@@ -183,18 +195,45 @@ const Groups: React.FC = () => {
               <HiUserGroup className="w-10 h-10 text-slate-400" />
             </div>
             <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-              Chưa có nhóm nào
+              {searchQuery ? 'Không tìm thấy nhóm nào' : 
+               filter === 'my' ? 'Bạn chưa tham gia nhóm nào' :
+               filter === 'created' ? 'Bạn chưa tạo nhóm nào' :
+               'Chưa có nhóm nào'}
             </h3>
             <p className="text-slate-600 dark:text-slate-400 mb-6">
-              {filter === 'my' ? 'Bạn chưa tham gia nhóm nào' : 'Hãy tạo nhóm đầu tiên!'}
+              {searchQuery ? 'Thử đổi từ khóa tìm kiếm hoặc tạo nhóm mới' :
+               filter === 'my' ? 'Khám phá và tham gia nhóm để học cùng bạn bè' :
+               filter === 'created' ? 'Tạo nhóm đầu tiên để chia sẻ kiến thức' :
+               'Hãy tạo nhóm đầu tiên!'}
             </p>
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors cursor-pointer"
-            >
-              <HiPlus className="w-5 h-5" />
-              Tạo nhóm mới
-            </button>
+            <div className="flex gap-3 justify-center">
+              {searchQuery && (
+                <button
+                  onClick={() => { setSearchQuery(''); loadGroups(); }}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                >
+                  <HiXMark className="w-5 h-5" />
+                  Xóa tìm kiếm
+                </button>
+              )}
+              {filter === 'my' && !searchQuery ? (
+                <button
+                  onClick={() => setFilter('all')}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors cursor-pointer"
+                >
+                  <HiGlobeAlt className="w-5 h-5" />
+                  Khám phá nhóm
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsCreateModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors cursor-pointer"
+                >
+                  <HiPlus className="w-5 h-5" />
+                  Tạo nhóm mới
+                </button>
+              )}
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -205,11 +244,21 @@ const Groups: React.FC = () => {
                 <Link
                   key={group._id}
                   to={`/groups/${group._id}`}
-                  className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 hover:shadow-lg hover:-translate-y-1 transition-all group"
+                  className="flex flex-col bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all group cursor-pointer relative h-full"
                 >
-                  <div className="flex items-start gap-4 mb-4">
+                  {/* Joined Badge */}
+                  {isMember && (
+                    <div className="absolute top-3 right-3">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-500/20 text-green-700 dark:text-green-400 rounded-full text-xs font-medium">
+                        <HiCheck className="w-3 h-3" />
+                        Đã tham gia
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="flex items-start gap-4 mb-3">
                     {/* Group Image */}
-                    <div className="w-14 h-14 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 overflow-hidden shadow-md">
                       {group.image ? (
                         <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
                       ) : (
@@ -218,41 +267,101 @@ const Groups: React.FC = () => {
                     </div>
                     
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      <h3 className={`font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-1 ${isMember ? 'pr-24' : ''}`}>
                         {group.name}
                       </h3>
-                      <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-                        <HiUsers className="w-4 h-4" />
-                        <span>{group.members.length} thành viên</span>
-                        {group.isPublic ? (
-                          <HiGlobeAlt className="w-4 h-4 text-green-500" />
-                        ) : (
-                          <HiLockClosed className="w-4 h-4 text-yellow-500" />
-                        )}
+                      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-1">
+                          <HiUsers className="w-3.5 h-3.5" />
+                          <span>{group.members.length}</span>
+                        </div>
+                        <span>•</span>
+                        <div className="flex items-center gap-1" title={group.isPublic ? 'Công khai' : 'Riêng tư'}>
+                          {group.isPublic ? (
+                            <>
+                              <HiGlobeAlt className="w-3.5 h-3.5 text-green-500" />
+                              <span className="text-green-600 dark:text-green-400">Công khai</span>
+                            </>
+                          ) : (
+                            <>
+                              <HiLockClosed className="w-3.5 h-3.5 text-amber-500" />
+                              <span className="text-amber-600 dark:text-amber-400">Riêng tư</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {group.description && (
-                    <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-4">
-                      {group.description}
-                    </p>
-                  )}
+                  {/* Description with Tooltip - Always same height */}
+                  <div className="flex-1 mb-3">
+                    {group.description ? (
+                      <Tooltip.Root>
+                        <Tooltip.Trigger asChild>
+                          <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 h-[2.5rem] cursor-help">
+                            {group.description}
+                          </p>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content
+                            className="max-w-xs px-3 py-2 text-sm bg-slate-900 dark:bg-slate-700 text-white rounded-lg shadow-lg z-50"
+                            sideOffset={5}
+                          >
+                            {group.description}
+                            <Tooltip.Arrow className="fill-slate-900 dark:fill-slate-700" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
+                    ) : (
+                      <div className="h-[2.5rem]" />
+                    )}
+                  </div>
 
-                  {/* Action */}
-                  {isMember ? (
-                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400 font-medium">
-                      <HiCheck className="w-4 h-4" />
-                      Đã tham gia
-                    </div>
-                  ) : (
-                    <button
-                      onClick={(e) => handleJoinGroup(group._id, e)}
-                      className="w-full py-2 bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-lg font-medium hover:bg-blue-100 dark:hover:bg-blue-500/20 transition-colors cursor-pointer"
-                    >
-                      Tham gia
-                    </button>
-                  )}
+                  {/* Activity Info - with real data */}
+                  {(() => {
+                    const activityStatus = getActivityStatus(group.updatedAt);
+                    const relativeTime = getRelativeTime(group.updatedAt);
+                    const activeMembers = estimateActiveMembers(group.members.length);
+                    
+                    return (
+                      <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-3 pb-3 border-b border-slate-100 dark:border-slate-700">
+                        <div className="flex items-center gap-1">
+                          <HiClock className="w-3.5 h-3.5" />
+                          <span>{relativeTime}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <div className={`w-1.5 h-1.5 rounded-full ${
+                            activityStatus.color === 'green' ? 'bg-green-500' :
+                            activityStatus.color === 'yellow' ? 'bg-yellow-500' :
+                            'bg-slate-400'
+                          }`} />
+                          <span className={
+                            activityStatus.color === 'green' ? 'text-green-600 dark:text-green-400' :
+                            activityStatus.color === 'yellow' ? 'text-yellow-600 dark:text-yellow-400' :
+                            'text-slate-500'
+                          }>
+                            {activeMembers > 0 && `${activeMembers} hoạt động`}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Action Button */}
+                  <button
+                    onClick={(e) => {
+                      if (!isMember) {
+                        handleJoinGroup(group._id, e);
+                      }
+                    }}
+                    className={`w-full py-2.5 rounded-lg font-medium transition-all text-sm mt-auto ${
+                      isMember
+                        ? 'bg-blue-600 text-white hover:bg-blue-500'
+                        : 'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 border border-blue-200 dark:border-blue-500/30'
+                    }`}
+                  >
+                    {isMember ? 'Vào nhóm' : 'Tham gia ngay'}
+                  </button>
                 </Link>
               );
             })}
@@ -356,6 +465,7 @@ const Groups: React.FC = () => {
         )}
       </div>
     </MainLayout>
+    </Tooltip.Provider>
   );
 };
 

@@ -7,7 +7,6 @@ import { errorHandler } from './middleware/errorHandler.js';
 import authRoutes from './routes/authRoutes.js';
 import flashcardRoutes from './routes/flashcardRoutes.js';
 import folderRoutes from './routes/folderRoutes.js';
-import importRoutes from './routes/importRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
 
 // Load environment variables
@@ -44,7 +43,6 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/flashcards', flashcardRoutes);
 app.use('/api/folders', folderRoutes);
-app.use('/api/import', importRoutes);
 app.use('/api/groups', groupRoutes);
 
 // 404 Handler

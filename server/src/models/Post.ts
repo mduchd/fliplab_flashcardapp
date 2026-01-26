@@ -50,7 +50,7 @@ const postSchema = new Schema<IPost>(
     },
     content: {
       type: String,
-      required: [true, 'Nội dung bài viết là bắt buộc'],
+      default: '',
       maxlength: [5000, 'Nội dung không được vượt quá 5000 ký tự'],
     },
     images: [{
