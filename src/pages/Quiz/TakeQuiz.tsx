@@ -4,6 +4,7 @@ import { quizService, QuizAnswer } from '../../services/quizService';
 import MainLayout from '../../components/layout/MainLayout';
 import { HiClock, HiFlag } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
+import { dailyProgressTracker } from '../../utils/dailyProgressTracker';
 import ConfirmModal from '../../components/ConfirmModal';
 import './TakeQuiz.css';
 
@@ -152,6 +153,11 @@ const TakeQuiz: React.FC = () => {
         sessionId: session.id,
         answers: quizAnswers,
       });
+
+      // Update daily progress based on correct answers
+      if (response.data?.correctCount !== undefined) {
+        dailyProgressTracker.incrementProgress(response.data.correctCount);
+      }
 
       toast.success('Nộp bài thành công!');
       

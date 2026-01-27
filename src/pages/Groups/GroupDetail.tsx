@@ -432,14 +432,14 @@ const GroupDetail: React.FC = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
             <button
               onClick={() => navigate('/groups')}
-              className="absolute top-4 left-4 p-2 bg-black/20 hover:bg-black/40 rounded-lg transition-colors cursor-pointer"
+              className="absolute top-4 left-4 z-10 p-2 bg-black/20 hover:bg-black/40 rounded-lg transition-colors cursor-pointer backdrop-blur-sm"
             >
               <HiArrowLeft className="w-5 h-5 text-white" />
             </button>
             {isAdmin && (
               <button
                 onClick={() => setIsSettingsOpen(true)}
-                className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-black/40 rounded-lg transition-colors cursor-pointer"
+                className="absolute top-4 right-4 z-10 p-2 bg-black/20 hover:bg-black/40 rounded-lg transition-colors cursor-pointer backdrop-blur-sm"
               >
                 <HiCog6Tooth className="w-5 h-5 text-white" />
               </button>
@@ -492,6 +492,15 @@ const GroupDetail: React.FC = () => {
                 >
                   <HiArrowRightOnRectangle className="w-4 h-4" />
                   Rời nhóm
+                </button>
+              )}
+              {isAdmin && (
+                <button
+                  onClick={() => setIsSettingsOpen(true)}
+                  className="ml-auto px-4 py-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors flex items-center gap-2 cursor-pointer text-sm font-medium"
+                >
+                  <HiCog6Tooth className="w-4 h-4" />
+                  Cài đặt
                 </button>
               )}
             </div>
@@ -929,8 +938,8 @@ const GroupDetail: React.FC = () => {
         {/* Settings Modal */}
         {isSettingsOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md">
-              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
+            <div className="bg-white dark:bg-slate-800 rounded-xl shadow-2xl w-full max-w-md flex flex-col max-h-[90vh]">
+              <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 shrink-0">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Cài đặt nhóm</h2>
                 <button
                   onClick={() => setIsSettingsOpen(false)}
@@ -940,7 +949,7 @@ const GroupDetail: React.FC = () => {
                 </button>
               </div>
 
-              <div className="p-4 space-y-4">
+              <div className="p-4 space-y-4 overflow-y-auto custom-scrollbar">
                 {/* Edit Cover Image */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Ảnh bìa</label>
@@ -1061,7 +1070,7 @@ const GroupDetail: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex gap-3 p-4 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex gap-3 p-4 border-t border-slate-200 dark:border-slate-700 shrink-0">
                 <button
                   onClick={() => setIsSettingsOpen(false)}
                   className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"

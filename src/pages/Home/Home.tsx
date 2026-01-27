@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { flashcardService, FlashcardSet } from '../../services/flashcardService';
 import { folderService, Folder } from '../../services/folderService';
@@ -22,8 +22,12 @@ import {
   HiArrowUpTray,
   HiMagnifyingGlass,
   HiFolder,
-  HiShare
+  HiShare,
+  HiFire,
+  HiFlag,
+  HiCheckBadge
 } from 'react-icons/hi2';
+import { dailyProgressTracker } from '../../utils/dailyProgressTracker';
 import { useToastContext } from '../../contexts/ToastContext';
 
 type FilterType = 'all' | 'recent' | 'alphabetical' | 'mostCards';
@@ -53,6 +57,9 @@ const Home: React.FC = () => {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const toast = useToastContext();
 
+  // Ref for auto-scrolling to content area
+  const contentAreaRef = useRef<HTMLDivElement>(null);
+
   // Move to Folder Modal state
   const [moveModal, setMoveModal] = useState<{
     isOpen: boolean;
@@ -68,6 +75,39 @@ const Home: React.FC = () => {
 
   // Import Modal State
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+  // Streak and Daily Goal state
+  const [streak, setStreak] = useState(() => dailyProgressTracker.getStreak());
+  const [studiedToday, setStudiedToday] = useState(() => dailyProgressTracker.hasStudiedToday());
+
+  const [dailyGoal] = useState(() => dailyProgressTracker.getDailyGoal());
+
+  const [todayProgress, setTodayProgress] = useState(() => dailyProgressTracker.getProgress());
+  const goalCompleted = todayProgress >= dailyGoal;
+
+  // Listen for daily progress updates
+  useEffect(() => {
+    const handleProgressUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { cardsStudied } = customEvent.detail;
+      setTodayProgress(cardsStudied);
+    };
+
+    const handleStreakUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { currentStreak } = customEvent.detail;
+      setStreak(currentStreak);
+      setStudiedToday(true);
+    };
+
+    window.addEventListener('dailyProgressUpdate', handleProgressUpdate);
+    window.addEventListener('streakUpdated', handleStreakUpdate);
+    
+    return () => {
+      window.removeEventListener('dailyProgressUpdate', handleProgressUpdate);
+      window.removeEventListener('streakUpdated', handleStreakUpdate);
+    };
+  }, []);
 
   const handleShareClick = (e: React.MouseEvent, set: FlashcardSet) => {
     e.stopPropagation();
@@ -370,6 +410,153 @@ const Home: React.FC = () => {
         </div>
       </div>
 
+      {/* Stats Panel - Streak & Daily Goal */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Streak Card - Softer Orange & Darker Night Mode */}
+        <div 
+          onClick={() => navigate('/?filter=recent')} // Navigate to Recent cards to start studying
+          className="relative overflow-hidden bg-orange-400 dark:bg-orange-900/60 dark:border dark:border-orange-700/30 rounded-2xl p-6 shadow-xl transition-all duration-300 group cursor-pointer hover:bg-orange-500 dark:hover:bg-orange-900/80 hover:shadow-orange-400/30 hover:-translate-y-1 flex flex-col"
+        >
+          <div className="relative z-10 text-white dark:text-orange-50 flex-1 flex flex-col">
+            <div className="flex items-start justify-between mb-6">
+              <div>
+                <div className="flex items-center gap-2 mb-1 opacity-90">
+                  <HiFire className={`w-6 h-6 ${studiedToday ? 'animate-bounce' : ''}`} />
+                  <h3 className="text-sm font-bold uppercase tracking-wider">Chuỗi ngày học</h3>
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-6xl font-black tracking-tight drop-shadow-sm">
+                    {streak}
+                  </span>
+                  <span className="text-xl font-bold opacity-80">ngày</span>
+                </div>
+              </div>
+              <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/10 dark:bg-white/5">
+                <HiFire className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            
+            {/* Action Button - Solid White Style (Adapted for Dark Mode) */}
+            <div className="mt-auto">
+              {!studiedToday ? (
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/?filter=recent');
+                    // Scroll to content area after a short delay
+                    setTimeout(() => {
+                      contentAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                  }}
+                  className="w-full py-3 bg-white dark:bg-orange-100 text-orange-500 dark:text-orange-900 rounded-xl font-bold text-sm shadow-sm hover:bg-orange-50 dark:hover:bg-white transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <HiFire className="w-4 h-4" />
+                  Học ngay để giữ chuỗi
+                </button>
+              ) : (
+                <div className="w-full py-3 bg-white text-orange-600 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-default">
+                  <HiCheckBadge className="w-5 h-5" />
+                  Đã hoàn thành hôm nay
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Daily Goal Card - Flat & Clean */}
+        <div 
+          onClick={() => navigate('/settings')} 
+          className={`relative overflow-hidden rounded-2xl p-6 shadow-xl transition-all duration-300 cursor-pointer flex flex-col ${
+            goalCompleted 
+              ? 'bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-800 dark:to-indigo-900 shadow-blue-500/30' 
+              : 'bg-blue-500 dark:bg-blue-900/60 dark:border dark:border-blue-700/30 hover:bg-blue-600 dark:hover:bg-blue-900/80 hover:shadow-blue-500/30'
+          }`}
+        >
+          <div className="relative z-10 text-white dark:text-blue-50 flex-1 flex flex-col">
+            <div className="flex items-start justify-between mb-6">
+              <div className="flex-1">
+                <div className={`flex items-center gap-2 mb-2 ${goalCompleted ? 'opacity-100' : 'opacity-90'}`}>
+                  {goalCompleted ? (
+                     <HiCheckBadge className="w-5 h-5 text-green-300" />
+                  ) : (
+                     <HiFlag className="w-5 h-5" />
+                  )}
+                  <h3 className={`text-xs font-bold uppercase tracking-wider ${goalCompleted ? 'text-green-100' : ''}`}>
+                    {goalCompleted ? 'Đã hoàn thành mục tiêu' : 'Mục tiêu ngày'}
+                  </h3>
+                </div>
+                <div className="flex flex-col">
+                  <div className="flex items-baseline gap-1.5">
+                    <span className={`text-6xl font-black tracking-tight transition-colors ${goalCompleted ? 'text-white' : ''}`}>
+                      {todayProgress}
+                    </span>
+                    <span className="text-xl font-bold opacity-70">/ {dailyGoal}</span>
+                  </div>
+                  {goalCompleted && (
+                    <span className="text-green-200 font-medium text-sm mt-1">
+                      Bạn làm tốt lắm!
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center backdrop-blur-sm border transition-all duration-300 ${
+                goalCompleted 
+                  ? 'bg-white/10 border-green-300/30' 
+                  : 'bg-white/10 border-white/10 dark:bg-white/5'
+              }`}>
+                {goalCompleted ? (
+                  <HiCheckBadge className="w-9 h-9 text-green-300" />
+                ) : (
+                  <HiFlag className="w-7 h-7 text-white/90" />
+                )}
+              </div>
+            </div>
+            
+            {/* Flat Progress Bar */}
+            <div className={`relative h-3 rounded-full overflow-hidden mb-6 border transition-colors ${goalCompleted ? 'bg-black/20 border-green-300/20' : 'bg-black/20 dark:bg-black/40 border-white/10'}`}>
+              <div 
+                className={`absolute inset-y-0 left-0 rounded-full transition-all duration-700 ease-out ${
+                  goalCompleted 
+                    ? 'bg-green-400' 
+                    : 'bg-white dark:bg-blue-100'
+                }`}
+                style={{ width: `${Math.min((todayProgress / dailyGoal) * 100, 100)}%` }}
+              />
+            </div>
+            
+            <div className="mt-auto">
+              {goalCompleted ? (
+                 <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/settings');
+                  }}
+                  className="w-full py-3 bg-white text-blue-600 rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:bg-blue-50"
+                >
+                  <HiPencilSquare className="w-4 h-4" />
+                  Tăng mục tiêu
+                </button>
+              ) : (
+                <button 
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate('/settings');
+                  }}
+                  className="w-full py-3 bg-white dark:bg-blue-100 text-blue-600 dark:text-blue-900 hover:bg-blue-50 dark:hover:bg-white transition-all rounded-xl font-bold text-sm flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                >
+                  <HiPencilSquare className="w-4 h-4" />
+                  Điều chỉnh mục tiêu
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div ref={contentAreaRef} className="scroll-mt-24" />
       {/* Content Area */}
       {activeTab === 'folders' ? (
         <FolderSection

@@ -18,7 +18,10 @@ import {
   HiAcademicCap,
   HiArrowPath
 } from 'react-icons/hi2';
+import { dailyProgressTracker } from '../../utils/dailyProgressTracker';
+
 import ActivityStats from '../../components/profile/ActivityStats';
+import FollowShareActions from '../../components/profile/FollowShareActions';
 import { authService } from '../../services/authService';
 import { flashcardService } from '../../services/flashcardService';
 import { useToastContext } from '../../contexts/ToastContext';
@@ -48,9 +51,9 @@ const Profile: React.FC = () => {
 
   // Stats State
   const [stats, setStats] = useState({
-    streak: 0,
-    studiedToday: 0,
-    dailyGoal: 20,
+    streak: dailyProgressTracker.getStreak(),
+    studiedToday: dailyProgressTracker.getProgress(),
+    dailyGoal: dailyProgressTracker.getDailyGoal(),
     totalDecks: 0
   });
 
@@ -60,59 +63,48 @@ const Profile: React.FC = () => {
   // Week history for 7-day strip
   const [weekHistory, setWeekHistory] = useState<{day: string; studied: boolean; count: number; isToday: boolean; date: string}[]>([]);
 
-  // Load stats from localStorage
+  // Sync with Daily Progress Tracker
   useEffect(() => {
-    // 1. Load Daily Goal
-    const savedGoal = localStorage.getItem('settings_dailyGoal');
-    const goal = savedGoal ? parseInt(savedGoal) : 20;
+    // 1. Initial Load
+    setStats(prev => ({
+      ...prev,
+      streak: dailyProgressTracker.getStreak(),
+      studiedToday: dailyProgressTracker.getProgress(),
+      dailyGoal: dailyProgressTracker.getDailyGoal()
+    }));
 
-    // 2. Load Streak (Prefer backend data if available, fallback to localStorage)
-    let currentStreak = user?.currentStreak || 0;
+    // 2. Listen for Updates
+    const handleProgressUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { cardsStudied } = customEvent.detail;
+      setStats(prev => ({
+        ...prev,
+        studiedToday: cardsStudied
+      }));
+    };
+
+    const handleStreakUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      const { currentStreak } = customEvent.detail;
+      setStats(prev => ({
+        ...prev,
+        streak: currentStreak
+      }));
+    };
+
+    window.addEventListener('dailyProgressUpdate', handleProgressUpdate);
+    window.addEventListener('streakUpdated', handleStreakUpdate);
     
-    // Only use localStorage if backend data is 0 or missing (and we have local data)
-    // OR if we want to sync local data. 
-    // Actually, let's trust the User object we just refreshed or passed in context.
-    // If user.currentStreak is undefined/0, check localStorage as fallback
-    if (!currentStreak) {
-      const streakData = localStorage.getItem('streakData');
-      if (streakData) {
-        try {
-          const { currentStreak: savedStreak, lastStudyDate } = JSON.parse(streakData);
-          const lastDate = new Date(lastStudyDate);
-          const today = new Date();
-          // Check if streak is valid (today or yesterday)
-          const yesterday = new Date(today);
-          yesterday.setDate(today.getDate() - 1);
-          
-          if (lastDate.toDateString() === today.toDateString() || 
-              lastDate.toDateString() === yesterday.toDateString()) {
-            currentStreak = savedStreak;
-          }
-        } catch (e) {
-          console.error("Error parsing local streak data", e);
-        }
-      }
-    }
+    return () => {
+      window.removeEventListener('dailyProgressUpdate', handleProgressUpdate);
+      window.removeEventListener('streakUpdated', handleStreakUpdate);
+    };
+  }, []);
 
-    // 3. Load Today's Progress
-    let progress = 0;
-    const progressData = localStorage.getItem('dailyProgress');
-    if (progressData) {
-      const { date, cardsStudied } = JSON.parse(progressData);
-      if (new Date(date).toDateString() === new Date().toDateString()) {
-        progress = cardsStudied;
-      }
-    }
-
-    setStats({
-      streak: currentStreak,
-      studiedToday: progress,
-      dailyGoal: goal,
-      totalDecks: 0
-    });
-
-    // 4. Load Total Decks & Recent Deck
-    const fetchDecks = async () => {
+  // Load Total Decks, Recent Deck & Refresh User Data
+  useEffect(() => {
+    const fetchData = async () => {
+      // 1. Fetch Decks
       try {
         const response = await flashcardService.getAll();
         if (response.success && response.data) {
@@ -143,11 +135,8 @@ const Profile: React.FC = () => {
       } catch (error) {
         console.error('Failed to load decks', error);
       }
-    };
-    fetchDecks();
 
-    // 5. Refresh User Data (to detect new study stats)
-    const fetchUser = async () => {
+      // 2. Refresh User Data
       try {
         const response = await authService.getMe();
         if (response.success && response.data.user) {
@@ -157,9 +146,12 @@ const Profile: React.FC = () => {
         console.error('Failed to refresh user data', error);
       }
     };
-    fetchUser();
 
-    // 6. Generate 7-day week history
+    fetchData();
+  }, []);
+
+  // 6. Generate 7-day week history
+  useEffect(() => {
     const generateWeekHistory = () => {
       const history: {day: string; studied: boolean; count: number; isToday: boolean; date: string}[] = [];
       
@@ -167,12 +159,12 @@ const Profile: React.FC = () => {
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       
-      // Determine if studied today and the last study date
-      const studiedToday = progress >= goal;
+      // Determine if studied today (using stats state)
+      const isStudiedToday = stats.studiedToday >= stats.dailyGoal;
       
       // Get last study date from localStorage if available
       let lastStudyDate: Date | null = null;
-      if (studiedToday) {
+      if (isStudiedToday) {
         lastStudyDate = new Date(today);
       } else {
         // Safe check for streakData
@@ -180,7 +172,7 @@ const Profile: React.FC = () => {
         if (localStreakData) {
           try {
             const parsed = JSON.parse(localStreakData);
-            lastStudyDate = new Date(parsed.lastStudyDate);
+            lastStudyDate = new Date(parsed.lastStudiedDate); // Change lastStudyDate to lastStudiedDate per tracker
             // Normalize to midnight
             lastStudyDate = new Date(lastStudyDate.getFullYear(), lastStudyDate.getMonth(), lastStudyDate.getDate());
           } catch (e) {
@@ -188,29 +180,37 @@ const Profile: React.FC = () => {
           }
         }
       }
-      
-      // Generate 7 days of history
+
+      // Generate last 7 days (reverse order)
       for (let i = 6; i >= 0; i--) {
-        // Create date for this position (i days ago)
-        const targetDate = new Date(today);
-        targetDate.setDate(today.getDate() - i);
+        const d = new Date(today);
+        d.setDate(today.getDate() - i);
         
-        const dayName = getDayName(targetDate);
-        const dateStr = `${targetDate.getDate().toString().padStart(2, '0')}/${(targetDate.getMonth() + 1).toString().padStart(2, '0')}`;
+        const dayName = getDayName(d);
+        const dateStr = d.toISOString().split('T')[0];
         const isToday = i === 0;
         
+        // Determine studied status
         let studied = false;
         let count = 0;
         
-        // Mark as studied if within the current streak
-        if (currentStreak > 0 && lastStudyDate) {
-          // Calculate how many days before the last study date this is
-          const daysBeforeLastStudy = Math.floor((lastStudyDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
-          
-          // If this day is the last study day or within (streak - 1) days before it
-          if (daysBeforeLastStudy >= 0 && daysBeforeLastStudy < currentStreak) {
-            studied = true;
-            count = isToday && studiedToday ? progress : Math.floor(Math.random() * 15) + 10;
+        // For today: use current progress
+        if (isToday) {
+          count = stats.studiedToday;
+          studied = count >= stats.dailyGoal;
+        } else {
+          // For past days: check based on streak logic (simplified estimation)
+          // Ideally we need a full history log. For now, if we have a streak, we assume past days are studied.
+          // This is a limitation without full calendar history.
+          if (lastStudyDate) {
+             // If this day is within the current streak duration from the last study date
+             if (stats.streak > 0 && d <= lastStudyDate) {
+                const daysFromLastStudy = Math.floor((lastStudyDate.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
+                if (daysFromLastStudy < stats.streak) {
+                    studied = true;
+                    count = stats.dailyGoal; // Assume goal met
+                }
+             }
           }
         }
         
@@ -219,8 +219,9 @@ const Profile: React.FC = () => {
       
       setWeekHistory(history);
     };
+
     generateWeekHistory();
-  }, []);
+  }, [stats.studiedToday, stats.dailyGoal, stats.streak]);
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -388,6 +389,15 @@ const Profile: React.FC = () => {
                   "{user.bio}"
                 </p>
               )}
+
+              {/* Follow & Share Actions */}
+              <div className="w-full mb-4 px-4">
+                <FollowShareActions
+                  targetUserId={user?.id || ''}
+                  currentUserId={user?.id}
+                  isOwnProfile={true}
+                />
+              </div>
 
               {/* Big Numbers - Inline compact */}
               <div className="flex items-center justify-center gap-4 mb-3 text-center">

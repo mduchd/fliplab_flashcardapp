@@ -30,6 +30,7 @@ import {
 import { useToastContext } from '../../contexts/ToastContext';
 import { shuffleArray } from '../../utils/helpers';
 import { playSuccessSound, playErrorSound, playFlipSound, playCompleteSound } from '../../utils/audio';
+import { dailyProgressTracker } from '../../utils/dailyProgressTracker';
 import confetti from 'canvas-confetti';
 
 interface MatchItem {
@@ -186,6 +187,9 @@ const Study: React.FC = () => {
         setCorrectPair([currentSelected.id, item.id]);
         setSelectedMatch(null);
 
+        // Update daily progress (1 card matched = 1 progress)
+        dailyProgressTracker.incrementProgress(1);
+
         // Delay to show green effect
         setTimeout(() => {
             const newMatched = new Set(matchedPairs);
@@ -324,8 +328,8 @@ const Study: React.FC = () => {
     if (flashcardSet && card) {
       // Call API to update progress (Backend)
       flashcardService.updateStudyProgress(flashcardSet._id, card._id, (card.box || 1) + 1);
-      // Dispatch event for Sidebar Goal (Frontend)
-      window.dispatchEvent(new Event('cardStudied'));
+      // Update daily progress for Daily Goal
+      dailyProgressTracker.incrementProgress(1);
     }
 
     setKnownCards(new Set(knownCards).add(currentIndex));

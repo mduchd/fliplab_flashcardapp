@@ -12,9 +12,13 @@ export const getFlashcardSets = async (req: AuthRequest, res: Response): Promise
     
     let query: any = { userId: req.userId };
     
-    // Search by name or description
+    // Search by name or description using regex for partial, case-insensitive matching
     if (search) {
-      query.$text = { $search: search as string };
+      const searchRegex = new RegExp(search as string, 'i'); // 'i' = case-insensitive
+      query.$or = [
+        { name: searchRegex },
+        { description: searchRegex }
+      ];
     }
     
     // Filter by tags
