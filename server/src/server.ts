@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes.js';
 import flashcardRoutes from './routes/flashcardRoutes.js';
 import folderRoutes from './routes/folderRoutes.js';
 import groupRoutes from './routes/groupRoutes.js';
+import quizRoutes from './routes/quizRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/flashcards', flashcardRoutes);
 app.use('/api/folders', folderRoutes);
 app.use('/api/groups', groupRoutes);
+app.use('/api/quizzes', quizRoutes);
 
 // 404 Handler
 app.use((req, res) => {

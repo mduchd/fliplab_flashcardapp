@@ -13,6 +13,12 @@ import Profile from './pages/Profile/Profile';
 import Settings from './pages/Settings/Settings';
 import Groups from './pages/Groups/Groups';
 import GroupDetail from './pages/Groups/GroupDetail';
+import QuizList from './pages/Quiz/QuizList';
+import QuizCreator from './pages/Quiz/QuizCreator';
+import JoinQuiz from './pages/Quiz/JoinQuiz';
+import TakeQuiz from './pages/Quiz/TakeQuiz';
+import QuizResults from './pages/Quiz/QuizResults';
+import StudentQuizHistory from './pages/Quiz/StudentQuizHistory';
 
 // Components
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -127,6 +133,62 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <GroupDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz"
+        element={
+          <ProtectedRoute>
+            <QuizList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz/create"
+        element={
+          <ProtectedRoute>
+            <QuizCreator />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz/edit/:id"
+        element={
+          <ProtectedRoute>
+            <QuizCreator />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz/join"
+        element={
+          <ProtectedRoute>
+            <JoinQuiz />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz/take/:id"
+        element={
+          <ProtectedRoute>
+            <TakeQuiz />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz/results/:sessionId"
+        element={
+          <ProtectedRoute>
+            <QuizResults />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz/history"
+        element={
+          <ProtectedRoute>
+            <StudentQuizHistory />
           </ProtectedRoute>
         }
       />

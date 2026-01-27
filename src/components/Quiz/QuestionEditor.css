@@ -1,0 +1,141 @@
+@import '../../pages/Quiz/quiz-variables.css';
+
+.question-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Options List */
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.option-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--card-background);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.option-item:hover {
+  border-color: var(--primary-color);
+  background: var(--primary-light);
+}
+
+.option-item.correct {
+  border-color: var(--success-color);
+  background: var(--success-light);
+}
+
+.option-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.option-item.correct .option-letter {
+  background: var(--success-color);
+}
+
+.option-input {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  outline: none;
+}
+
+.option-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.option-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  color: var(--success-color);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.check-icon {
+  font-size: 1.25rem;
+}
+
+.correct-label {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Time Input */
+.time-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.time-input {
+  max-width: 120px;
+}
+
+.time-unit {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Remove number input arrows */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .option-item {
+    padding: 0.625rem;
+  }
+
+  .option-letter {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+
+  .option-input {
+    font-size: 0.9rem;
+  }
+}

@@ -1,0 +1,237 @@
+@import './quiz-variables.css';
+
+.join-quiz-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+  width: fit-content;
+}
+
+.btn-back:hover {
+  background: var(--background-secondary);
+  color: var(--text-primary);
+  border-color: var(--primary-color);
+}
+
+.join-quiz-card {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.join-quiz-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.quiz-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.join-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.join-subtitle {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.join-form {
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+}
+
+.access-code-input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 4px;
+  text-align: center;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--background-primary);
+  color: var(--primary-color);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+}
+
+.access-code-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+}
+
+.access-code-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.4;
+  letter-spacing: 2px;
+}
+
+.form-hint {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0 0;
+  text-align: center;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.spinner-sm {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Info Box */
+.info-box {
+  background: var(--background-secondary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: auto;
+}
+
+.info-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.info-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.info-list li {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.info-list li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--success-color);
+  font-weight: 700;
+}
+
+/* Quick Links */
+.quick-links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.link-button {
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.link-button:hover {
+  background: var(--primary-light);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .join-quiz-container {
+    padding: 1rem;
+  }
+
+  .join-quiz-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .quiz-icon {
+    font-size: 3rem;
+  }
+
+  .join-title {
+    font-size: 1.75rem;
+  }
+
+  .access-code-input {
+    font-size: 1.25rem;
+    letter-spacing: 2px;
+  }
+}
