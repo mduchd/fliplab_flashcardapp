@@ -21,6 +21,8 @@ export interface IQuiz extends Document {
     shuffleOptions: boolean;
     showResults: boolean; // Show results immediately after quiz
     allowRetake: boolean;
+    startDate?: Date;
+    endDate?: Date;
   };
   isPublic: boolean;
   accessCode?: string; // For private quizzes
@@ -113,6 +115,14 @@ const quizSchema = new Schema<IQuiz>(
         type: Boolean,
         default: true,
       },
+      startDate: {
+        type: Date,
+        default: null,
+      },
+      endDate: {
+        type: Date,
+        default: null,
+      },
     },
     isPublic: {
       type: Boolean,
@@ -121,7 +131,8 @@ const quizSchema = new Schema<IQuiz>(
     accessCode: {
       type: String,
       trim: true,
-      sparse: true, // Allow null but ensure uniqueness when present
+      sparse: true,
+      unique: true, // Allow null but ensure uniqueness when present
     },
   },
   {
@@ -131,6 +142,6 @@ const quizSchema = new Schema<IQuiz>(
 
 // Indexes for better query performance
 quizSchema.index({ createdBy: 1, createdAt: -1 });
-quizSchema.index({ accessCode: 1 }, { sparse: true });
+
 
 export const Quiz = mongoose.model<IQuiz>('Quiz', quizSchema);

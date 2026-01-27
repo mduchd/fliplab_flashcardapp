@@ -16,7 +16,7 @@ const JoinQuiz: React.FC = () => {
     e.preventDefault();
 
     if (!accessCode.trim()) {
-      toast.error('Please enter an access code');
+      toast.error('Vui lòng nhập mã truy cập');
       return;
     }
 
@@ -25,13 +25,13 @@ const JoinQuiz: React.FC = () => {
       const response = await quizService.joinQuiz(accessCode.trim());
       const quizId = response.data.quiz.id;
       
-      toast.success(`Joined: ${response.data.quiz.title}`);
+      toast.success(`Đã tham gia: ${response.data.quiz.title}`);
       
       // Navigate to quiz taking page
       navigate(`/quiz/take/${quizId}`);
     } catch (error: any) {
       console.error('Failed to join quiz:', error);
-      toast.error(error.response?.data?.message || 'Invalid access code');
+      toast.error(error.response?.data?.message || 'Mã truy cập không hợp lệ');
     } finally {
       setLoading(false);
     }
@@ -76,7 +76,7 @@ const JoinQuiz: React.FC = () => {
                 disabled={loading}
               />
               <p className="form-hint">
-                Enter the code exactly as shown (case-insensitive)
+                Nhập chính xác mã được cung cấp (không phân biệt chữ hoa thường)
               </p>
             </div>
 

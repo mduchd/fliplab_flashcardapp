@@ -17,7 +17,8 @@ import {
   HiBell,
   HiPlus,
   HiClipboardDocumentList,
-  HiDocumentPlus
+  HiDocumentPlus,
+  HiRocketLaunch
 } from 'react-icons/hi2';
 
 // Helper to check if two dates are the same day
@@ -236,12 +237,12 @@ const Sidebar: React.FC = () => {
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
             }
           >
@@ -259,8 +260,8 @@ const Sidebar: React.FC = () => {
               }}
               className={
                 isCollapsed
-                  ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${isCreateMenuOpen ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`
-                  : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden w-full text-left cursor-pointer ${isCreateMenuOpen ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`
+                  ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${isCreateMenuOpen ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`
+                  : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden w-full text-left cursor-pointer ${isCreateMenuOpen ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300' : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'}`
               }
             >
               <HiPlus className="w-6 h-6 flex-shrink-0" />
@@ -274,7 +275,7 @@ const Sidebar: React.FC = () => {
               ref={menuDropdownRef} 
               className="fixed z-[9999] bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden w-60"
               style={{
-                top: `${createMenuRef.current.getBoundingClientRect().top}px`,
+                top: `${createMenuRef.current.getBoundingClientRect().top - 8}px`,
                 left: `${createMenuRef.current.getBoundingClientRect().right + 8}px`
               }}
             >
@@ -334,12 +335,12 @@ const Sidebar: React.FC = () => {
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
             }
           >
@@ -355,12 +356,12 @@ const Sidebar: React.FC = () => {
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
                     isActive
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
             }
           >
@@ -379,12 +380,12 @@ const Sidebar: React.FC = () => {
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
                     location.pathname === '/quiz'
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden w-full text-left cursor-pointer ${
                     location.pathname === '/quiz'
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
             }
           >
@@ -403,16 +404,16 @@ const Sidebar: React.FC = () => {
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
                     location.pathname === '/quiz/join'
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden w-full text-left cursor-pointer ${
                     location.pathname === '/quiz/join'
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
             }
           >
-            <HiPlusCircle className="w-6 h-6 flex-shrink-0" />
+            <HiRocketLaunch className="w-6 h-6 flex-shrink-0" />
             {!isCollapsed && <span>Tham gia Quiz</span>}
           </button>
 
@@ -424,12 +425,12 @@ const Sidebar: React.FC = () => {
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
                     location.pathname === '/' && !location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium text-left cursor-pointer ${
                     location.pathname === '/' && !location.search.includes('filter=recent')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
-                      : 'text-slate-600 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
             }
           >

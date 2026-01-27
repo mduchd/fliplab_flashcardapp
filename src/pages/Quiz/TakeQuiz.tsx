@@ -83,12 +83,12 @@ const TakeQuiz: React.FC = () => {
       setTimeRemaining(remaining);
       
       if (remaining === 0) {
-        toast.error('Time expired');
+        toast.error('Hết giờ');
         navigate('/quiz/join');
       }
     } catch (error: any) {
       console.error('Failed to start quiz:', error);
-      toast.error(error.response?.data?.message || 'Failed to start quiz');
+      toast.error(error.response?.data?.message || 'Không thể bắt đầu bài thi');
       navigate('/quiz/join');
     } finally {
       setLoading(false);
@@ -130,7 +130,7 @@ const TakeQuiz: React.FC = () => {
   };
 
   const handleAutoSubmit = async () => {
-    toast.info('Time expired! Submitting your answers...');
+    toast.info('Hết giờ! Đang nộp bài...');
     await confirmSubmit();
   };
 
@@ -153,7 +153,7 @@ const TakeQuiz: React.FC = () => {
         answers: quizAnswers,
       });
 
-      toast.success('Quiz submitted successfully!');
+      toast.success('Nộp bài thành công!');
       
       // Navigate to results
       navigate(`/quiz/results/${session.id}`, {
@@ -161,7 +161,7 @@ const TakeQuiz: React.FC = () => {
       });
     } catch (error: any) {
       console.error('Failed to submit quiz:', error);
-      toast.error(error.response?.data?.message || 'Failed to submit quiz');
+      toast.error(error.response?.data?.message || 'Nộp bài thất bại');
     } finally {
       setSubmitting(false);
       setSubmitModalOpen(false);
@@ -185,7 +185,7 @@ const TakeQuiz: React.FC = () => {
       <MainLayout>
         <div className="loading-container">
           <div className="spinner"></div>
-          <p>Starting quiz...</p>
+          <p>Đang tải bài thi...</p>
         </div>
       </MainLayout>
     );
@@ -195,9 +195,9 @@ const TakeQuiz: React.FC = () => {
     return (
       <MainLayout>
         <div className="error-container">
-          <p>Quiz not found</p>
+          <p>Không tìm thấy bài thi</p>
           <button className="btn-primary" onClick={() => navigate('/quiz/join')}>
-            Back to Join Quiz
+            Quay lại
           </button>
         </div>
       </MainLayout>
@@ -217,7 +217,7 @@ const TakeQuiz: React.FC = () => {
             <h1 className="quiz-title">{session.title}</h1>
             <div className="quiz-progress">
               <span className="progress-text">
-                Question {currentQuestionIndex + 1} of {questions.length}
+                Câu hỏi {currentQuestionIndex + 1} / {questions.length}
               </span>
               <div className="progress-bar">
                 <div className="progress-fill" style={{ width: `${progress}%` }}></div>
@@ -238,7 +238,7 @@ const TakeQuiz: React.FC = () => {
           {/* Question */}
           <div className="question-card">
             <div className="question-header">
-              <span className="question-label">Question {currentQuestionIndex + 1}</span>
+              <span className="question-label">Câu hỏi {currentQuestionIndex + 1}</span>
             </div>
             <h2 className="question-text">{currentQuestion.question}</h2>
           </div>
@@ -252,7 +252,7 @@ const TakeQuiz: React.FC = () => {
               return (
                 <button
                   key={index}
-                  className={`option-button ${isSelected ? 'selected' : ''}`}
+                  className={`option-button cursor-pointer ${isSelected ? 'selected' : ''}`}
                   onClick={() => handleAnswerSelect(index)}
                 >
                   <div className="option-letter">{letter}</div>
@@ -269,7 +269,7 @@ const TakeQuiz: React.FC = () => {
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
             >
-              ← Previous
+              ← Trước
             </button>
 
             {currentQuestionIndex === questions.length - 1 ? (
@@ -279,11 +279,11 @@ const TakeQuiz: React.FC = () => {
                 disabled={submitting}
               >
                 <HiFlag className="icon" />
-                Submit Quiz
+                Nộp bài
               </button>
             ) : (
               <button className="btn-primary" onClick={handleNext}>
-                Next →
+                Tiếp →
               </button>
             )}
           </div>
@@ -291,8 +291,8 @@ const TakeQuiz: React.FC = () => {
 
         {/* Question Navigator Sidebar */}
         <div className="question-navigator">
-          <h3 className="navigator-title">Questions</h3>
-          <p className="navigator-subtitle">{answeredCount} / {questions.length} answered</p>
+          <h3 className="navigator-title">Danh sách câu hỏi</h3>
+          <p className="navigator-subtitle">Đã trả lời {answeredCount} / {questions.length}</p>
           
           <div className="question-grid">
             {questions.map((_, index) => {
@@ -317,10 +317,10 @@ const TakeQuiz: React.FC = () => {
           isOpen={submitModalOpen}
           onCancel={() => setSubmitModalOpen(false)}
           onConfirm={confirmSubmit}
-          title="Submit Quiz"
-          message={`You have answered ${answeredCount} out of ${questions.length} questions. Are you sure you want to submit?`}
-          confirmText="Submit"
-          cancelText="Continue Quiz"
+          title="Nộp bài thi"
+          message={`Bạn đã trả lời ${answeredCount} / ${questions.length} câu hỏi. Bạn có chắc chắn muốn nộp bài?`}
+          confirmText="Nộp bài"
+          cancelText="Làm tiếp"
           variant="info"
         />
       </div>

@@ -16,6 +16,8 @@ export interface QuizSettings {
   shuffleOptions: boolean;
   showResults: boolean;
   allowRetake: boolean;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 export interface Quiz {

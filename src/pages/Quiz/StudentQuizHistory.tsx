@@ -23,7 +23,7 @@ const StudentQuizHistory: React.FC = () => {
       setSessions(response.data.sessions);
     } catch (error: any) {
       console.error('Failed to fetch quiz history:', error);
-      toast.error(error.response?.data?.message || 'Failed to load quiz history');
+      toast.error(error.response?.data?.message || 'Không thể tải lịch sử quiz');
     } finally {
       setLoading(false);
     }
@@ -49,11 +49,11 @@ const StudentQuizHistory: React.FC = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <span className="status-badge completed">Completed</span>;
+        return <span className="status-badge completed">Đã hoàn thành</span>;
       case 'in-progress':
-        return <span className="status-badge in-progress">In Progress</span>;
+        return <span className="status-badge in-progress">Đang làm</span>;
       case 'abandoned':
-        return <span className="status-badge abandoned">Abandoned</span>;
+        return <span className="status-badge abandoned">Đã bỏ dở</span>;
       default:
         return null;
     }
@@ -71,9 +71,12 @@ const StudentQuizHistory: React.FC = () => {
         {/* Header */}
         <div className="history-header">
           <div>
-            <button className="btn-back" onClick={() => navigate('/quiz/join')}>
-              <HiArrowLeft className="icon" />
-              Quay lại
+            <button 
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all group cursor-pointer mb-6" 
+              onClick={() => navigate('/quiz/join')}
+            >
+              <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+              <span className="font-medium">Quay lại</span>
             </button>
             <h1 className="page-title">Lịch sử Quiz của tôi</h1>
             <p className="page-subtitle">Xem tất cả các lần làm quiz và điểm số</p>
@@ -84,7 +87,7 @@ const StudentQuizHistory: React.FC = () => {
         {loading && (
           <div className="loading-state">
             <div className="spinner"></div>
-            <p>Loading your quiz history...</p>
+            <p>Đang tải lịch sử quiz...</p>
           </div>
         )}
 
@@ -149,7 +152,7 @@ const StudentQuizHistory: React.FC = () => {
                             ) : (
                               <div className="fail-badge">
                                 <HiXCircle />
-                                <span>Not Passed</span>
+                                <span>Không đạt</span>
                               </div>
                             )}
                           </div>
@@ -159,17 +162,17 @@ const StudentQuizHistory: React.FC = () => {
                       {/* Stats */}
                       <div className="session-stats">
                         <div className="stat-item">
-                          <span className="stat-label">Correct:</span>
+                          <span className="stat-label">Số câu đúng:</span>
                           <span className="stat-value correct">
                             {session.correctCount} / {session.totalQuestions}
                           </span>
                         </div>
                         <div className="stat-item">
-                          <span className="stat-label">Time:</span>
+                          <span className="stat-label">Thời gian:</span>
                           <span className="stat-value">{formatTime(session.timeSpent)}</span>
                         </div>
                         <div className="stat-item">
-                          <span className="stat-label">Score:</span>
+                          <span className="stat-label">Điểm số:</span>
                           <span className="stat-value" style={{ color: scoreColor }}>
                             {Math.round(session.score)}%
                           </span>
@@ -181,7 +184,7 @@ const StudentQuizHistory: React.FC = () => {
                   {/* In Progress Message */}
                   {session.status === 'in-progress' && (
                     <div className="in-progress-message">
-                      <p>This quiz is still in progress</p>
+                      <p>Không có dữ liệu chi tiết</p>
                     </div>
                   )}
                 </div>
@@ -222,7 +225,7 @@ const StudentQuizHistory: React.FC = () => {
                       )
                     : 0}%
                 </span>
-                <span className="summary-label">Avg Score</span>
+                <span className="summary-label">Điểm trung bình</span>
               </div>
             </div>
           </div>

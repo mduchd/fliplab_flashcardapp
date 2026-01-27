@@ -26,7 +26,7 @@ const QuizList: React.FC = () => {
       setQuizzes(response.data.quizzes);
     } catch (error: any) {
       console.error('Failed to fetch quizzes:', error);
-      toast.error(error.response?.data?.message || 'Failed to load quizzes');
+      toast.error(error.response?.data?.message || 'Không thể tải danh sách quiz');
     } finally {
       setLoading(false);
     }
@@ -37,19 +37,19 @@ const QuizList: React.FC = () => {
 
     try {
       await quizService.deleteQuiz(selectedQuiz._id);
-      toast.success('Quiz deleted successfully');
+      toast.success('Đã xóa quiz thành công');
       setQuizzes(quizzes.filter(q => q._id !== selectedQuiz._id));
       setDeleteModalOpen(false);
       setSelectedQuiz(null);
     } catch (error: any) {
       console.error('Failed to delete quiz:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete quiz');
+      toast.error(error.response?.data?.message || 'Xóa quiz thất bại');
     }
   };
 
   const handleCopyAccessCode = (code: string) => {
     navigator.clipboard.writeText(code);
-    toast.success('Access code copied to clipboard!');
+    toast.success('Đã sao chép mã truy cập!');
   };
 
   return (
@@ -62,11 +62,11 @@ const QuizList: React.FC = () => {
             <p className="page-subtitle">Tạo và quản lý các quiz của bạn</p>
           </div>
           <button
-            className="btn-primary"
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-medium rounded-lg hover:scale-105 transition-all duration-300 transform cursor-pointer"
             onClick={() => navigate('/quiz/create')}
           >
-            <HiPlus className="icon" />
-            Tạo Quiz
+            <HiPlus className="w-5 h-5" />
+            <span>Tạo Quiz Mới</span>
           </button>
         </div>
 
@@ -85,11 +85,11 @@ const QuizList: React.FC = () => {
             <h3>Chưa có quiz nào</h3>
             <p>Tạo quiz đầu tiên để bắt đầu!</p>
             <button
-              className="btn-primary"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg hover:scale-105 transition-all duration-300 transform mt-4 mx-auto cursor-pointer"
               onClick={() => navigate('/quiz/create')}
             >
-              <HiPlus className="icon" />
-              Tạo Quiz Đầu Tiên
+              <HiPlus className="w-6 h-6" />
+              <span>Tạo Quiz Đầu Tiên</span>
             </button>
           </div>
         )}
@@ -98,7 +98,7 @@ const QuizList: React.FC = () => {
         {!loading && quizzes.length > 0 && (
           <div className="quiz-grid">
             {quizzes.map((quiz) => (
-              <div key={quiz._id} className="quiz-card">
+              <div key={quiz._id} className="quiz-card cursor-pointer transition-all hover:shadow-md border border-slate-200 dark:border-slate-700">
                 {/* Card Header */}
                 <div className="quiz-card-header">
                   <h3 className="quiz-title">{quiz.title}</h3>
@@ -120,7 +120,7 @@ const QuizList: React.FC = () => {
                   </div>
                   <div className="info-item">
                     <span className="info-label">Thời gian:</span>
-                    <span className="info-value">{quiz.settings.timeLimit} min</span>
+                    <span className="info-value">{quiz.settings.timeLimit} phút</span>
                   </div>
                   <div className="info-item">
                     <span className="info-label">Điểm đạt:</span>
@@ -137,7 +137,7 @@ const QuizList: React.FC = () => {
                       <button
                         className="btn-icon-sm"
                         onClick={() => handleCopyAccessCode(quiz.accessCode!)}
-                        title="Copy access code"
+                        title="Sao chép mã"
                       >
                         <HiClipboardDocument />
                       </button>
@@ -150,7 +150,7 @@ const QuizList: React.FC = () => {
                   <button
                     className="btn-secondary btn-sm"
                     onClick={() => navigate(`/quiz/${quiz._id}/results`)}
-                    title="View Results"
+                    title="Xem kết quả"
                   >
                     <HiUsers className="icon" />
                     Kết quả
@@ -158,7 +158,7 @@ const QuizList: React.FC = () => {
                   <button
                     className="btn-secondary btn-sm"
                     onClick={() => navigate(`/quiz/${quiz._id}`)}
-                    title="View Quiz"
+                    title="Xem chi tiết"
                   >
                     <HiEye className="icon" />
                     Xem
@@ -166,7 +166,7 @@ const QuizList: React.FC = () => {
                   <button
                     className="btn-secondary btn-sm"
                     onClick={() => navigate(`/quiz/edit/${quiz._id}`)}
-                    title="Edit Quiz"
+                    title="Sửa"
                   >
                     <HiPencil className="icon" />
                     Sửa
@@ -177,7 +177,7 @@ const QuizList: React.FC = () => {
                       setSelectedQuiz(quiz);
                       setDeleteModalOpen(true);
                     }}
-                    title="Delete Quiz"
+                    title="Xóa"
                   >
                     <HiTrash className="icon" />
                     Xóa
@@ -187,7 +187,7 @@ const QuizList: React.FC = () => {
                 {/* Created Date */}
                 <div className="quiz-footer">
                   <span className="created-date">
-                    Created {new Date(quiz.createdAt).toLocaleDateString()}
+                    Đã tạo {new Date(quiz.createdAt).toLocaleDateString('vi-VN')}
                   </span>
                 </div>
               </div>
@@ -203,10 +203,10 @@ const QuizList: React.FC = () => {
             setSelectedQuiz(null);
           }}
           onConfirm={handleDelete}
-          title="Delete Quiz"
-          message={`Are you sure you want to delete "${selectedQuiz?.title}"? This action cannot be undone and will delete all associated quiz sessions.`}
-          confirmText="Delete"
-          cancelText="Cancel"
+          title="Xóa Quiz"
+          message={`Bạn có chắc chắn muốn xóa "${selectedQuiz?.title}"? Hành động này không thể hoàn tác và sẽ xóa tất cả lịch sử làm bài liên quan.`}
+          confirmText="Xóa"
+          cancelText="Hủy"
           variant="danger"
         />
       </div>

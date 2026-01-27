@@ -27,10 +27,10 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onChange }) =
     <div className="question-editor">
       {/* Question Text */}
       <div className="form-group">
-        <label className="form-label">Question Text *</label>
+        <label className="form-label">Nội dung câu hỏi *</label>
         <textarea
           className="form-textarea"
-          placeholder="Enter your question here..."
+          placeholder="Nhập câu hỏi của bạn vào đây..."
           value={question.question}
           onChange={(e) => updateQuestion('question', e.target.value)}
           rows={3}
@@ -40,20 +40,20 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onChange }) =
       {/* Options */}
       <div className="form-group">
         <label className="form-label">
-          Answer Options * <span className="hint">(Click to select correct answer)</span>
+          Các lựa chọn đáp án * <span className="hint">(Click để chọn đáp án đúng)</span>
         </label>
         <div className="options-list">
           {question.options.map((option, index) => (
             <div
               key={index}
-              className={`option-item ${question.correctAnswer === index ? 'correct' : ''}`}
+              className={`option-item cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 ${question.correctAnswer === index ? 'correct' : ''}`}
               onClick={() => setCorrectAnswer(index)}
             >
               <div className="option-letter">{String.fromCharCode(65 + index)}</div>
               <input
                 type="text"
                 className="option-input"
-                placeholder={`Option ${String.fromCharCode(65 + index)}`}
+                placeholder={`Đáp án ${String.fromCharCode(65 + index)}`}
                 value={option}
                 onChange={(e) => updateOption(index, e.target.value)}
                 onClick={(e) => e.stopPropagation()}
@@ -62,7 +62,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onChange }) =
                 {question.correctAnswer === index && (
                   <>
                     <HiCheckCircle className="check-icon" />
-                    <span className="correct-label">Correct</span>
+                    <span className="correct-label">Đúng</span>
                   </>
                 )}
               </div>
@@ -74,8 +74,8 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onChange }) =
       {/* Optional Time Limit */}
       <div className="form-group">
         <label className="form-label">
-          Time Limit (Optional) 
-          <span className="hint"> - Leave empty to use quiz default</span>
+          Giới hạn thời gian (Tùy chọn) 
+          <span className="hint"> - Để trống để dùng mặc định của bài thi</span>
         </label>
         <div className="time-input-group">
           <input
@@ -87,7 +87,7 @@ const QuestionEditor: React.FC<QuestionEditorProps> = ({ question, onChange }) =
             min={5}
             max={300}
           />
-          <span className="time-unit">seconds</span>
+          <span className="time-unit">giây</span>
         </div>
       </div>
     </div>
