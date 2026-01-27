@@ -45,7 +45,7 @@ const Avatar: React.FC<AvatarProps> = ({
     if (avatarUrl) {
       if (isEmojiAvatar(avatarUrl)) {
         return (
-          <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
+          <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-50 to-blue-100 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-bl from-white/40 to-transparent pointer-events-none" />
             <span className={`${textSize} drop-shadow-sm z-10`}>{avatarUrl}</span>
           </div>

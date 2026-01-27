@@ -722,7 +722,7 @@ const Profile: React.FC = () => {
             </div>
             <span className="text-sm font-bold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
               {stats.studiedToday >= stats.dailyGoal 
-                ? '✁EHoàn thành!' 
+                ? 'Hoàn thành!' 
                 : weekHistory.filter(d => d.studied).length > 0
                   ? `${weekHistory.filter(d => d.studied).length}/7 ngày`
                   : '0/7 ngày'}

@@ -136,7 +136,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({
                       <button
                         onClick={() => handleAddReply(comment._id)}
                         disabled={!replyContent.trim()}
-                        className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50"
+                        className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <HiPaperAirplane className="w-4 h-4" />
                       </button>

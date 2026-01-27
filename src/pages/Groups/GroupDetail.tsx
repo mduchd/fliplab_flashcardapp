@@ -614,7 +614,7 @@ const GroupDetail: React.FC = () => {
                         {post.poll.options.map((option, idx) => {
                           const totalVotes = post.poll!.options.reduce((acc, curr) => acc + curr.votes.length, 0);
                           const percent = totalVotes === 0 ? 0 : Math.round((option.votes.length / totalVotes) * 100);
-                          const isVoted = option.votes.includes(user!.id);
+                          const isVoted = user?.id ? option.votes.includes(user.id) : false;
                           return (
                             <div key={idx} onClick={() => handleVote(post._id, idx)} className="relative h-10 rounded-lg bg-slate-100 dark:bg-slate-700 overflow-hidden cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors group">
                               <div className={`absolute left-0 top-0 bottom-0 transition-all duration-500 ${isVoted ? 'bg-blue-200 dark:bg-blue-900/50' : 'bg-slate-200 dark:bg-slate-600'}`} style={{ width: `${percent}%` }} />
