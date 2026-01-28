@@ -6,6 +6,7 @@ import CommentSection from '../../components/CommentSection';
 import ImageViewerModal from '../../components/ImageViewerModal';
 import { groupService, Group, Post } from '../../services/groupService';
 import { flashcardService, FlashcardSet } from '../../services/flashcardService';
+import { folderService, Folder } from '../../services/folderService';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToastContext } from '../../contexts/ToastContext';
 import {
@@ -29,6 +30,7 @@ import {
   HiMapPin,
   HiPlus,
   HiCheckCircle,
+  HiFolder,
 } from 'react-icons/hi2';
 
 const GroupDetail: React.FC = () => {
@@ -50,6 +52,11 @@ const GroupDetail: React.FC = () => {
   const [isPosting, setIsPosting] = useState(false);
   const [userFlashcardSets, setUserFlashcardSets] = useState<FlashcardSet[]>([]);
   const [showFlashcardPicker, setShowFlashcardPicker] = useState(false);
+  
+  // Folder sharing
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [userFolders, setUserFolders] = useState<Folder[]>([]);
+  const [showFolderPicker, setShowFolderPicker] = useState(false);
   
   // Poll creation
   const [isPollMode, setIsPollMode] = useState(false);
@@ -171,10 +178,11 @@ const GroupDetail: React.FC = () => {
       // Normal post validation
       const hasContent = newPostContent.trim().length > 0;
       const hasSet = !!selectedFlashcardSet;
+      const hasFolder = !!selectedFolder;
       const hasImages = newPostImages.length > 0;
       
-      if (!hasContent && !hasSet && !hasImages) {
-        toast.error('Vui lòng nhập nội dung, chọn ảnh hoặc chia sẻ bộ thẻ');
+      if (!hasContent && !hasSet && !hasFolder && !hasImages) {
+        toast.error('Vui lòng nhập nội dung, chọn ảnh hoặc chia sẻ tài liệu');
         return;
       }
     }
@@ -187,6 +195,7 @@ const GroupDetail: React.FC = () => {
         content: contentToSend,
         images: isPollMode ? [] : newPostImages,
         sharedFlashcardSet: isPollMode ? undefined : (selectedFlashcardSet || undefined),
+        sharedFolder: isPollMode ? undefined : (selectedFolder || undefined),
       };
 
       if (isPollMode) {
@@ -202,17 +211,30 @@ const GroupDetail: React.FC = () => {
 
       if (response.success) {
         toast.success('Đăng bài thành công!');
+        
+        // Manually update posts list to show changes immediately
+        const createdPost = response.data.post;
+        
+        // If sharedFolder was selected but backend didn't return it (legacy backend), inject it manually
+        if (selectedFolder && !createdPost.sharedFolder) {
+           const folderData = userFolders.find(f => f._id === selectedFolder);
+           if (folderData) {
+             createdPost.sharedFolder = folderData;
+           }
+        }
+        
+        setPosts(prev => [createdPost, ...prev]);
+
         setNewPostContent('');
         setNewPostImages([]);
         setSelectedFlashcardSet(null);
+        setSelectedFolder(null); // Reset folder
         setIsCreatePostOpen(false);
         
         // Reset poll
         setPollQuestion('');
         setPollOptions(['', '']);
         setIsPollMode(false);
-        
-        loadPosts();
       }
     } catch (error: any) {
       console.error('Create post error:', error);
@@ -393,7 +415,17 @@ const GroupDetail: React.FC = () => {
         setUserFlashcardSets(response.data.flashcardSets);
       }
     } catch (error) {
-      console.error('Failed to load flashcard sets:', error);
+    }
+  };
+
+  const loadUserFolders = async () => {
+    try {
+      const response = await folderService.getFolders();
+      if (response.success) {
+        setUserFolders(response.data.folders);
+      }
+    } catch (error) {
+       console.error('Failed to load folders:', error);
     }
   };
 
@@ -655,6 +687,23 @@ const GroupDetail: React.FC = () => {
                     </Link>
                   )}
 
+                  {/* Shared Folder */}
+                  {post.sharedFolder && (
+                    <Link
+                      to={`/?folderId=${post.sharedFolder._id}`}
+                      className="mx-4 mb-3 p-4 bg-gradient-to-r from-orange-50 to-orange-100 dark:from-orange-500/10 dark:to-orange-500/10 rounded-lg border border-orange-200 dark:border-orange-500/30 flex items-center gap-3 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group"
+                    >
+                      <div className="w-12 h-12 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400">
+                        <HiFolder className="w-6 h-6" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-slate-900 dark:text-white group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">{post.sharedFolder.name}</p>
+                        <p className="text-sm text-slate-600 dark:text-slate-400">{post.sharedFolder.setCount || 0} bộ thẻ</p>
+                      </div>
+                      <HiBookOpen className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" />
+                    </Link>
+                  )}
+
                   {/* Images */}
                   {post.images.length > 0 && (
                     <div className="px-4 pb-3">
@@ -856,6 +905,21 @@ const GroupDetail: React.FC = () => {
                   </div>
                 )}
 
+                {/* Selected Folder */}
+                {selectedFolder && (
+                  <div className="p-3 bg-orange-50 dark:bg-orange-500/10 rounded-lg flex items-center justify-between">
+                    <span className="text-sm font-medium text-orange-600 dark:text-orange-400">
+                      Chia sẻ thư mục: {userFolders.find(f => f._id === selectedFolder)?.name}
+                    </span>
+                    <button
+                      onClick={() => setSelectedFolder(null)}
+                      className="text-orange-500 hover:text-orange-600 cursor-pointer"
+                    >
+                      <HiXMark className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+
                 {/* Flashcard Picker */}
                 {showFlashcardPicker && (
                   <div className="border border-slate-200 dark:border-slate-700 rounded-lg max-h-48 overflow-y-auto">
@@ -877,6 +941,35 @@ const GroupDetail: React.FC = () => {
                           <div>
                             <p className="font-medium text-slate-900 dark:text-white text-sm">{set.name}</p>
                             <p className="text-xs text-slate-500">{set.cards?.length || 0} thẻ</p>
+                          </div>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+
+                {/* Folder Picker */}
+                {showFolderPicker && (
+                  <div className="border border-slate-200 dark:border-slate-700 rounded-lg max-h-48 overflow-y-auto">
+                    {userFolders.length === 0 ? (
+                      <p className="p-4 text-center text-slate-500 text-sm">Bạn chưa có thư mục nào</p>
+                    ) : (
+                      userFolders.map((folder) => (
+                        <button
+                          key={folder._id}
+                          onClick={() => {
+                            setSelectedFolder(folder._id);
+                            setShowFolderPicker(false);
+                            setSelectedFlashcardSet(null); // Deselect set if folder selected
+                          }}
+                          className="w-full p-3 text-left hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center gap-3 cursor-pointer"
+                        >
+                          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-orange-100 dark:bg-orange-500/20 text-orange-500">
+                            <HiFolder className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-slate-900 dark:text-white text-sm">{folder.name}</p>
+                            <p className="text-xs text-slate-500">{folder.setCount || 0} bộ thẻ</p>
                           </div>
                         </button>
                       ))
@@ -908,6 +1001,17 @@ const GroupDetail: React.FC = () => {
                       <HiRectangleStack className="w-4 h-4" />
                       Chia sẻ thẻ
                     </button>
+                    <button
+                      onClick={() => {
+                        setShowFolderPicker(!showFolderPicker);
+                        setShowFlashcardPicker(false);
+                        loadUserFolders();
+                      }}
+                      className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer"
+                    >
+                      <HiFolder className="w-4 h-4" />
+                      Chia sẻ thư mục
+                    </button>
                   </div>
                 )}
               </div>
@@ -915,7 +1019,7 @@ const GroupDetail: React.FC = () => {
               <div className="p-4 border-t border-slate-200 dark:border-slate-700">
                 <button
                   onClick={handleCreatePost}
-                  disabled={isPosting || (isPollMode ? (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) : (!newPostContent.trim() && !selectedFlashcardSet))}
+                  disabled={isPosting || (isPollMode ? (!pollQuestion.trim() || pollOptions.filter(o => o.trim()).length < 2) : (!newPostContent.trim() && !selectedFlashcardSet && !selectedFolder && newPostImages.length === 0))}
                   className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {isPosting ? (

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import MainLayout from '../../components/layout/MainLayout';
 import { 
-  HiUser, 
+  // HiUser removed
   HiPencilSquare, 
   HiBookOpen,
   HiCheckCircle, 
@@ -26,6 +26,7 @@ import { authService } from '../../services/authService';
 import { flashcardService } from '../../services/flashcardService';
 import { useToastContext } from '../../contexts/ToastContext';
 import { ANIMAL_AVATARS, AVATAR_FRAMES } from '../../constants/avatarConstants';
+import Avatar from '../../components/Avatar';
 
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -289,71 +290,9 @@ const Profile: React.FC = () => {
     }
   };
 
-  // Check if avatar is an emoji
-  const isEmojiAvatar = (avatar?: string) => {
-    if (!avatar) return false;
-    return ANIMAL_AVATARS.includes(avatar);
-  };
-
-  // Render Avatar (Image, Emoji or Initial)
-  const renderAvatar = (avatarUrl?: string, displayName?: string, size: 'sm' | 'lg' = 'lg', frameId: string = 'none') => {
-    const sizeClasses = size === 'lg' ? 'w-28 h-28' : 'w-24 h-24';
-    const textSize = size === 'lg' ? 'text-6xl' : 'text-5xl';
-    const frameConfig = AVATAR_FRAMES.find(f => f.id === frameId) || AVATAR_FRAMES[0];
-    
-    // Render inner content (image, emoji, or initial)
-    const renderContent = () => {
-      if (avatarUrl) {
-        if (isEmojiAvatar(avatarUrl)) {
-          return (
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-50 to-blue-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-bl from-white/40 to-transparent pointer-events-none" />
-              <span className={`${textSize} drop-shadow-sm z-10`}>{avatarUrl}</span>
-            </div>
-          );
-        }
-        // Custom uploaded image
-        return (
-          <img 
-            src={avatarUrl} 
-            alt="Avatar" 
-            className="w-full h-full rounded-full object-cover"
-          />
-        );
-      }
-      // Default initial
-      return (
-        <div className="w-full h-full rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center font-bold text-white text-4xl">
-          {displayName?.charAt(0).toUpperCase() || <HiUser className="w-10 h-10" />}
-        </div>
-      );
-    };
 
 
-    // Special handling for frames that need inner background buffering (gradient borders)
-    const complexFrames = ['rainbow', 'cosmic'];
-    
-    if (complexFrames.includes(frameId)) {
-      return (
-        <div className={`${sizeClasses} rounded-full ${frameConfig.class} flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}>
-          <div className="w-full h-full rounded-full overflow-hidden bg-white dark:bg-slate-900">
-            {renderContent()}
-          </div>
-        </div>
-      );
-    }
-
-    // Standard frames with border/ring/shadow
-    // Container has frame styles but no overflow-hidden (to show shadow/ring)
-    // Inner wrapper clips the content
-    return (
-      <div className={`${sizeClasses} rounded-full ${frameConfig.class} flex-shrink-0 group-hover:scale-105 transition-transform duration-300`}>
-        <div className="w-full h-full rounded-full overflow-hidden">
-          {renderContent()}
-        </div>
-      </div>
-    );
-  };
+  // Removed renderAvatar function in favor of shared component
 
   return (
     <MainLayout>
@@ -366,8 +305,14 @@ const Profile: React.FC = () => {
             {/* Left Column: User Info - Compact */}
             <div className="lg:col-span-6 flex flex-col items-center lg:border-r border-slate-100 dark:border-white/10 lg:pr-8">
               {/* Avatar + Edit Button */}
-              <div className="relative mb-3">
-                {renderAvatar(user?.avatar, user?.displayName, 'lg', user?.avatarFrame)}
+              <div className="relative mb-3 group">
+                <Avatar 
+                  avatarUrl={user?.avatar} 
+                  displayName={user?.displayName} 
+                  size="lg" 
+                  frameId={user?.avatarFrame} 
+                  className="group-hover:scale-105 transition-transform duration-300"
+                />
                 <button 
                   onClick={openEditModal}
                   className="absolute -bottom-1 -right-1 p-2 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 rounded-full shadow-md hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
@@ -787,7 +732,7 @@ const Profile: React.FC = () => {
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-200 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">Chỉnh sửa hồ sơ</h2>
@@ -804,7 +749,12 @@ const Profile: React.FC = () => {
               {/* Avatar Upload */}
               <div className="flex flex-col items-center">
                 <div className="relative group mb-3">
-                  {renderAvatar(editAvatar, editDisplayName, 'lg', editAvatarFrame)}
+                  <Avatar 
+                    avatarUrl={editAvatar} 
+                    displayName={editDisplayName} 
+                    size="lg" 
+                    frameId={editAvatarFrame}
+                  />
                   
                   <button 
                     onClick={() => fileInputRef.current?.click()}
@@ -825,7 +775,7 @@ const Profile: React.FC = () => {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => fileInputRef.current?.click()}
-                    className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline"
+                    className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
                   >
                     Tải ảnh lên
                   </button>
@@ -835,7 +785,7 @@ const Profile: React.FC = () => {
                         setShowAvatarPresets(!showAvatarPresets);
                         setShowFrameSelector(false);
                     }}
-                    className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline"
+                    className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
                   >
                     Chọn Emoji
                   </button>
@@ -845,7 +795,7 @@ const Profile: React.FC = () => {
                         setShowFrameSelector(!showFrameSelector);
                         setShowAvatarPresets(false);
                     }}
-                    className="text-sm text-purple-600 dark:text-purple-400 font-medium hover:underline"
+                    className="text-sm text-blue-600 dark:text-blue-400 font-medium hover:underline cursor-pointer"
                   >
                     Khung hình
                   </button>
@@ -860,7 +810,7 @@ const Profile: React.FC = () => {
                         <button
                           key={emoji}
                           onClick={() => selectPresetAvatar(emoji)}
-                          className="w-8 h-8 flex items-center justify-center text-xl hover:bg-white dark:hover:bg-slate-600 rounded transition-colors"
+                          className="w-8 h-8 flex items-center justify-center text-xl hover:bg-white dark:hover:bg-slate-600 rounded transition-colors cursor-pointer"
                         >
                           {emoji}
                         </button>
@@ -874,19 +824,29 @@ const Profile: React.FC = () => {
                   <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg w-full">
                     <p className="text-xs font-semibold text-slate-500 mb-2">Chọn khung hình:</p>
                     <div className="grid grid-cols-4 gap-3">
-                      {AVATAR_FRAMES.map((frame) => (
-                        <button
-                          key={frame.id}
-                          onClick={() => {
-                            setEditAvatarFrame(frame.id);
-                            setShowFrameSelector(false);
-                          }}
-                          className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-colors ${editAvatarFrame === frame.id ? 'bg-blue-100 dark:bg-blue-900/30 ring-1 ring-blue-500' : 'hover:bg-white dark:hover:bg-slate-600'}`}
-                        >
-                          <div className={`w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 ${frame.class}`}></div>
-                          <span className="text-[10px] text-slate-600 dark:text-slate-300 truncate w-full text-center">{frame.name}</span>
-                        </button>
-                      ))}
+                      {AVATAR_FRAMES.map((frame) => {
+                         // Determine frame type logic matching Avatar.tsx
+                         const isSpinning = (frame as any).isSpinning;
+                         const isComplex = (frame as any).isComplex || ['rainbow', 'cosmic'].includes(frame.id) || isSpinning;
+                         
+                         return (
+                          <button
+                            key={frame.id}
+                            onClick={() => {
+                              setEditAvatarFrame(frame.id);
+                              // setShowFrameSelector(false); // Kept open for preview
+                            }}
+                            className={`flex flex-col items-center gap-2 p-2 rounded-lg transition-colors cursor-pointer ${editAvatarFrame === frame.id ? 'bg-blue-100 dark:bg-blue-900/30 ring-1 ring-blue-500' : 'hover:bg-white dark:hover:bg-slate-600'}`}
+                          >
+                            <div className={`w-8 h-8 rounded-full relative flex-shrink-0 ${isComplex ? frame.class : `ring-2 ${frame.class} bg-slate-200 dark:bg-slate-700`}`}>
+                              {isComplex && (
+                                <div className="absolute inset-[3px] bg-slate-200 dark:bg-slate-700 rounded-full" />
+                              )}
+                            </div>
+                            <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300 truncate w-full text-center">{frame.name}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
@@ -930,7 +890,7 @@ const Profile: React.FC = () => {
             <div className="p-6 border-t border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex justify-end gap-3 sticky bottom-0 rounded-b-lg">
               <button
                 onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                className="px-4 py-2 text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
                 disabled={isSaving}
               >
                 Hủy
@@ -938,7 +898,7 @@ const Profile: React.FC = () => {
               <button
                 onClick={handleSaveProfile}
                 disabled={isSaving}
-                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-blue-500/30 transition-all"
+                className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-blue-500/30 transition-all cursor-pointer"
               >
                 {isSaving ? (
                   <>

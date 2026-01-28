@@ -52,6 +52,14 @@ export interface Post {
     cards: any[];
     color: string;
   };
+  sharedFolder?: {
+    _id: string;
+    name: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+    setCount?: number;
+  };
   likes: string[];
   comments: {
     _id: string;
@@ -174,6 +182,7 @@ export const groupService = {
     content: string;
     images?: string[];
     sharedFlashcardSet?: string;
+    sharedFolder?: string;
     poll?: {
       question: string;
       options: string[];
