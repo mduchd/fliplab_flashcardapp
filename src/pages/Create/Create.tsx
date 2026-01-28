@@ -26,25 +26,35 @@ const Create: React.FC = () => {
     { id: '2', term: '', definition: '', image: '' },
   ]);
   const [tags, setTags] = useState('');
-  const [color, setColor] = useState('#2563eb');
+  const [color, setColor] = useState('#3b82f6');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState('');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const colors = [
-    '#2563eb', // blue (default)
+    '#3b82f6', // blue (default)
+    '#64748b', // slate
+    '#6b7280', // gray
+    '#71717a', // zinc
+    '#737373', // neutral
+    '#78716c', // stone
+    '#ef4444', // red
+    '#f97316', // orange
+    '#f59e0b', // amber
+    '#eab308', // yellow
+    '#84cc16', // lime
+    '#22c55e', // green
+    '#10b981', // emerald
+    '#14b8a6', // teal
+    '#06b6d4', // cyan
+    '#0ea5e9', // sky
     '#6366f1', // indigo
     '#8b5cf6', // violet
-    '#a855f7', // purple muted
-    '#ec4899', // pink muted
-    '#ef4444', // red muted
-    '#f97316', // orange muted
-    '#eab308', // yellow muted
-    '#22c55e', // green muted
-    '#14b8a6', // teal muted
-    '#0ea5e9', // sky blue
-    '#6b7280', // gray
+    '#a855f7', // purple
+    '#d946ef', // fuchsia
+    '#ec4899', // pink
+    '#f43f5e', // rose
   ];
 
   useEffect(() => {
@@ -67,7 +77,7 @@ const Create: React.FC = () => {
         image: c.image || '',
       })));
       setTags(set.tags.join(', '));
-      setColor(set.color || '#2563eb');
+      setColor(set.color || '#3b82f6');
     } catch (err) {
       setError('Không thể tải bộ thẻ');
       console.error(err);
@@ -291,7 +301,7 @@ const Create: React.FC = () => {
 
               <div>
                 <label className="block text-slate-700 dark:text-blue-200 text-sm mb-2">Màu sắc</label>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
                   {colors.map((c) => (
                       <button
                         key={c}

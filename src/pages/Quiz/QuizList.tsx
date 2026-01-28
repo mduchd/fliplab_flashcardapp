@@ -135,7 +135,7 @@ const QuizList: React.FC = () => {
                     <div className="access-code-display">
                       <code className="access-code">{quiz.accessCode}</code>
                       <button
-                        className="btn-icon-sm"
+                        className="btn-icon-sm cursor-pointer"
                         onClick={() => handleCopyAccessCode(quiz.accessCode!)}
                         title="Sao chép mã"
                       >
@@ -148,7 +148,7 @@ const QuizList: React.FC = () => {
                 {/* Actions */}
                 <div className="quiz-actions">
                   <button
-                    className="btn-secondary btn-sm"
+                    className="btn-secondary btn-sm cursor-pointer"
                     onClick={() => navigate(`/quiz/${quiz._id}/results`)}
                     title="Xem kết quả"
                   >
@@ -156,7 +156,7 @@ const QuizList: React.FC = () => {
                     Kết quả
                   </button>
                   <button
-                    className="btn-secondary btn-sm"
+                    className="btn-secondary btn-sm cursor-pointer"
                     onClick={() => navigate(`/quiz/${quiz._id}`)}
                     title="Xem chi tiết"
                   >
@@ -164,7 +164,7 @@ const QuizList: React.FC = () => {
                     Xem
                   </button>
                   <button
-                    className="btn-secondary btn-sm"
+                    className="btn-secondary btn-sm cursor-pointer"
                     onClick={() => navigate(`/quiz/edit/${quiz._id}`)}
                     title="Sửa"
                   >
@@ -172,7 +172,7 @@ const QuizList: React.FC = () => {
                     Sửa
                   </button>
                   <button
-                    className="btn-danger btn-sm"
+                    className="btn-danger btn-sm cursor-pointer"
                     onClick={() => {
                       setSelectedQuiz(quiz);
                       setDeleteModalOpen(true);

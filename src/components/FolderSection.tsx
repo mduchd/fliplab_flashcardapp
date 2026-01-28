@@ -92,17 +92,30 @@ export const ICON_MAP: Record<string, React.ElementType> = {
 export const ICON_KEYS = Object.keys(ICON_MAP);
 
 // Folder color options
+// Folder color options
 export const FOLDER_COLORS = [
   { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
-  { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
-  { id: 'purple', class: 'bg-purple-500', ring: 'ring-purple-200' },
-  { id: 'pink', class: 'bg-pink-500', ring: 'ring-pink-200' },
+  { id: 'slate', class: 'bg-slate-500', ring: 'ring-slate-200' },
+  { id: 'gray', class: 'bg-gray-500', ring: 'ring-gray-200' },
+  { id: 'zinc', class: 'bg-zinc-500', ring: 'ring-zinc-200' },
+  { id: 'neutral', class: 'bg-neutral-500', ring: 'ring-neutral-200' },
+  { id: 'stone', class: 'bg-stone-500', ring: 'ring-stone-200' },
   { id: 'red', class: 'bg-red-500', ring: 'ring-red-200' },
   { id: 'orange', class: 'bg-orange-500', ring: 'ring-orange-200' },
   { id: 'amber', class: 'bg-amber-500', ring: 'ring-amber-200' },
+  { id: 'yellow', class: 'bg-yellow-500', ring: 'ring-yellow-200' },
+  { id: 'lime', class: 'bg-lime-500', ring: 'ring-lime-200' },
+  { id: 'green', class: 'bg-green-500', ring: 'ring-green-200' },
   { id: 'emerald', class: 'bg-emerald-500', ring: 'ring-emerald-200' },
   { id: 'teal', class: 'bg-teal-500', ring: 'ring-teal-200' },
   { id: 'cyan', class: 'bg-cyan-500', ring: 'ring-cyan-200' },
+  { id: 'sky', class: 'bg-sky-500', ring: 'ring-sky-200' },
+  { id: 'indigo', class: 'bg-indigo-500', ring: 'ring-indigo-200' },
+  { id: 'violet', class: 'bg-violet-500', ring: 'ring-violet-200' },
+  { id: 'purple', class: 'bg-purple-500', ring: 'ring-purple-200' },
+  { id: 'fuchsia', class: 'bg-fuchsia-500', ring: 'ring-fuchsia-200' },
+  { id: 'pink', class: 'bg-pink-500', ring: 'ring-pink-200' },
+  { id: 'rose', class: 'bg-rose-500', ring: 'ring-rose-200' },
 ];
 
 // Folder icons
@@ -264,11 +277,23 @@ const FolderSection: React.FC<FolderSectionProps> = ({
         )}
 
         {folders.length === 0 ? (
-          <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-6 text-center border border-dashed border-slate-200 dark:border-slate-700">
-            <HiFolderOpen className="w-10 h-10 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Chưa có thư mục nào. Tạo thư mục để phân loại bộ thẻ của bạn!
+          <div 
+            onClick={() => navigate('/create-folder')}
+            className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-10 text-center border-2 border-dashed border-slate-200 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-500/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer group flex flex-col items-center justify-center min-h-[200px]"
+          >
+            <div className="bg-white dark:bg-slate-700 w-16 h-16 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-sm ring-4 ring-slate-50 dark:ring-slate-800">
+              <HiFolderPlus className="w-8 h-8 text-blue-500 dark:text-blue-400" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              Chưa có thư mục nào
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto mb-6">
+              Tạo thư mục để phân loại và quản lý các bộ thẻ của bạn một cách khoa học.
             </p>
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg group-hover:bg-blue-700 transition-colors shadow-sm">
+              <HiFolderPlus className="w-5 h-5" />
+              Tạo thư mục ngay
+            </span>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -434,7 +459,7 @@ const FolderSection: React.FC<FolderSectionProps> = ({
                       onClick={() => setFormColor(color.id)}
                       className={`w-8 h-8 rounded-full ${color.class} transition-all cursor-pointer ${
                         formColor === color.id
-                          ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-800 ring-blue-500 scale-110'
+                          ? 'ring-4 ring-blue-500 dark:ring-white ring-offset-2 ring-offset-white dark:ring-offset-slate-800 scale-110'
                           : 'hover:scale-110'
                       }`}
                     />

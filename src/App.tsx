@@ -19,6 +19,7 @@ import JoinQuiz from './pages/Quiz/JoinQuiz';
 import TakeQuiz from './pages/Quiz/TakeQuiz';
 import QuizResults from './pages/Quiz/QuizResults';
 import StudentQuizHistory from './pages/Quiz/StudentQuizHistory';
+import Notifications from './pages/Notifications/Notifications';
 
 // Components
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -109,6 +110,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <Profile />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <Notifications />
           </ProtectedRoute>
         }
       />

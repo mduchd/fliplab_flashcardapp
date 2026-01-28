@@ -14,7 +14,7 @@ import {
   HiBell,
   HiPlus,
   HiClipboardDocumentList,
-  HiDocumentPlus,
+  HiAcademicCap,
   HiRocketLaunch
 } from 'react-icons/hi2';
 
@@ -24,8 +24,37 @@ const Sidebar: React.FC = () => {
   const location = useLocation();
   const { isCollapsed, isMobileOpen, setMobileOpen } = useSidebar();
   const [isCreateMenuOpen, setIsCreateMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const createMenuRef = React.useRef<HTMLButtonElement>(null);
   const menuDropdownRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Check local storage for unread count
+    const checkNotifications = () => {
+      const saved = localStorage.getItem('notifications');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        const count = parsed.filter((n: any) => !n.read).length;
+        setUnreadCount(count);
+      } else {
+        // Default mock if not visited yet
+        setUnreadCount(2);
+      }
+    };
+
+    checkNotifications();
+    
+    // Listen for custom update event
+    window.addEventListener('notifications-updated', checkNotifications);
+    
+    // Poll every few seconds to sync across tabs/components
+    const interval = setInterval(checkNotifications, 2000);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('notifications-updated', checkNotifications);
+    };
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -50,7 +79,7 @@ const Sidebar: React.FC = () => {
   const handleLibraryClick = (action: 'library' | 'recent' | 'settings') => {
     switch (action) {
       case 'library':
-        navigate('/');
+        navigate('/?tab=sets');
         break;
       case 'recent':
         navigate('/?filter=recent');
@@ -95,15 +124,15 @@ const Sidebar: React.FC = () => {
           <NavLink
             to="/"
             onClick={() => setMobileOpen(false)}
-            className={({ isActive }) =>
+            className={() =>
               isCollapsed
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all cursor-pointer ${
-                    isActive
+                    location.pathname === '/' && location.search === ''
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300'
                       : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium whitespace-nowrap overflow-hidden cursor-pointer ${
-                    isActive
+                    location.pathname === '/' && location.search === ''
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
@@ -180,7 +209,7 @@ const Sidebar: React.FC = () => {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 text-left transition-colors cursor-pointer"
               >
-                <HiDocumentPlus className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                <HiAcademicCap className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">Quiz mới</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Tạo bài kiểm tra tự động chấm</p>
@@ -228,8 +257,25 @@ const Sidebar: React.FC = () => {
                   }`
             }
           >
-            <HiBell className="w-6 h-6 flex-shrink-0" />
-            {!isCollapsed && <span>Thông báo</span>}
+            <div className="relative flex items-center">
+              <HiBell className="w-6 h-6 flex-shrink-0" />
+              {unreadCount > 0 && isCollapsed && (
+                <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+              )}
+            </div>
+            {!isCollapsed && (
+              <span className="flex-1 flex justify-between items-center">
+                Thông báo
+                {unreadCount > 0 && (
+                  <span className="px-2 py-0.5 rounded-full bg-red-500 text-white text-xs font-bold">
+                    {unreadCount}
+                  </span>
+                )}
+              </span>
+            )}
           </NavLink>
 
           {/* Quiz Link - matches all quiz routes */}
@@ -286,12 +332,12 @@ const Sidebar: React.FC = () => {
             className={
               isCollapsed
                 ? `flex items-center justify-center w-10 h-10 mx-auto rounded-lg transition-all ${
-                    location.pathname === '/' && !location.search.includes('filter=recent')
+                    location.pathname === '/' && location.search.includes('tab=')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`
                 : `w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all font-medium text-left cursor-pointer ${
-                    location.pathname === '/' && !location.search.includes('filter=recent')
+                    location.pathname === '/' && location.search.includes('tab=')
                       ? 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 font-bold'
                       : 'text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
                   }`

@@ -18,7 +18,8 @@ import {
   HiFolderPlus,
   HiSquare2Stack,
   HiArrowPath,
-  HiClock
+  HiClock,
+  HiAcademicCap
 } from 'react-icons/hi2';
 import { FlashcardSet, flashcardService } from '../../services/flashcardService';
 
@@ -389,12 +390,20 @@ const Navbar: React.FC = () => {
                     <HiSquare2Stack className="w-5 h-5 text-blue-500" />
                     Tạo bộ thẻ
                   </Link>
+                  <Link
+                    to="/quiz/create"
+                    onClick={() => setIsCreateMenuOpen(false)}
+                    className="flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors"
+                  >
+                    <HiAcademicCap className="w-5 h-5 text-blue-500" />
+                    Tạo Quiz
+                  </Link>
                   <button
                     onClick={() => {
                       setIsCreateMenuOpen(false);
                       navigate('/?tab=folders&create=true');
                     }}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors text-left"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 rounded-md transition-colors text-left cursor-pointer"
                   >
                     <HiFolderPlus className="w-5 h-5 text-blue-500" />
                     Tạo thư mục
