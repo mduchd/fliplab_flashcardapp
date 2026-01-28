@@ -6,7 +6,6 @@ import QuestionEditor from '../../components/Quiz/QuestionEditor';
 import QuizSettingsPanel from '../../components/Quiz/QuizSettingsPanel';
 import { HiPlus, HiTrash, HiArrowLeft } from 'react-icons/hi2';
 import { useToastContext } from '../../contexts/ToastContext';
-import './QuizCreator.css';
 
 const QuizCreator: React.FC = () => {
   const navigate = useNavigate();
@@ -155,9 +154,9 @@ const QuizCreator: React.FC = () => {
   if (loading) {
     return (
       <MainLayout>
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Đang tải quiz...</p>
+        <div className="flex flex-col items-center justify-center py-20">
+          <div className="w-10 h-10 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+          <p className="text-slate-500 font-medium">Đang tải quiz...</p>
         </div>
       </MainLayout>
     );
@@ -165,92 +164,100 @@ const QuizCreator: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="quiz-creator-container">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="quiz-creator-header">
+        <div className="flex items-center gap-4 mb-8">
           <button 
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all group cursor-pointer mb-6" 
+            className="flex items-center justify-center w-10 h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 hover:border-blue-500 rounded-xl transition-all shadow-sm cursor-pointer" 
             onClick={() => navigate('/quiz')}
           >
-            <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-            <span className="font-medium">Quay lại danh sách</span>
+            <HiArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="page-title">
-            {isEditMode ? 'Sửa Quiz' : 'Tạo Quiz Mới'}
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {isEditMode ? 'Chỉnh sửa Quiz' : 'Tạo Quiz Mới'}
           </h1>
         </div>
 
-        <div className="quiz-creator-content">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Panel - Quiz Details & Questions */}
-          <div className="quiz-creator-main">
+          <div className="lg:col-span-2 space-y-8">
             {/* Basic Info */}
-            <div className="quiz-section">
-              <h2 className="section-title">Thông tin cơ bản</h2>
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                <span className="w-1 h-6 bg-blue-600 rounded-full"></span>
+                Thông tin cơ bản
+              </h2>
               
-              <div className="form-group">
-                <label htmlFor="title" className="form-label">Tiêu đề Quiz *</label>
-                <input
-                  id="title"
-                  type="text"
-                  className="form-input"
-                  placeholder="Nhập tiêu đề quiz..."
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  maxLength={200}
-                />
-              </div>
+              <div className="space-y-6">
+                <div>
+                  <label htmlFor="title" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Tiêu đề Quiz <span className="text-red-500">*</span></label>
+                  <input
+                    id="title"
+                    type="text"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 text-slate-900 dark:text-white"
+                    placeholder="Nhập tiêu đề quiz..."
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    maxLength={200}
+                  />
+                </div>
 
-              <div className="form-group">
-                <label htmlFor="description" className="form-label">Mô tả</label>
-                <textarea
-                  id="description"
-                  className="form-textarea"
-                  placeholder="Nhập mô tả quiz (tùy chọn)..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  maxLength={1000}
-                />
-              </div>
+                <div>
+                  <label htmlFor="description" className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Mô tả</label>
+                  <textarea
+                    id="description"
+                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-600 text-slate-900 dark:text-white min-h-[100px]"
+                    placeholder="Nhập mô tả quiz (tùy chọn)..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    rows={3}
+                    maxLength={1000}
+                  />
+                </div>
 
-              <div className="form-group">
-                <label className="relative flex items-center justify-between cursor-pointer group p-3 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-blue-300 dark:hover:border-blue-700 transition-colors bg-white dark:bg-slate-800/50">
-                  <div className="flex-1 pr-4">
-                    <div className="font-medium text-slate-700 dark:text-slate-200 mb-0.5">Công khai Quiz</div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">Cho phép học sinh tìm thấy quiz mà không cần mã truy cập</div>
-                  </div>
-                  <div className="relative inline-flex items-center">
-                    <input
-                      type="checkbox"
-                      className="sr-only peer"
-                      checked={isPublic}
-                      onChange={(e) => setIsPublic(e.target.checked)}
-                    />
-                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                  </div>
-                </label>
+                <div>
+                  <label className="relative flex items-center justify-between cursor-pointer group p-4 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-blue-300 dark:hover:border-blue-700 transition-colors bg-white dark:bg-slate-800">
+                    <div className="flex-1 pr-4">
+                      <div className="font-bold text-slate-700 dark:text-slate-200 mb-1">Công khai Quiz</div>
+                      <div className="text-sm text-slate-500 dark:text-slate-400">Cho phép học sinh tìm thấy quiz này mà không cần mã truy cập</div>
+                    </div>
+                    <div className="relative inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        className="sr-only peer"
+                        checked={isPublic}
+                        onChange={(e) => setIsPublic(e.target.checked)}
+                      />
+                      <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
 
             {/* Questions */}
-            <div className="quiz-section">
-              <div className="section-header">
-                <h2 className="section-title">Câu hỏi ({questions.length})</h2>
-
+            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-6 shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span className="w-1 h-6 bg-blue-600 rounded-full"></span>
+                  Danh sách câu hỏi <span className="text-slate-400 font-normal">({questions.length})</span>
+                </h2>
               </div>
 
-              <div className="questions-list">
+              <div className="space-y-6">
                 {questions.map((question, index) => (
-                  <div key={index} className="question-item">
-                    <div className="question-header">
-                      <span className="question-number">Câu hỏi {index + 1}</span>
+                  <div key={index} className="relative bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-700 p-4 transition-all hover:border-blue-200 dark:hover:border-blue-800">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-bold uppercase tracking-wider rounded-lg">
+                        Câu hỏi {index + 1}
+                      </span>
                       {questions.length > 1 && (
                         <button
-                          className="btn-danger btn-icon"
+                          className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors cursor-pointer"
                           onClick={() => deleteQuestion(index)}
                           title="Xóa câu hỏi"
                         >
-                          <HiTrash />
+                          <HiTrash className="w-5 h-5" />
                         </button>
                       )}
                     </div>
@@ -263,49 +270,50 @@ const QuizCreator: React.FC = () => {
               </div>
 
               <button
-                className="w-full mt-4 py-4 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg flex items-center justify-center gap-2 text-slate-500 hover:text-blue-600 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-slate-800/50 transition-all cursor-pointer group"
+                className="w-full mt-6 py-4 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl flex items-center justify-center gap-2 text-slate-500 hover:text-blue-600 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/20 transition-all cursor-pointer group"
                 onClick={addQuestion}
               >
-                <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-700 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center transition-colors">
-                  <HiPlus className="w-5 h-5 text-slate-500 group-hover:text-blue-600 transition-colors" />
+                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
+                  <HiPlus className="w-5 h-5" />
                 </div>
-                <span className="font-medium">Thêm Câu hỏi Mới</span>
+                <span className="font-bold">Thêm Câu hỏi Mới</span>
               </button>
             </div>
           </div>
 
           {/* Right Panel - Settings */}
-          <div className="quiz-creator-sidebar">
-            <QuizSettingsPanel
-              settings={settings}
-              onChange={setSettings}
-            />
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+              <QuizSettingsPanel
+                settings={settings}
+                onChange={setSettings}
+              />
 
-            {/* Action Buttons */}
-            {/* Action Buttons */}
-            <div className="mt-6 flex flex-col gap-3">
-              <button
-                className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-lg shadow-sm hover:shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
-                onClick={handleSave}
-                disabled={saving}
-              >
-                {saving ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    <span>Đang lưu...</span>
-                  </>
-                ) : (
-                  <span>{isEditMode ? 'Cập nhật Quiz' : 'Tạo Quiz'}</span>
-                )}
-              </button>
-              
-              <button
-                className="w-full py-3 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer disabled:opacity-70"
-                onClick={() => navigate('/quiz')}
-                disabled={saving}
-              >
-                Hủy
-              </button>
+              {/* Action Buttons */}
+              <div className="flex flex-col gap-3">
+                <button
+                  className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
+                  onClick={handleSave}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>Đang lưu...</span>
+                    </>
+                  ) : (
+                    <span>{isEditMode ? 'Cập nhật Quiz' : 'Hoàn tất & Tạo Quiz'}</span>
+                  )}
+                </button>
+                
+                <button
+                  className="w-full py-4 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer disabled:opacity-70"
+                  onClick={() => navigate('/quiz')}
+                  disabled={saving}
+                >
+                  Hủy bỏ
+                </button>
+              </div>
             </div>
           </div>
         </div>
