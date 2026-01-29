@@ -589,7 +589,7 @@ const GroupDetail: React.FC = () => {
                       <Avatar 
                         avatarUrl={post.author.avatar}
                         displayName={post.author.displayName}
-                        frameId={(post.author as any).avatarFrame}
+                        frameId={post.author.avatarFrame}
                         size="sm"
                       />
                       <div>
@@ -769,7 +769,7 @@ const GroupDetail: React.FC = () => {
                   <Avatar 
                     avatarUrl={member.avatar}
                     displayName={member.displayName}
-                    frameId={(member as any).avatarFrame}
+                    frameId={member.avatarFrame}
                     size="sm"
                   />
                   <div className="flex-1">

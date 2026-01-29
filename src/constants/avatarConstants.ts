@@ -38,5 +38,10 @@ export const AVATAR_FRAMES = [
   
   { id: 'ruby', name: 'Hồng ngọc', class: 'ring-rose-600 shadow-[0_0_20px_rgba(225,29,72,0.9)]' },
   { id: 'emerald', name: 'Lục bảo', class: 'ring-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.8)]' },
-  { id: 'ghost', name: 'Bóng ma', class: 'ring-slate-400/60 shadow-[0_0_25px_rgba(255,255,255,0.5)] animate-pulse' }
+  { id: 'ghost', name: 'Bóng ma', class: 'ring-slate-400/60 shadow-[0_0_25px_rgba(255,255,255,0.5)] animate-pulse' },
+  
+  // Cute & Gentle Frames
+  { id: 'sakura', name: 'Hoa anh đào', class: 'bg-[conic-gradient(from_0deg,#fce7f3,#f9a8d4,#fff1f2,#fce7f3)]', isSpinning: true },
+  { id: 'angel', name: 'Thiên thần', class: 'bg-[conic-gradient(from_180deg,#e0f2fe,#d8b4fe,#ffffff,#e0f2fe)]', isSpinning: true },
+  { id: 'fairy', name: 'Tiên nữ', class: 'ring-pink-300 shadow-[0_0_20px_rgba(249,168,212,0.8)]' }
 ];

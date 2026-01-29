@@ -449,6 +449,9 @@ const Study: React.FC = () => {
       case '2':
         handleKnow();
         break;
+      case '3':
+        handleShuffle();
+        break;
     }
   }, [currentIndex, isFlipped, isLoading, error, flashcardSet, isCompleted]);
 
@@ -558,36 +561,36 @@ const Study: React.FC = () => {
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{flashcardSet.name}</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setIsShareModalOpen(true)}
-              className="px-4 py-2 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-200 dark:hover:bg-green-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
-            >
-              <HiShare size={18} />
-              Chia sẻ
-            </button>
-            <button
-              onClick={() => setIsMoveModalOpen(true)}
-              className="px-4 py-2 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
-            >
-              <HiFolder size={18} />
-              Thêm vào thư mục
-            </button>
-            <button
-              onClick={() => navigate(`/create/${id}`)}
-              className="px-4 py-2 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all flex items-center gap-2 font-medium cursor-pointer"
-            >
-              <Edit2 size={18} />
-              Chỉnh sửa bộ thẻ
-            </button>
-            <button
-              onClick={() => navigate('/')}
-              className="px-4 py-2 bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-white/20 transition-all flex items-center gap-2 font-medium cursor-pointer hover:shadow-sm active:scale-95"
-            >
-              <X size={20} />
-              Thoát
-            </button>
-          </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsShareModalOpen(true)}
+                className="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-100 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-all flex items-center gap-2 font-semibold cursor-pointer shadow-sm hover:shadow-md text-sm"
+              >
+                <HiShare size={16} />
+                Chia sẻ
+              </button>
+              <button
+                onClick={() => setIsMoveModalOpen(true)}
+                className="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-100 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-all flex items-center gap-2 font-semibold cursor-pointer shadow-sm hover:shadow-md text-sm"
+              >
+                <HiFolder size={16} />
+                Thêm vào thư mục
+              </button>
+              <button
+                onClick={() => navigate(`/create/${id}`)}
+                className="px-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-100 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-600 transition-all flex items-center gap-2 font-semibold cursor-pointer shadow-sm hover:shadow-md text-sm"
+              >
+                <Edit2 size={16} />
+                Chỉnh sửa
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="p-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-200 rounded-lg hover:bg-red-50 hover:text-red-600 hover:border-red-200 dark:hover:bg-slate-600 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                title="Thoát"
+              >
+                <X size={20} />
+              </button>
+            </div>
         </div>
 
         {/* Progress Bar */}
@@ -613,8 +616,8 @@ const Study: React.FC = () => {
               }}
               className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all cursor-pointer ${
                 studyMode === 'flashcard'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               <CreditCard size={18} />
@@ -628,8 +631,8 @@ const Study: React.FC = () => {
               }}
               className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all cursor-pointer ${
                 studyMode === 'quiz'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               <LayoutGrid size={18} />
@@ -642,8 +645,8 @@ const Study: React.FC = () => {
               }}
               className={`px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition-all cursor-pointer ${
                 studyMode === 'match'
-                  ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-white shadow-md'
-                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               <Puzzle size={18} />
@@ -860,41 +863,48 @@ const Study: React.FC = () => {
           <>
             <div className="mt-2 space-y-3">
               {/* Navigation Row */}
-              <div className="flex items-center justify-center gap-6">
-                <button
-                  onClick={handlePrev}
-                  disabled={currentIndex === 0}
-                  className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
-                >
-                  <ArrowLeft size={24} />
-                </button>
-                
-                <span className="text-xl font-bold text-slate-700 dark:text-slate-300 min-w-[3rem] text-center">
-                  {currentIndex + 1} / {activeCards.length}
-                </span>
+              {/* Navigation & Tools Row */}
+              <div className="max-w-2xl mx-auto relative flex items-center justify-center mb-2 h-20">
+                {/* Center: Navigation */}
+                <div className="flex items-center gap-6">
+                  <button
+                    onClick={handlePrev}
+                    disabled={currentIndex === 0}
+                    className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <ArrowLeft size={24} />
+                  </button>
+                  
+                  <span className="text-xl font-bold text-slate-700 dark:text-slate-300 min-w-[3rem] text-center select-none">
+                    {currentIndex + 1} / {activeCards.length}
+                  </span>
 
-                <button
-                  onClick={handleNext}
-                  disabled={currentIndex === activeCards.length - 1}
-                  className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
-                >
-                  <ArrowRight size={24} />
-                </button>
+                  <button
+                    onClick={handleNext}
+                    disabled={currentIndex === activeCards.length - 1}
+                    className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <ArrowRight size={24} />
+                  </button>
+                </div>
+
+                {/* Right: Tools - Now aligned with card edge */}
+                <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden sm:block">
+                  <button
+                    onClick={handleShuffle}
+                    title="Trộn thẻ"
+                    className="p-4 bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 rounded-full hover:bg-slate-200 dark:hover:bg-white/20 transition-all cursor-pointer shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                  >
+                    <Shuffle size={20} />
+                  </button>
+                </div>
               </div>
 
-              {/* Action Row */}
-              <div className="flex items-center justify-center gap-4">
-                 <button
-                  onClick={handleShuffle}
-                  title="Trộn thẻ"
-                  className="p-4 bg-blue-100 dark:bg-blue-500/20 text-blue-600 dark:text-blue-300 rounded-lg hover:bg-blue-200 dark:hover:bg-blue-500/30 transition-all cursor-pointer shadow-sm hover:shadow-md hover:scale-110 active:scale-95"
-                >
-                  <Shuffle size={24} />
-                </button>
-
+              {/* Action Row - Primary Buttons */}
+              <div className="flex items-center justify-center gap-4 pt-2">
                 <button
                   onClick={handleDontKnow}
-                  className="flex-1 max-w-[200px] py-4 bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400 rounded-lg font-semibold hover:bg-red-200 dark:hover:bg-red-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+                  className="w-40 py-4 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <X size={24} />
                   <span>Chưa biết</span>
@@ -902,7 +912,7 @@ const Study: React.FC = () => {
 
                 <button
                   onClick={handleKnow}
-                  className="flex-1 max-w-[200px] py-4 bg-green-100 dark:bg-green-500/20 text-green-600 dark:text-green-400 rounded-lg font-semibold hover:bg-green-200 dark:hover:bg-green-500/30 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm hover:shadow-md hover:scale-105 active:scale-95"
+                  className="w-40 py-4 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
                 >
                   <Check size={24} />
                   <span>Đã biết</span>
@@ -910,13 +920,14 @@ const Study: React.FC = () => {
               </div>
             </div>
 
-            {/* Keyboard Hints */}
-            <div className="mt-3 text-center text-slate-700 dark:text-slate-200 text-base flex items-center justify-center gap-2">
+             {/* Keyboard Hints */}
+            <div className="mt-4 text-center text-slate-500 dark:text-slate-400 text-sm flex items-center justify-center gap-2 select-none">
               <span className="hidden md:inline font-medium">
-                Phím tắt: <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">Space</kbd> lật,{' '}
-                <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">← →</kbd> chuyển,{' '}
-                <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">1</kbd> chưa biết,{' '}
-                <kbd className="px-2.5 py-1.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white rounded-lg mx-1 font-semibold text-sm shadow-sm">2</kbd> đã biết
+                Phím tắt: <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md font-sans text-xs font-bold mx-1">Space</kbd> lật,{' '}
+                <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md font-sans text-xs font-bold mx-1">← →</kbd> đổi thẻ,{' '}
+                <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md font-sans text-xs font-bold mx-1">1</kbd> chưa biết,{' '}
+                <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md font-sans text-xs font-bold mx-1">2</kbd> đã biết,{' '}
+                <kbd className="px-2 py-1 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md font-sans text-xs font-bold mx-1">3</kbd> trộn thẻ
               </span>
             </div>
           </>

@@ -167,7 +167,8 @@ const Home: React.FC = () => {
       setIsLoading(true);
       const [setsResponse, foldersResponse] = await Promise.all([
         flashcardService.getAll(),
-        folderService.getFolders()
+        folderService.getFolders(),
+        dailyProgressTracker.initStats(), // Sync streak & goal from server
       ]);
       setFlashcardSets(setsResponse.data.flashcardSets);
       setFolders(foldersResponse.data.folders);
@@ -469,7 +470,7 @@ const Home: React.FC = () => {
           onClick={() => navigate('/settings')} 
           className={`relative overflow-hidden rounded-2xl p-6 shadow-xl transition-all duration-300 cursor-pointer flex flex-col ${
             goalCompleted 
-              ? 'bg-gradient-to-br from-blue-600 to-indigo-700 dark:from-blue-800 dark:to-indigo-900 shadow-blue-500/30' 
+              ? 'bg-gradient-to-br from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 shadow-blue-500/30' 
               : 'bg-blue-500 dark:bg-blue-900/60 dark:border dark:border-blue-700/30 hover:bg-blue-600 dark:hover:bg-blue-900/80 hover:shadow-blue-500/30'
           }`}
         >

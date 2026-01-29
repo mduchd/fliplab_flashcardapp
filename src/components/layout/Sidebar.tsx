@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useSidebar } from '../../contexts/SidebarContext';
+import { notificationService } from '../../services/notificationService';
 import { 
   HiHome, 
   HiPlusCircle, 
@@ -30,15 +31,14 @@ const Sidebar: React.FC = () => {
 
   useEffect(() => {
     // Check local storage for unread count
-    const checkNotifications = () => {
-      const saved = localStorage.getItem('notifications');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        const count = parsed.filter((n: any) => !n.read).length;
-        setUnreadCount(count);
-      } else {
-        // Default mock if not visited yet
-        setUnreadCount(2);
+    const checkNotifications = async () => {
+      try {
+        const response = await notificationService.getMyNotifications(1, 1);
+        if (response.success) {
+          setUnreadCount(response.unreadCount);
+        }
+      } catch (error) {
+        // Silent error
       }
     };
 

@@ -11,18 +11,21 @@ export interface Group {
     username: string;
     displayName: string;
     avatar?: string;
+    avatarFrame?: string;
   };
   admins: {
     _id: string;
     username: string;
     displayName: string;
     avatar?: string;
+    avatarFrame?: string;
   }[];
   members: {
     _id: string;
     username: string;
     displayName: string;
     avatar?: string;
+    avatarFrame?: string;
   }[];
   isPublic: boolean;
   tags: string[];
@@ -42,6 +45,7 @@ export interface Post {
     username: string;
     displayName: string;
     avatar?: string;
+    avatarFrame?: string;
   };
   content: string;
   images: string[];
@@ -68,6 +72,7 @@ export interface Post {
       username: string;
       displayName: string;
       avatar?: string;
+      avatarFrame?: string;
     };
     content: string;
     likes: string[];
@@ -78,6 +83,7 @@ export interface Post {
         username: string;
         displayName: string;
         avatar?: string;
+        avatarFrame?: string;
       };
       content: string;
       createdAt: string;
