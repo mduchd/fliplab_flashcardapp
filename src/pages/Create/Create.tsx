@@ -1,10 +1,30 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { flashcardService, Flashcard, CreateFlashcardSetData } from '../../services/flashcardService';
 import MainLayout from '../../components/layout/MainLayout';
-import { HiArrowLeft, HiPlus, HiBookmarkSquare, HiTrash, HiArrowPath, HiPhoto, HiArrowUpTray } from 'react-icons/hi2';
+import { 
+  HiPlus, 
+  HiTrash, 
+  HiPhoto, 
+  HiArrowLeft, 
+  HiArrowUpTray, 
+  HiSparkles,
+  HiEye,
+  HiArrowPath,
+  HiCheckCircle,
+  HiRectangleStack,
+  HiClock,
+  HiAcademicCap,
+  HiShare,
+  HiFolder,
+  HiPencil
+} from 'react-icons/hi2';
+import { ICON_MAP, ICON_OPTIONS } from '../../utils/icons';
 import { useToastContext } from '../../contexts/ToastContext';
 import ImportModalV2, { ImportData } from '../../components/ImportModalV2';
+import AIGenerateModal from '../../components/AIGenerateModal';
+import PreviewFlashcardModal from '../../components/PreviewFlashcardModal';
 
 interface CardInput {
   id: string;
@@ -27,10 +47,14 @@ const Create: React.FC = () => {
   ]);
   const [tags, setTags] = useState('');
   const [color, setColor] = useState('#3b82f6');
+  const [icon, setIcon] = useState('stack');
+  const [showAllIcons, setShowAllIcons] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [error, setError] = useState('');
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
 
   const colors = [
     '#3b82f6', // blue (default)
@@ -78,6 +102,7 @@ const Create: React.FC = () => {
       })));
       setTags(set.tags.join(', '));
       setColor(set.color || '#3b82f6');
+      setIcon(set.icon || 'stack');
     } catch (err) {
       setError('Không thể tải bộ thẻ');
       console.error(err);
@@ -178,6 +203,25 @@ const Create: React.FC = () => {
     }
   };
 
+  const handleAIGenerated = (newCards: { term: string; definition: string }[]) => {
+    // Convert to CardInput
+    const formattedCards: CardInput[] = newCards.map((c, i) => ({
+      id: `ai-${Date.now()}-${i}`,
+      term: c.term,
+      definition: c.definition,
+      image: ''
+    }));
+
+    // If current list is empty or has only 1 empty card, replace it
+    const isListEmpty = cards.length <= 1 && !cards[0].term && !cards[0].definition;
+    
+    if (isListEmpty) {
+      setCards(formattedCards);
+    } else {
+      setCards(prev => [...prev, ...formattedCards]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -209,6 +253,7 @@ const Create: React.FC = () => {
         })),
         tags: tags.split(',').map((t) => t.trim()).filter(Boolean),
         color,
+        icon,
       };
 
       if (isEditing) {
@@ -314,6 +359,124 @@ const Create: React.FC = () => {
                       />
                   ))}
                 </div>
+
+                {/* Icon Selection */}
+                <div className="mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-slate-700 dark:text-blue-200 text-sm">Biểu tượng</label>
+                    <button
+                      type="button"
+                      onClick={() => setShowAllIcons(!showAllIcons)}
+                      className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors flex items-center gap-1"
+                    >
+                      {showAllIcons ? 'Thu gọn' : 'Xem thêm'}
+                      <svg className={`w-3 h-3 transition-transform ${showAllIcons ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                  </div>
+                  
+                  <div className={`flex flex-wrap gap-3 transition-all duration-300 ease-in-out ${showAllIcons ? 'max-h-[500px] overflow-y-auto pr-1' : 'max-h-[96px] overflow-hidden'}`}>
+                    {ICON_OPTIONS.map((opt) => {
+                      const Icon = ICON_MAP[opt.key];
+                      if (!Icon) return null; // Safety check
+                      
+                      const isSelected = icon === opt.key;
+                      
+                      return (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          onClick={() => setIcon(opt.key)}
+                          title={opt.label}
+                          className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center transition-all cursor-pointer border-2 ${
+                            isSelected 
+                              ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-white dark:border-blue-400 shadow-md scale-105' 
+                              : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50 text-slate-400 hover:border-blue-300 dark:hover:border-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                          }`}
+                        >
+                          <Icon className="w-5 h-5" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Live Preview Card */}
+                <div className="mt-8">
+                   <label className="block text-slate-700 dark:text-blue-200 text-sm mb-3 font-semibold">
+                      Xem trước hiển thị:
+                   </label>
+                   <div className="w-full max-w-[450px] bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden relative group transition-all hover:-translate-y-1">
+                      {/* Top Color Bar */}
+                      <div className="h-1.5 w-full transition-colors duration-300" style={{ backgroundColor: color }}></div>
+                      
+                      {/* Background Watermark Icon - Dynamic */}
+                      <div 
+                          className="absolute -right-6 -top-6 opacity-[0.15] transform rotate-12 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110 pointer-events-none z-0"
+                          style={{ color: color }}
+                      >
+                           {(() => {
+                             const BgIcon = ICON_MAP[icon] || HiRectangleStack;
+                             return <BgIcon className="w-32 h-32" />;
+                           })()}
+                      </div>
+
+                      <div className="p-5 relative z-10">
+                          {/* Title - Custom Color */}
+                          <h3 className="text-xl font-bold mb-1 line-clamp-1 transition-colors" style={{ color: color }}>
+                              {name || 'Tiêu đề bộ thẻ...'}
+                          </h3>
+
+                          {/* Description - Syncs live with input */}
+                          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4 line-clamp-2 min-h-[1.25rem]">
+                              {description || 'Mô tả bộ thẻ...'}
+                          </p>
+                          
+                          {/* Chips */}
+                          <div className="flex flex-wrap gap-2 mb-6">
+                             <div className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-lg flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                                 <HiRectangleStack className="w-4 h-4" style={{ color: color }} />
+                                 {cards.length} thẻ
+                             </div>
+                             <div className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700/50 rounded-lg flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-300">
+                                 <HiClock className="w-4 h-4" style={{ color: color }} />
+                                 {new Date().toLocaleDateString('vi-VN')}
+                             </div>
+                          </div>
+
+                          {/* Action Row */}
+                          <div className="flex items-center gap-3">
+                              <button 
+                                  type="button" 
+                                  className="flex-1 h-12 rounded-xl text-white font-bold text-sm shadow-md transition-all hover:brightness-110 active:scale-95 flex items-center justify-center gap-2 cursor-default pointer-events-none"
+                                  style={{ backgroundColor: color }}
+                              >
+                                  <HiAcademicCap className="w-5 h-5" />
+                                  Học ngay
+                              </button>
+                              
+                              <div className="flex gap-2">
+                                  <div className="w-11 h-11 bg-slate-50 dark:bg-slate-700/50 rounded-xl flex items-center justify-center text-slate-400 border border-slate-100 dark:border-slate-600 opacity-60">
+                                      <HiShare className="w-5 h-5" />
+                                  </div>
+                                  <div className="w-11 h-11 bg-slate-50 dark:bg-slate-700/50 rounded-xl flex items-center justify-center text-slate-400 border border-slate-100 dark:border-slate-600 opacity-60">
+                                      <HiFolder className="w-5 h-5" />
+                                  </div>
+                                  <div className="w-11 h-11 bg-slate-50 dark:bg-slate-700/50 rounded-xl flex items-center justify-center text-slate-400 border border-slate-100 dark:border-slate-600 opacity-60">
+                                      <HiPencil className="w-5 h-5" />
+                                  </div>
+                                   <div className="w-11 h-11 bg-slate-50 dark:bg-slate-700/50 rounded-xl flex items-center justify-center text-slate-400 border border-slate-100 dark:border-slate-600 opacity-60">
+                                      <HiTrash className="w-5 h-5" />
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                   </div>
+                   <p className="mt-3 text-xs text-slate-400 italic flex items-center gap-1">
+                      * Đây là bản xem trước hiển thị ở trang chủ
+                   </p>
+                </div>
               </div>
             </div>
           </div>
@@ -323,6 +486,22 @@ const Create: React.FC = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Danh sách thẻ ({cards.length})</h2>
               <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsPreviewModalOpen(true)}
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <HiEye className="w-[18px] h-[18px]" />
+                  Xem trước
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsAIModalOpen(true)}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] transition-all flex items-center gap-2 cursor-pointer font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)] active:scale-95"
+                >
+                  <HiSparkles className="w-5 h-5 text-white" />
+                  Magic AI
+                </button>
                 <button
                   type="button"
                   onClick={() => setIsImportModalOpen(true)}
@@ -465,7 +644,7 @@ const Create: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <HiBookmarkSquare className="w-6 h-6" />
+                  <HiCheckCircle className="w-6 h-6" />
                   {isEditing ? 'Lưu thay đổi' : 'Hoàn tất & Tạo bộ thẻ'}
                 </>
               )}
@@ -481,8 +660,23 @@ const Create: React.FC = () => {
         onImport={handleImport}
         existingDeckName={name || undefined}
       />
+
+      {/* AI Generate Modal */}
+      <AIGenerateModal
+        isOpen={isAIModalOpen}
+        onClose={() => setIsAIModalOpen(false)}
+        onSuccess={handleAIGenerated}
+      />
+
+      {/* Preview Modal */}
+      <PreviewFlashcardModal 
+        isOpen={isPreviewModalOpen}
+        onClose={() => setIsPreviewModalOpen(false)}
+        cards={cards} // Pass raw card list
+      />
     </MainLayout>
   );
 };
 
 export default Create;
+

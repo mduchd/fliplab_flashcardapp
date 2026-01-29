@@ -27,6 +27,7 @@ import {
   HiFlag,
   HiCheckBadge
 } from 'react-icons/hi2';
+import { ICON_MAP } from '../../utils/icons';
 import { dailyProgressTracker } from '../../utils/dailyProgressTracker';
 import { useToastContext } from '../../contexts/ToastContext';
 
@@ -693,7 +694,10 @@ const Home: React.FC = () => {
                   className="absolute -right-6 -top-6 opacity-[0.15] transform rotate-12 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110 pointer-events-none z-0"
                   style={{ color: set.color || '#2563eb' }}
                 >
-                   <HiRectangleStack className="w-32 h-32" />
+                   {(() => {
+                     const BgIcon = ICON_MAP[set.icon || 'stack'] || ICON_MAP['stack'];
+                     return <BgIcon className="w-32 h-32" />;
+                   })()}
                 </div>
 
                 <div className="p-5 flex flex-col h-full relative z-10">

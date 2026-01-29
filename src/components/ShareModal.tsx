@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { HiXMark, HiLink, HiClipboardDocument, HiArrowDownTray, HiCheck, HiQrCode } from 'react-icons/hi2';
+import { HiXMark, HiShare, HiClipboardDocument, HiArrowDownTray, HiCheck, HiQrCode } from 'react-icons/hi2';
 import { FlashcardSet } from '../services/flashcardService';
 
 interface ShareModalProps {
@@ -66,7 +66,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, flashcardSet }
           
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-              <HiLink className="w-6 h-6 text-white" />
+              <HiShare className="w-6 h-6 text-white" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-white">Chia sẻ bộ thẻ</h2>

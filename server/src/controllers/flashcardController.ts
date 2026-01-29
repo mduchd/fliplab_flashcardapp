@@ -35,6 +35,7 @@ export const getFlashcardSets = async (req: AuthRequest, res: Response): Promise
         description: 1,
         tags: 1,
         color: 1,
+        icon: 1,
         lastStudied: 1,
         totalStudies: 1,
         createdAt: 1,

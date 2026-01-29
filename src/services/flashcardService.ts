@@ -20,6 +20,7 @@ export interface FlashcardSet {
   isPublic: boolean;
   tags: string[];
   color?: string;
+  icon?: string;
   createdAt: string;
   updatedAt: string;
   lastStudied?: string;
@@ -34,6 +35,7 @@ export interface CreateFlashcardSetData {
   isPublic?: boolean;
   tags?: string[];
   color?: string;
+  icon?: string;
 }
 
 export const flashcardService = {
