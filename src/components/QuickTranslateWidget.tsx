@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { HiLanguage, HiXMark, HiClipboardDocument, HiSpeakerWave, HiMagnifyingGlass } from 'react-icons/hi2';
+import { HiLanguage, HiClipboardDocument, HiSpeakerWave, HiMagnifyingGlass, HiArrowsRightLeft } from 'react-icons/hi2';
 import { translationService } from '../services/translationService';
 import { useToastContext } from '../contexts/ToastContext';
 
@@ -180,17 +180,18 @@ const QuickTranslateWidget: React.FC = () => {
 
   return (
     <div ref={containerRef} className="relative z-50">
-      {/* Toggle Button (Navbar Style) */}
+      {/* Toggle Button (Navbar Style - Labeled) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-2.5 rounded-full transition-all duration-200 focus:outline-none flex-shrink-0 border border-transparent active:scale-95 cursor-pointer ${
+        className={`flex items-center gap-2 px-3 py-2 rounded-full transition-all duration-200 focus:outline-none flex-shrink-0 border active:scale-95 cursor-pointer ${
           isOpen 
-            ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 ring-2 ring-blue-100 dark:ring-blue-900' 
-            : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600 dark:hover:text-blue-300'
+            ? 'bg-slate-200 text-slate-700 border-transparent hover:bg-slate-300 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700 dark:hover:text-white'
+            : 'bg-blue-600 text-white border-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:text-white dark:border-blue-500 dark:hover:bg-blue-500' 
         }`}
         title="Dịch nhanh"
       >
         <HiLanguage className="w-5 h-5" />
+        <span className="hidden sm:inline font-bold text-sm">Dịch</span>
       </button>
 
       {/* Popup Panel (Dropdown Style) */}
@@ -274,10 +275,10 @@ const QuickTranslateWidget: React.FC = () => {
             {/* Swap Button */}
             <button 
                 onClick={handleSwap}
-                className="p-2 text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-full transition-all active:rotate-180 flex-shrink-0"
+                className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 hover:border-blue-300 dark:hover:border-blue-500 rounded-full transition-all active:rotate-180 flex-shrink-0 cursor-pointer shadow-sm"
                 title="Đảo chiều ngôn ngữ"
             >
-                <HiLanguage className="w-4 h-4" />
+                <HiArrowsRightLeft className="w-4 h-4" />
             </button>
 
             {/* Target Language Selector */}
