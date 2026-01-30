@@ -5,8 +5,6 @@ import MainLayout from '../../components/layout/MainLayout';
 import { 
   HiPencilSquare, 
   HiCalendarDays, 
-  HiArrowRightOnRectangle,
-  HiCog6Tooth,
   HiCamera,
   HiCheckCircle,
   HiArrowPath,
@@ -341,16 +339,16 @@ const Profile: React.FC = () => {
             </div>
         </div>
       )}
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-[0.4] dark:opacity-[0.15] bg-dot-pattern" />
+
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Profile Header - 2 Column Layout */}
         {/* Profile Header - Unified Card Design */}
         <div className="relative mb-10 w-full max-w-5xl mx-auto">
-            <div className="bg-white dark:bg-[#0B1120] rounded-[2rem] shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
                
                {/* 1. Cover Image - Full Width Top Section */}
                <div 
-                  className="h-56 md:h-80 w-full relative group cursor-pointer bg-slate-100 dark:bg-slate-800"
+                  className="h-56 md:h-80 w-full relative group cursor-pointer bg-slate-100 dark:bg-slate-700"
                   onClick={() => user?.coverImage && setShowCoverModal(true)}
                >
                   {user?.coverImage ? (
@@ -369,7 +367,7 @@ const Profile: React.FC = () => {
                   <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                      <button 
                         onClick={(e) => { e.stopPropagation(); openEditModal(); }} 
-                        className="p-2.5 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-2xl text-white text-sm font-medium cursor-pointer flex items-center gap-2 px-4 transition-all border border-white/10 hover:scale-105 active:scale-95"
+                        className="p-2.5 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-lg text-white text-sm font-medium cursor-pointer flex items-center gap-2 px-4 transition-all border border-white/10 hover:scale-105 active:scale-95"
                      >
                         <HiCamera className="w-4 h-4" /> <span className="text-xs font-bold">Thay ảnh bìa</span>
                      </button>
@@ -381,9 +379,9 @@ const Profile: React.FC = () => {
                   
                   {/* Avatar - Overlapping the Seam */}
                   <div className="relative -mt-16 mb-4 group z-10">
-                    <div className="p-1.5 bg-white dark:bg-[#0B1120] rounded-full ring-0 shadow-sm flex items-center justify-center">
+                    <div className="p-1.5 bg-white dark:bg-slate-800 rounded-full ring-0 shadow-sm flex items-center justify-center">
                       <div className="transform scale-110 origin-center isolate">
-                         <Avatar avatarUrl={user?.avatar} displayName={user?.displayName} size="xl" frameId={user?.avatarFrame} className="shadow-2xl ring-4 ring-white dark:ring-[#0B1120]" />
+                         <Avatar avatarUrl={user?.avatar} displayName={user?.displayName} size="xl" frameId={user?.avatarFrame} className="shadow-2xl ring-4 ring-white dark:ring-slate-800" />
                       </div>
                     </div>
                     <button 
@@ -402,13 +400,13 @@ const Profile: React.FC = () => {
                     </h1>
                     
                     <div className="flex items-center justify-center gap-2 mb-4">
-                      <span className="text-blue-600 dark:text-blue-400 font-bold bg-blue-50 dark:bg-blue-500/10 px-3 py-1 rounded-lg text-xs md:text-sm flex items-center gap-1.5 transition-colors hover:bg-blue-100 dark:hover:bg-blue-500/20 cursor-pointer">
+                      <span className="text-blue-700 dark:text-blue-300 font-bold bg-blue-50 dark:bg-blue-500/20 px-3 py-1 rounded-lg text-xs md:text-sm flex items-center gap-1.5 transition-colors hover:bg-blue-100 dark:hover:bg-blue-500/30 cursor-pointer border border-blue-100 dark:border-blue-500/20">
                          @{user?.username} <HiCheckCircle className="w-4 h-4" />
                       </span>
                     </div>
 
                     {user?.bio && (
-                       <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base font-medium leading-relaxed opacity-90 max-w-lg mx-auto italic">
+                       <p className="text-slate-700 dark:text-slate-200 text-sm md:text-base font-medium leading-relaxed opacity-100 max-w-lg mx-auto italic">
                          {user.bio}
                        </p>
                     )}
@@ -418,12 +416,12 @@ const Profile: React.FC = () => {
                   <div className="flex items-center justify-center gap-8 md:gap-16 mb-6 w-full">
                      <div className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity">
                         <span className="text-2xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followersCount || 0}</span>
-                        <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Người theo dõi</span>
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Người theo dõi</span>
                      </div>
                      
                      <div className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity">
                         <span className="text-2xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followingCount || 0}</span>
-                        <span className="text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">Đang theo dõi</span>
+                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Đang theo dõi</span>
                      </div>
                   </div>
 
@@ -431,7 +429,7 @@ const Profile: React.FC = () => {
                   <div className="flex items-center justify-center gap-3 w-full max-w-sm mb-2">
                      <button 
                         onClick={openEditModal} 
-                        className="flex-1 py-2.5 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-xl hover:bg-slate-800 dark:hover:bg-slate-200 shadow-lg shadow-slate-200/50 dark:shadow-none hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
+                        className="flex-1 py-2.5 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 shadow-lg shadow-slate-200/50 dark:shadow-none hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
                      >
                         <HiPencilSquare className="w-4 h-4" /> Chỉnh sửa
                      </button>
@@ -441,7 +439,7 @@ const Profile: React.FC = () => {
                   </div>
                   
                   {/* Join Date - Subtle Footer */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 w-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-wider">
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 w-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                      <HiCalendarDays className="w-3.5 h-3.5 mr-1.5" />
                      <span>Thành viên từ {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '2024'}</span>
                   </div>

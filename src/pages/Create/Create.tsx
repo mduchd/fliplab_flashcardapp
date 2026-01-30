@@ -18,8 +18,10 @@ import {
   HiAcademicCap,
   HiShare,
   HiFolder,
-  HiPencil
+  HiPencil,
+  HiLanguage
 } from 'react-icons/hi2';
+import { translationService } from '../../services/translationService';
 import { ICON_MAP, ICON_OPTIONS } from '../../utils/icons';
 import { useToastContext } from '../../contexts/ToastContext';
 import ImportModalV2, { ImportData } from '../../components/ImportModalV2';
@@ -73,6 +75,27 @@ const Create: React.FC = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isAIModalOpen, setIsAIModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
+  const [translatingCardId, setTranslatingCardId] = useState<string | null>(null);
+
+  const handleTranslate = async (cardId: string, text: string) => {
+    if (!text.trim()) return toast.info('Vui lòng nhập thuật ngữ trước khi dịch');
+    
+    setTranslatingCardId(cardId);
+    try {
+      const res = await translationService.translate(text);
+      if (res.success && res.data) {
+        updateCard(cardId, 'definition', res.data.translated);
+        toast.success('Đã dịch tự động!');
+      } else {
+        toast.error(res.error || 'Lỗi dịch thuật');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('Có lỗi xảy ra khi dịch');
+    } finally {
+      setTranslatingCardId(null);
+    }
+  };
 
   const colors = [
     '#3b82f6', // blue (default)
@@ -559,10 +582,27 @@ const Create: React.FC = () => {
                         type="text"
                         value={card.term}
                         onChange={(e) => updateCard(card.id, 'term', e.target.value)}
-                        className="w-full px-4 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+                        className="w-full pl-4 pr-12 py-3 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/20 rounded-lg text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all font-medium"
                         placeholder="Thuật ngữ (Term)..."
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && e.ctrlKey) {
+                            handleTranslate(card.id, card.term);
+                          }
+                        }}
                       />
-                      <span className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold pointer-events-none uppercase tracking-wider bg-slate-50 dark:bg-white/5 px-1">Term</span>
+                      <button 
+                        type="button"
+                        onClick={() => handleTranslate(card.id, card.term)}
+                        disabled={translatingCardId === card.id}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-blue-600 dark:text-slate-500 dark:hover:text-blue-400 transition-colors rounded-md hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        title="Dịch nhanh sang Tiếng Việt (Ctrl + Enter)"
+                      >
+                        {translatingCardId === card.id ? (
+                          <HiArrowPath className="w-5 h-5 animate-spin text-blue-500" />
+                        ) : (
+                          <HiLanguage className="w-5 h-5" />
+                        )}
+                      </button>
                     </div>
                     <div className="relative">
                       <input

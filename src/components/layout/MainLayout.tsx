@@ -9,6 +9,7 @@ interface MainLayoutProps {
 
 import AIChatWidget from '../AIChatWidget';
 
+
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { isCollapsed } = useSidebar();
 
@@ -28,6 +29,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {children}
         </main>
       </div>
+
       <AIChatWidget />
     </div>
   );

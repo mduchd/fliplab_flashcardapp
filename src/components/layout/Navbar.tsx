@@ -22,6 +22,7 @@ import {
   HiAcademicCap
 } from 'react-icons/hi2';
 import { FlashcardSet, flashcardService } from '../../services/flashcardService';
+import QuickTranslateWidget from '../QuickTranslateWidget';
 
 const Navbar: React.FC = () => {
   const { user, logout, isAuthenticated } = useAuth();
@@ -368,6 +369,9 @@ const Navbar: React.FC = () => {
 
         {/* RIGHT: Actions & User Menu */}
         <div className="flex items-center gap-4 min-w-fit justify-end pr-4">
+          
+          {/* Quick Translate Widget */}
+          <QuickTranslateWidget />
           
           {/* Create New Button */}
           {/* Create Menu Dropdown */}

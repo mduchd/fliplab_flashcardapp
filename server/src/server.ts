@@ -14,6 +14,7 @@ import commentRoutes from './routes/commentRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import streakRoutes from './routes/streakRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import translationRoutes from './routes/translationRoutes.js';
 
 // Load environment variables
 dotenv.config();
@@ -56,6 +57,7 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/streaks', streakRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/translate', translationRoutes);
 
 // 404 Handler
 app.use((req, res) => {
