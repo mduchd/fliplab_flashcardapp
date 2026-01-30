@@ -132,9 +132,14 @@ const AIGenerateModal: React.FC<AIGenerateModalProps> = ({ isOpen, onClose, onSu
 
                 <div className="flex items-center gap-3 w-full sm:w-auto text-slate-500 dark:text-slate-400">
                     <HiInformationCircle className="w-5 h-5 text-purple-600 dark:text-purple-400" />
-                    <span className="text-xs max-w-[150px] leading-tight">
-                        AI sẽ tự động tìm định nghĩa và ví dụ chuẩn xác.
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                          Giới hạn: 20 lượt/ngày
+                      </span>
+                      <span className="text-[10px] leading-tight opacity-80">
+                          AI sẽ tự động tìm định nghĩa chuẩn xác.
+                      </span>
+                    </div>
                 </div>
            </div>
         </div>
@@ -155,7 +160,7 @@ const AIGenerateModal: React.FC<AIGenerateModalProps> = ({ isOpen, onClose, onSu
              {isLoading ? (
                <>
                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                 <span className="animate-pulse">AI đang suy nghĩ...</span>
+                 <span className="animate-pulse">Đang phù phép...</span>
                </>
              ) : (
                <>

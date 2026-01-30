@@ -56,6 +56,7 @@ export const register = async (req: AuthRequest, res: Response): Promise<void> =
           displayName: user.displayName,
           avatar: user.avatar,
           avatarFrame: user.avatarFrame,
+          coverImage: user.coverImage || '',
           bio: user.bio,
         },
         token,
@@ -150,6 +151,7 @@ export const login = async (req: AuthRequest, res: Response): Promise<void> => {
           displayName: user.displayName,
           avatar: user.avatar,
           avatarFrame: user.avatarFrame,
+          coverImage: user.coverImage || '',
           bio: user.bio,
           totalStudyTime: user.totalStudyTime,
           totalCardsStudied: user.totalCardsStudied,
@@ -228,6 +230,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
           displayName: user.displayName,
           avatar: user.avatar,
           avatarFrame: user.avatarFrame,
+          coverImage: user.coverImage || '',
           bio: user.bio,
           totalStudyTime: user.totalStudyTime,
           totalCardsStudied: user.totalCardsStudied,
@@ -250,7 +253,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
 // @access  Private
 export const updateProfile = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { displayName, avatar, bio } = req.body;
+    const { displayName, avatar, bio, coverImage } = req.body;
     
     const user = await User.findById(req.userId);
     if (!user) {
@@ -265,6 +268,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
     if (displayName) user.displayName = displayName;
     if (avatar !== undefined) user.avatar = avatar;
     if (bio !== undefined) user.bio = bio;
+    if (coverImage !== undefined) user.coverImage = coverImage;
     if (req.body.avatarFrame !== undefined) user.avatarFrame = req.body.avatarFrame;
 
     await user.save();
@@ -280,6 +284,7 @@ export const updateProfile = async (req: AuthRequest, res: Response): Promise<vo
           displayName: user.displayName,
           avatar: user.avatar,
           avatarFrame: user.avatarFrame,
+          coverImage: user.coverImage || '',
           bio: user.bio,
           totalStudyTime: user.totalStudyTime,
           totalCardsStudied: user.totalCardsStudied,

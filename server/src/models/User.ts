@@ -11,6 +11,7 @@ export interface IUser extends Document {
   createdAt: Date;
   updatedAt: Date;
   avatarFrame?: string;
+  coverImage?: string;
   lastLogin?: Date;
   totalStudyTime: number;
   totalCardsStudied: number;
@@ -58,6 +59,10 @@ const userSchema = new Schema<IUser>(
     avatarFrame: {
       type: String,
       default: 'none',
+    },
+    coverImage: {
+      type: String,
+      default: '',
     },
     lastLogin: {
       type: Date,

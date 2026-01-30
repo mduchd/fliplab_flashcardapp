@@ -35,27 +35,56 @@ const getMockData = (topic: string, count: number) => {
 // --- CACHE & RATE LIMIT STORE (In-Memory) ---
 const responseCache = new Map<string, { data: any, timestamp: number }>();
 const userRateLimit = new Map<string, { count: number, resetAt: number }>();
+const userDailyUsage = new Map<string, { count: number, date: string }>(); // New: Daily Tracker
 
-const CACHE_TTL = 60 * 60 * 1000; // 1 Hour Cache
+const CACHE_TTL = 60 * 60 * 1000; // 1 Hour
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 Minute
-const MAX_REQUESTS = 10; // Max 10 requests per minute per user
+const MAX_RPM = 10; // Spam protection (10 req/min)
+const MAX_RPD = 20; // Hard Limit (20 req/day - Gemini 2.5 Free Tier)
 
-// Helper: Check Rate Limit
+// Helper: Check Daily Quota
+const checkDailyQuota = (userId: string): { allowed: boolean, remaining: number, used: number } => {
+    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const record = userDailyUsage.get(userId) || { count: 0, date: today };
+
+    // Reset if new day
+    if (record.date !== today) {
+        record.date = today;
+        record.count = 0;
+    }
+
+    if (record.count >= MAX_RPD) {
+        return { allowed: false, remaining: 0, used: record.count };
+    }
+
+    return { allowed: true, remaining: MAX_RPD - record.count, used: record.count };
+};
+
+// Helper: Increment Usage
+const incrementUsage = (userId: string) => {
+    const today = new Date().toISOString().split('T')[0];
+    const record = userDailyUsage.get(userId) || { count: 0, date: today };
+    if (record.date !== today) { record.count = 0; record.date = today; } // Double check
+    record.count++;
+    userDailyUsage.set(userId, record);
+    return MAX_RPD - record.count;
+};
+
+// Helper: Check Rate Limit (Spam Protection)
 const checkRateLimit = (userId: string): boolean => {
     const now = Date.now();
     const userRecord = userRateLimit.get(userId) || { count: 0, resetAt: now + RATE_LIMIT_WINDOW };
 
     if (now > userRecord.resetAt) {
-        // Reset window
         userRecord.count = 1;
         userRecord.resetAt = now + RATE_LIMIT_WINDOW;
     } else {
         userRecord.count++;
     }
-
     userRateLimit.set(userId, userRecord);
-    return userRecord.count <= MAX_REQUESTS;
+    return userRecord.count <= MAX_RPM;
 };
+
 
 // Helper: Get/Set Cache
 const getCachedResponse = (key: string) => {
@@ -81,20 +110,31 @@ export const generateFlashcards = async (req: Request, res: Response) => {
     // @ts-ignore
     const userId = req.user?.id || 'anonymous';
     
-    // 1. Rate Limit Check
+    // 1. Daily Quota Check
+    const quota = checkDailyQuota(userId);
+    if (!quota.allowed) {
+        return res.status(429).json({ 
+            message: 'Đã hết lượt dùng AI hôm nay (20/20). Vui lòng quay lại ngày mai!' 
+        });
+    }
+
+    // 2. Rate Limit Check (Spam)
     if (!checkRateLimit(userId)) {
-        return res.status(429).json({ message: 'Bạn thao tác quá nhanh! Vui lòng đợi một chút.' });
+        return res.status(429).json({ message: 'Thao tác quá nhanh! Vui lòng đợi giây lát.' });
     }
 
     const { prompt, count = 10, topic } = req.body;
     if (!prompt && !topic) return res.status(400).json({ message: 'Vui lòng cung cấp chủ đề' });
 
-    // 2. Cache Check
+    // 3. Cache Check
     const cacheKey = `gen_card_${topic || prompt}_${count}`;
     const cached = getCachedResponse(cacheKey);
     if (cached) {
         console.log('⚡ Using Cached AI Response');
-        return res.json({ suggestions: cached });
+        return res.json({ 
+            suggestions: cached,
+            usage: { used: quota.used, total: MAX_RPD, remaining: quota.remaining } // Cache doesn't consume quota
+        });
     }
 
     try {
@@ -122,9 +162,14 @@ export const generateFlashcards = async (req: Request, res: Response) => {
 
         const flashcards = JSON.parse(text);
         if (Array.isArray(flashcards)) {
-            // 3. Save to Cache
+            // 4. Save to Cache & Increment Usage
             setCachedResponse(cacheKey, flashcards);
-            return res.json({ suggestions: flashcards });
+            const remaining = incrementUsage(userId); // Consume Quota
+            
+            return res.json({ 
+                suggestions: flashcards,
+                usage: { used: quota.used + 1, total: MAX_RPD, remaining }
+            });
         }
         throw new Error('Invalid Format');
 
@@ -134,7 +179,8 @@ export const generateFlashcards = async (req: Request, res: Response) => {
         return res.json({ 
             suggestions: getMockData(topic || prompt, count),
             isMock: true,
-            message: "Hệ thống AI bận, dùng dữ liệu mẫu." 
+            message: "Hệ thống AI bận, dùng dữ liệu mẫu.",
+            usage: { used: quota.used, total: MAX_RPD, remaining: quota.remaining }
         });
     }
 };
@@ -147,17 +193,29 @@ export const chatWithAI = async (req: Request, res: Response) => {
 
     if (!message) return res.status(400).json({ reply: 'Bạn chưa nói gì cả...' });
 
-    // 1. Rate Limit Check
+    // 1. Daily Quota Check
+    const quota = checkDailyQuota(userId);
+    if (!quota.allowed) {
+        return res.json({ 
+            reply: '💔 Bạn đã dùng hết 20 lượt AI miễn phí hôm nay. Quay lại vào ngày mai nhé hoặc dùng tính năng Tạo thẻ!',
+            isOverQuota: true
+        });
+    }
+
+    // 2. Rate Limit Check
     if (!checkRateLimit(userId)) {
         return res.json({ reply: '⏳ Bạn hỏi nhanh quá! Cho mình nghỉ tay xíu nhé (Rate limit).' });
     }
 
-    // 2. Cache Check (Simple exact match for chat)
+    // 3. Cache Check
     const cacheKey = `chat_${style}_${message.toLowerCase().trim()}`;
     const cached = getCachedResponse(cacheKey);
     if (cached) {
         console.log('⚡ Using Cached Chat Response');
-        return res.json({ reply: cached });
+        return res.json({ 
+            reply: cached,
+            usage: { used: quota.used, total: MAX_RPD, remaining: quota.remaining }
+        });
     }
 
     try {
@@ -195,10 +253,14 @@ export const chatWithAI = async (req: Request, res: Response) => {
         const response = await result.response;
         const reply = response.text();
 
-        // 3. Save to Cache
+        // 4. Save to Cache & Increment Usage
         setCachedResponse(cacheKey, reply);
+        const remaining = incrementUsage(userId);
 
-        return res.json({ reply });
+        return res.json({ 
+            reply, 
+            usage: { used: quota.used + 1, total: MAX_RPD, remaining }
+        });
 
     } catch (error: any) {
         console.error('❌ AI Chat Error (Fallback mock):', error.message);

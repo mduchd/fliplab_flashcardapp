@@ -167,8 +167,18 @@ export const dailyProgressTracker = {
     const today = new Date().toISOString().split('T')[0];
     const stored = localStorage.getItem('streakData');
     if (!stored) return false;
+    
     const data = JSON.parse(stored);
-    return data.lastStudiedDate === today;
+    
+    // Check if date matches
+    if (data.lastStudiedDate !== today) {
+        return false;
+    }
+
+    // Additional Check: If Date matches but Progress is 0, it means Daily Goal was reset (New Day logic)
+    // but Streak Date might be desynced or timezone overlapped. 
+    // We strictly require at least 1 card studied to show "Completed".
+    return this.getProgress() > 0;
   },
 
   /**

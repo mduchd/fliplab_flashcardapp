@@ -417,30 +417,36 @@ const Home: React.FC = () => {
         {/* Streak Card - Softer Orange & Darker Night Mode */}
         <div 
           onClick={() => navigate('/?filter=recent')} // Navigate to Recent cards to start studying
-          className="relative overflow-hidden bg-orange-400 dark:bg-orange-900/60 dark:border dark:border-orange-700/30 rounded-2xl p-6 shadow-xl transition-all duration-300 group cursor-pointer hover:bg-orange-500 dark:hover:bg-orange-900/80 hover:shadow-orange-400/30 hover:-translate-y-1 flex flex-col"
+          className={`relative overflow-hidden rounded-2xl p-6 shadow-xl transition-all duration-300 group cursor-pointer flex flex-col ${
+            (studiedToday && todayProgress > 0)
+              ? 'bg-orange-500 dark:bg-orange-900/60 dark:border dark:border-orange-700/30 hover:bg-orange-600 dark:hover:bg-orange-900/80 hover:shadow-orange-500/30 hover:-translate-y-1'
+              : 'bg-slate-400 dark:bg-slate-800/80 dark:border dark:border-slate-700 hover:bg-slate-500 dark:hover:bg-slate-800 hover:shadow-lg hover:-translate-y-0.5'
+          }`}
         >
           <div className="relative z-10 text-white dark:text-orange-50 flex-1 flex flex-col">
             <div className="flex items-start justify-between mb-6">
               <div>
                 <div className="flex items-center gap-2 mb-1 opacity-90">
-                  <HiFire className={`w-6 h-6 ${studiedToday ? 'animate-bounce' : ''}`} />
+                  <HiFire className={`w-6 h-6 ${(studiedToday && todayProgress > 0) ? 'animate-bounce text-yellow-300' : 'text-slate-200'}`} />
                   <h3 className="text-sm font-bold uppercase tracking-wider">Chuỗi ngày học</h3>
                 </div>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-6xl font-black tracking-tight drop-shadow-sm">
+                  <span className={`text-6xl font-black tracking-tight drop-shadow-sm ${(studiedToday && todayProgress > 0) ? 'text-white' : 'text-slate-100'}`}>
                     {streak}
                   </span>
                   <span className="text-xl font-bold opacity-80">ngày</span>
                 </div>
               </div>
-              <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/10 dark:bg-white/5">
-                <HiFire className="w-8 h-8 text-white" />
+              <div className={`w-16 h-16 rounded-2xl flex items-center justify-center backdrop-blur-sm border transition-colors ${
+                 (studiedToday && todayProgress > 0) ? 'bg-white/20 border-white/20' : 'bg-black/10 border-white/10'
+              }`}>
+                <HiFire className={`w-8 h-8 ${(studiedToday && todayProgress > 0) ? 'text-white' : 'text-slate-300'}`} />
               </div>
             </div>
             
             {/* Action Button - Solid White Style (Adapted for Dark Mode) */}
             <div className="mt-auto">
-              {!studiedToday ? (
+              {(!studiedToday || todayProgress === 0) ? (
                 <button 
                   type="button"
                   onClick={(e) => {
@@ -451,9 +457,13 @@ const Home: React.FC = () => {
                       contentAreaRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     }, 100);
                   }}
-                  className="w-full py-3 bg-white dark:bg-orange-100 text-orange-500 dark:text-orange-900 rounded-xl font-bold text-sm shadow-sm hover:bg-orange-50 dark:hover:bg-white transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  className={`w-full py-3 rounded-xl font-bold text-sm shadow-sm transition-colors flex items-center justify-center gap-2 cursor-pointer ${
+                    (studiedToday && todayProgress > 0)
+                      ? 'bg-white dark:bg-orange-100 text-orange-500 dark:text-orange-900 hover:bg-orange-50 dark:hover:bg-white'
+                      : 'bg-white/90 text-slate-600 hover:bg-white hover:text-slate-800 border border-slate-300/50'
+                  }`}
                 >
-                  <HiFire className="w-4 h-4" />
+                  <HiFire className={`w-4 h-4 ${(studiedToday && todayProgress > 0) ? 'text-orange-500' : 'text-slate-400'}`} />
                   Học ngay để giữ chuỗi
                 </button>
               ) : (

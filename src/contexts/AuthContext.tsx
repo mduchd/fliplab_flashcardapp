@@ -8,6 +8,7 @@ interface User {
   displayName: string;
   avatar?: string;
   avatarFrame?: string;
+  coverImage?: string;
   bio?: string;
   totalStudyTime?: number;
   totalCardsStudied?: number;

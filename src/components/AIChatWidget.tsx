@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { HiXMark, HiPaperAirplane, HiChatBubbleOvalLeftEllipsis, HiChevronDown } from 'react-icons/hi2';
+import { HiXMark, HiPaperAirplane, HiChatBubbleOvalLeftEllipsis, HiChevronDown, HiSparkles, HiBookOpen, HiChatBubbleLeftRight, HiListBullet, HiBolt } from 'react-icons/hi2';
 import { FaRobot } from 'react-icons/fa6';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
+import AIGenerateModal from './AIGenerateModal';
 
 interface Message {
   id: string;
@@ -19,7 +21,9 @@ const CHAT_STYLES = [
 ];
 
 const AIChatWidget: React.FC = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const [isMagicModalOpen, setIsMagicModalOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
@@ -37,6 +41,15 @@ const AIChatWidget: React.FC = () => {
   // Auto-hide tooltip after 5 seconds
   const [showTooltip, setShowTooltip] = useState(true);
   const [timeLeft, setTimeLeft] = useState(15.0);
+  const [quotaUsage, setQuotaUsage] = useState({ used: 0, total: 20, remaining: 20 });
+  
+  // Quick Actions (Suggestions)
+  const QUICK_ACTIONS = [
+    { label: 'Tạo thẻ Magic AI', icon: <HiSparkles className="text-purple-500" />, isMagic: true },
+    { label: 'Giải thích', icon: <HiBookOpen />, prompt: 'Giải thích chi tiết về khái niệm này: ' },
+    { label: 'Cho ví dụ', icon: <HiChatBubbleLeftRight />, prompt: 'Lấy ví dụ minh họa dễ hiểu cho: ' },
+    { label: 'Tóm tắt', icon: <HiListBullet />, prompt: 'Tóm tắt ngắn gọn các ý chính của: ' },
+  ];
 
   useEffect(() => {
     let interval: any;
@@ -64,12 +77,25 @@ const AIChatWidget: React.FC = () => {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+  const handleSendMessage = async (overrideInput?: string) => {
+    const finalInputValue = overrideInput || inputValue;
+    if (!finalInputValue.trim()) return;
 
+    // 1. Check Local Quota before sending
+    if (quotaUsage.remaining <= 0) {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: '💔 Bạn đã hết 20 lượt miễn phí hôm nay rồi. Quay lại vào ngày mai nhé!',
+        sender: 'ai',
+        timestamp: new Date()
+      }]);
+      return;
+    }
+
+    // 2. Add User Message & UI Updates
     const userMsg: Message = {
       id: Date.now().toString(),
-      text: inputValue,
+      text: finalInputValue,
       sender: 'user',
       timestamp: new Date()
     };
@@ -77,20 +103,25 @@ const AIChatWidget: React.FC = () => {
     setMessages(prev => [...prev, userMsg]);
     
     // Smart Time Estimation
-    // Base 2.5s + 0.05s per char + random 1-2s buffer
-    const estimatedTime = 2.5 + (inputValue.length * 0.05) + (Math.random() * 1.5);
-    setTimeLeft(Math.min(estimatedTime, 20)); // Cap at 20s
+    const estimatedTime = 2.5 + (finalInputValue.length * 0.05) + (Math.random() * 1.5);
+    setTimeLeft(Math.min(estimatedTime, 20));
 
     setInputValue('');
     setIsTyping(true);
 
     try {
-      // Call Real API with Style
+      // 3. Call Real API
       const response = await api.post('/ai/chat', { 
-        message: inputValue,
+        message: finalInputValue,
         style: chatStyle 
       });
-      const aiResponseText = response.data.reply || "Xin lỗi, mình đang gặp chút trục trặc. Bạn thử lại sau nhé!";
+      
+      const aiResponseText = response.data.reply || "Xin lỗi, mình đang gặp chút trục trặc.";
+      
+      // 4. Update Quota from Server Response
+      if (response.data.usage) {
+        setQuotaUsage(response.data.usage);
+      }
 
       const aiMsg: Message = {
         id: (Date.now() + 1).toString(),
@@ -105,13 +136,25 @@ const AIChatWidget: React.FC = () => {
       console.error('Chat error', error);
       const errorMsg: Message = {
         id: Date.now().toString(),
-        text: 'Mất kết nối với Server rồi... 😿 Bạn kiểm tra lại mạng xem sao nhé!',
+        text: 'Mất kết nối với Server... 😿 Bạn kiểm tra lại mạng xem sao nhé!',
         sender: 'ai',
         timestamp: new Date()
       };
       setMessages(prev => [...prev, errorMsg]);
     } finally {
       setIsTyping(false);
+    }
+  };
+  
+  // Helper to trigger send from Quick Actions
+  const handleQuickAction = (promptPrefix: string) => {
+    // If input is empty, just set the prefix. If has text, prepend prefix and send.
+    if (!inputValue.trim()) {
+      setInputValue(promptPrefix);
+      // Focus textarea (optional if using ref)
+    } else {
+      const fullMessage = `${promptPrefix} ${inputValue}`;
+      handleSendMessage(fullMessage);
     }
   };
 
@@ -135,10 +178,17 @@ const AIChatWidget: React.FC = () => {
                 <FaRobot className="w-6 h-6 text-white" />
               </div>
               <div className="flex flex-col">
-                <h3 className="font-bold text-white text-sm">Trợ lý FlipLab</h3>
-                {/* Style Selector */}
-                {/* Custom Style Dropdown */}
-                <div className="flex items-center gap-1.5 mt-0.5">
+                <h3 className="font-bold text-white text-sm">AI Tutor (Beta)</h3>
+                <div className="flex items-center gap-1 mt-0.5">
+                   <span 
+                      className="text-[10px] text-blue-100 bg-white/20 px-1.5 py-0.5 rounded flex items-center gap-1 cursor-help"
+                      title="Giới hạn 20 lượt mỗi ngày. Reset vào 00:00."
+                   >
+                      <HiBolt className="w-3 h-3 text-yellow-300" />
+                      {quotaUsage.remaining}/{quotaUsage.total} lượt
+                   </span>
+                </div>
+                <div className="flex items-center gap-1.5 mt-1">
                   <span className="text-[10px] text-blue-50/80 font-medium select-none">Phong cách:</span>
                   <div className="relative" title="Chọn phong cách trả lời của AI">
                     <button
@@ -230,6 +280,44 @@ const AIChatWidget: React.FC = () => {
               </div>
             ))}
             
+             {/* Quick Actions (Show if few messages or last is from AI) */}
+            {!isTyping && quotaUsage.remaining > 0 && (
+               <div className="grid grid-cols-2 gap-2 mt-2">
+                 {QUICK_ACTIONS.map((action, idx) => (
+                   <button
+                     key={idx}
+                     onClick={() => {
+                        // @ts-ignore
+                        if (action.isMagic) {
+                             setIsMagicModalOpen(true);
+                             setIsOpen(false);
+                        } else {
+                             // @ts-ignore
+                             handleQuickAction(action.prompt);
+                        }
+                     }}
+                     className={`flex items-center gap-2 p-2.5 bg-white dark:bg-slate-800 border rounded-xl transition-all text-xs shadow-sm text-left cursor-pointer group ${
+                        // @ts-ignore
+                        action.isMagic 
+                            ? 'border-purple-200 dark:border-purple-500/30 hover:bg-purple-50 dark:hover:bg-purple-900/10' 
+                            : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                     }`}
+                   >
+                     <div className={`shrink-0 transition-transform group-hover:scale-110 ${
+                        // @ts-ignore
+                        action.isMagic ? 'text-purple-600' : 'text-blue-600 dark:text-blue-400'
+                     }`}>
+                       {action.icon}
+                     </div>
+                     <span className={`font-medium ${
+                        // @ts-ignore
+                        action.isMagic ? 'text-purple-700 dark:text-purple-300' : 'text-slate-600 dark:text-slate-300'
+                     }`}>{action.label}</span>
+                   </button>
+                 ))}
+               </div>
+            )}
+            
             {/* Typing Indicator */}
             {isTyping && (
               <div className="flex justify-start">
@@ -261,7 +349,7 @@ const AIChatWidget: React.FC = () => {
                 style={{ minHeight: '40px' }}
               />
               <button
-                onClick={handleSendMessage}
+                onClick={() => handleSendMessage()}
                 disabled={!inputValue.trim() || isTyping}
                 className="p-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:bg-slate-400 text-white rounded-lg transition-all shadow-md active:scale-95 cursor-pointer flex-shrink-0 mb-0.5"
               >
@@ -269,7 +357,7 @@ const AIChatWidget: React.FC = () => {
               </button>
             </div>
             <p className="text-[10px] text-center text-slate-400 mt-2">
-              AI có thể mắc sai sót, hãy kiểm tra lại thông tin quan trọng.
+              AI có giới hạn 20 lượt/ngày. Hãy sử dụng tiết kiệm nhé!
             </p>
           </div>
         </div>
@@ -306,6 +394,21 @@ const AIChatWidget: React.FC = () => {
             </p>
         </div>
       )}
+       {/* Magic AI Modal - Global Access */}
+       <AIGenerateModal 
+          isOpen={isMagicModalOpen}
+          onClose={() => setIsMagicModalOpen(false)}
+          onSuccess={(cards) => {
+             // Navigate to create page with data
+             navigate('/create', { 
+               state: { 
+                 generatedCards: cards,
+                 deckTopic: 'Magic AI Deck' 
+               } 
+             });
+             setIsMagicModalOpen(false);
+          }}
+       />
     </div>
   );
 };

@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { flashcardService, Flashcard, CreateFlashcardSetData } from '../../services/flashcardService';
 import MainLayout from '../../components/layout/MainLayout';
 import { 
@@ -36,6 +36,7 @@ interface CardInput {
 const Create: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation(); // Add useLocation
   const isEditing = !!id;
   const toast = useToastContext();
 
@@ -45,6 +46,23 @@ const Create: React.FC = () => {
     { id: '1', term: '', definition: '', image: '' },
     { id: '2', term: '', definition: '', image: '' },
   ]);
+  
+  // ... imports and other state ...
+
+  useEffect(() => {
+    if (id) {
+      loadFlashcardSet();
+    } else {
+       // Check for data passed from Magic AI (Chat widget)
+       const state = location.state as { generatedCards?: { term: string; definition: string }[], deckTopic?: string };
+       if (state?.generatedCards) {
+          setName(state.deckTopic || `Bộ thẻ về ${state.generatedCards[0]?.term || 'Mới'}`);
+          handleAIGenerated(state.generatedCards);
+          // Clear state to prevent reloading on refresh (optional, but good practice)
+          window.history.replaceState({}, document.title);
+       }
+    }
+  }, [id, location.state]);
   const [tags, setTags] = useState('');
   const [color, setColor] = useState('#3b82f6');
   const [icon, setIcon] = useState('stack');
