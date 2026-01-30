@@ -261,7 +261,7 @@ const Avatar: React.FC<AvatarProps> = ({
   
   if (isSpinning || specialEffectFrames.includes(frameId)) {
     return (
-      <div className={`${sizeClass} relative flex-shrink-0 ${className}`}>
+      <div className={`${sizeClass} relative flex-shrink-0 rounded-full ${className}`}>
         {/* Render Effects */}
         {renderSpecialEffects()}
         

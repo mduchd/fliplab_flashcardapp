@@ -63,13 +63,11 @@ export const getFlashcardSets = async (req: AuthRequest, res: Response): Promise
 
 // @desc    Get single flashcard set
 // @route   GET /api/flashcards/:id
-// @access  Private
+// @access  Private (Public sets accessible)
 export const getFlashcardSet = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const flashcardSet = await FlashcardSet.findOne({
-      _id: req.params.id,
-      userId: req.userId,
-    });
+    const flashcardSet = await FlashcardSet.findById(req.params.id)
+      .populate('userId', 'username displayName avatar avatarFrame');
 
     if (!flashcardSet) {
       res.status(404).json({
@@ -77,6 +75,16 @@ export const getFlashcardSet = async (req: AuthRequest, res: Response): Promise<
         message: 'Flashcard set not found',
       });
       return;
+    }
+
+    // Access Control: Allow if owner OR if set is public
+    const ownerId = (flashcardSet.userId as any)._id.toString();
+    if (ownerId !== req.userId && !flashcardSet.isPublic) {
+       res.status(403).json({
+         success: false,
+         message: 'This flashcard set is private',
+       });
+       return;
     }
 
     res.json({

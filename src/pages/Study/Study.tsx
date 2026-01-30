@@ -6,6 +6,8 @@ import { authService } from '../../services/authService';
 import MainLayout from '../../components/layout/MainLayout';
 import ShareModal from '../../components/ShareModal';
 import MoveToFolderModal from '../../components/MoveToFolderModal';
+import FollowShareActions from '../../components/profile/FollowShareActions';
+import { useAuth } from '../../contexts/AuthContext';
 import { 
   HiArrowLeft as ArrowLeft, 
   HiArrowRight as ArrowRight, 
@@ -44,6 +46,7 @@ const Study: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const toast = useToastContext();
+  const { user } = useAuth();
   
   const [flashcardSet, setFlashcardSet] = useState<FlashcardSet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -560,6 +563,37 @@ const Study: React.FC = () => {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{flashcardSet.name}</h1>
+            {/* Author Info & Follow */}
+            {/* Author Info & Follow - Only show if NOT own deck */}
+            {(flashcardSet.userId as any)?._id && user?.id !== (flashcardSet.userId as any)._id && (
+              <div className="flex items-center gap-3 mt-2">
+                <div className="flex items-center gap-2 group cursor-pointer hover:opacity-80">
+                  <img 
+                    src={(flashcardSet.userId as any).avatar || `https://ui-avatars.com/api/?name=${(flashcardSet.userId as any).username}&background=random`} 
+                    alt="Author" 
+                    className="w-6 h-6 rounded-full border border-slate-200 dark:border-slate-700 object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${(flashcardSet.userId as any).username}&background=random`;
+                    }}
+                  />
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {(flashcardSet.userId as any).displayName || (flashcardSet.userId as any).username}
+                  </span>
+                </div>
+                
+                {/* Follow Button (Small) */}
+                <div className="origin-left scale-75">
+                  <FollowShareActions 
+                    targetUserId={(flashcardSet.userId as any)._id} 
+                    currentUserId={user?.id}
+                    isOwnProfile={false}
+                    mode="buttons-only"
+                    variant="secondary"
+                    hideShare={true}
+                  />
+                </div>
+              </div>
+            )}
           </div>
             <div className="flex items-center gap-3">
               <button

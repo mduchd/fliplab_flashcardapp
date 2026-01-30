@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 import { useSidebar } from '../../contexts/SidebarContext';
@@ -12,6 +12,25 @@ import AIChatWidget from '../AIChatWidget';
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { isCollapsed } = useSidebar();
+
+  // Chatbot Visibility State
+  const [showChatbot, setShowChatbot] = useState(() => {
+    return localStorage.getItem('settings_chatbotEnabled') !== 'false';
+  });
+
+  useEffect(() => {
+    const handleVisibilityChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail && typeof customEvent.detail.enabled === 'boolean') {
+        setShowChatbot(customEvent.detail.enabled);
+      }
+    };
+
+    window.addEventListener('chatbotVisibilityChange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('chatbotVisibilityChange', handleVisibilityChange);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-black transition-colors duration-300">
@@ -30,7 +49,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         </main>
       </div>
 
-      <AIChatWidget />
+      {showChatbot && <AIChatWidget />}
     </div>
   );
 };

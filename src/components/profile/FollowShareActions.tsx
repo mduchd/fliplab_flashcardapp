@@ -9,6 +9,7 @@ interface FollowShareActionsProps {
   isOwnProfile: boolean;
   variant?: 'primary' | 'secondary';
   mode?: 'full' | 'stats-only' | 'buttons-only';
+  hideShare?: boolean;
 }
 
 const FollowShareActions: React.FC<FollowShareActionsProps> = ({
@@ -16,7 +17,8 @@ const FollowShareActions: React.FC<FollowShareActionsProps> = ({
   currentUserId,
   isOwnProfile,
   variant = 'primary',
-  mode = 'full'
+  mode = 'full',
+  hideShare = false
 }) => {
   // ... existing hooks ... 
   const toast = useToastContext();
@@ -138,26 +140,28 @@ const FollowShareActions: React.FC<FollowShareActionsProps> = ({
           )}
 
           {/* Share Button */}
-          <button
-            onClick={handleShareProfile}
-            className={`${isOwnProfile ? 'flex-1' : ''} flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold text-sm transition-all cursor-pointer ${
-               variant === 'secondary'
-                  ? 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 shadow-sm' 
-                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {linkCopied ? (
-              <>
-                <HiCheck className="w-5 h-5 text-green-600" />
-                Đã chép
-              </>
-            ) : (
-              <>
-                <HiLink className="w-5 h-5" />
-                Chia sẻ
-              </>
-            )}
-          </button>
+          {!hideShare && (
+            <button
+              onClick={handleShareProfile}
+              className={`${isOwnProfile ? 'flex-1' : ''} flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-bold text-sm transition-all cursor-pointer ${
+                variant === 'secondary'
+                    ? 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-600 shadow-sm' 
+                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {linkCopied ? (
+                <>
+                  <HiCheck className="w-5 h-5 text-green-600" />
+                  Đã chép
+                </>
+              ) : (
+                <>
+                  <HiLink className="w-5 h-5" />
+                  Chia sẻ
+                </>
+              )}
+            </button>
+          )}
         </div>
       )}
     </div>

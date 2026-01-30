@@ -253,14 +253,18 @@ const Create: React.FC = () => {
       image: ''
     }));
 
-    // If current list is empty or has only 1 empty card, replace it
-    const isListEmpty = cards.length <= 1 && !cards[0].term && !cards[0].definition;
+    // Filter out existing empty cards (no term AND no definition)
+    const validExistingCards = cards.filter(c => c.term.trim() || c.definition.trim() || c.image);
     
-    if (isListEmpty) {
-      setCards(formattedCards);
+    // If we have valid existing cards, append new ones. 
+    // If not (meaning current list is all empty placeholders), just use the new ones.
+    if (validExistingCards.length > 0) {
+      setCards([...validExistingCards, ...formattedCards]);
     } else {
-      setCards(prev => [...prev, ...formattedCards]);
+      setCards(formattedCards);
     }
+    
+    toast.success(`Đã tạo ${newCards.length} thẻ từ AI!`);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

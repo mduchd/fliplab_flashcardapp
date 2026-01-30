@@ -10,9 +10,13 @@ import {
   HiArrowPath,
   HiPlusCircle,
   HiXMark,
-  HiCloudArrowUp
+  HiCloudArrowUp,
+  HiClock,
+  HiFire,
+  HiTrophy,
+  HiFlag
 } from 'react-icons/hi2';
-import { HiBookOpen, HiClock } from 'react-icons/hi';
+import { HiBookOpen } from 'react-icons/hi';
 import { dailyProgressTracker } from '../../utils/dailyProgressTracker';
 
 import ActivityStats from '../../components/profile/ActivityStats';
@@ -22,6 +26,7 @@ import { flashcardService } from '../../services/flashcardService';
 import { useToastContext } from '../../contexts/ToastContext';
 import { ANIMAL_AVATARS, AVATAR_FRAMES } from '../../constants/avatarConstants';
 import Avatar from '../../components/Avatar';
+import FollowListModal from '../../components/profile/FollowListModal';
 
 const Profile: React.FC = () => {
   const { user, updateUser } = useAuth();
@@ -29,6 +34,7 @@ const Profile: React.FC = () => {
   const toast = useToastContext();
   
   // Modal State
+  const [activeFollowModal, setActiveFollowModal] = useState<'followers' | 'following' | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editDisplayName, setEditDisplayName] = useState(user?.displayName || '');
   const [editAvatar, setEditAvatar] = useState<string | undefined>(user?.avatar);
@@ -412,18 +418,29 @@ const Profile: React.FC = () => {
                     )}
                   </div>
                   
+
+
+
                   {/* Stats Row - Clean, Compact */}
                   <div className="flex items-center justify-center gap-8 md:gap-16 mb-6 w-full">
-                     <div className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity">
+                     <div 
+                        className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setActiveFollowModal('followers')}
+                     >
                         <span className="text-2xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followersCount || 0}</span>
                         <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Người theo dõi</span>
                      </div>
                      
-                     <div className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity">
+                     <div 
+                        className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => setActiveFollowModal('following')}
+                     >
                         <span className="text-2xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followingCount || 0}</span>
                         <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Đang theo dõi</span>
                      </div>
                   </div>
+
+
 
                   {/* Actions - Compact Pills */}
                   <div className="flex items-center justify-center gap-3 w-full max-w-sm mb-2">
@@ -457,10 +474,12 @@ const Profile: React.FC = () => {
                <ActivityStats 
                  viewMode="chart-only"
                  noBackground={true}
-                 activityData={user?.totalCardsStudied && user.totalCardsStudied > 0 
-                   ? [{ date: new Date().toISOString(), count: user.totalCardsStudied }] 
-                   : undefined
-                 } 
+                 activityData={weekHistory.map(d => ({
+                    date: d.date,
+                    count: d.count,
+                    label: d.day,
+                    isToday: d.isToday
+                 }))} 
                />
              </div>
 
@@ -477,55 +496,64 @@ const Profile: React.FC = () => {
           <div className="lg:col-span-4 flex flex-col gap-5 h-full">
              
              {/* 1. PRIMARY ACTION: Daily Due Card - Compact */}
-             <div className="relative overflow-hidden bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-5 shadow-lg shadow-blue-900/5 group hover:-translate-y-1 transition-all duration-300 cursor-pointer" onClick={() => recentDeck ? navigate(`/study/${recentDeck.id}`) : navigate('/')}>
-               {/* Decorative Glow */}
-               <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 dark:bg-blue-500/5 blur-[50px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-
-               <div className="relative z-10">
-                 <div className="flex items-center justify-between mb-4">
-                   <div className="flex items-center gap-3">
-                     <div className="p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400">
-                        <HiCalendarDays className="w-5 h-5" />
+             {(() => {
+               const isGoalMet = stats.studiedToday >= stats.dailyGoal;
+               const remainingCards = Math.max(0, stats.dailyGoal - stats.studiedToday);
+               const progressPercent = Math.min(100, Math.round((stats.studiedToday / stats.dailyGoal) * 100));
+               
+               return (
+               <div className={`relative overflow-hidden bg-white dark:bg-slate-800 border rounded-xl p-6 shadow-lg group hover:-translate-y-1 transition-all duration-300 cursor-pointer ${isGoalMet ? 'border-green-200 dark:border-green-900/30 shadow-green-900/5' : 'border-slate-200 dark:border-slate-700 shadow-blue-900/5'}`} onClick={() => recentDeck ? navigate(`/study/${recentDeck.id}`) : navigate('/')}>
+                 {/* Decorative Glow */}
+                 <div className={`absolute top-0 right-0 w-40 h-40 blur-[60px] rounded-full -translate-y-1/2 translate-x-1/2 pointer-events-none opacity-50 ${isGoalMet ? 'bg-green-400/20' : 'bg-blue-600/10'}`}></div>
+  
+                 <div className="relative z-10">
+                   <div className="flex items-start gap-4 mb-6">
+                       {/* Icon NO Background - Just pure color */}
+                       <div className={`${isGoalMet ? 'text-green-500' : 'text-blue-600 dark:text-blue-500'}`}>
+                          {isGoalMet ? <HiCheckCircle className="w-8 h-8 drop-shadow-sm" /> : <HiFlag className="w-8 h-8 drop-shadow-sm" />}
+                       </div>
+                       <div className="pt-0.5">
+                          <h3 className="font-bold text-slate-900 dark:text-white leading-tight text-base mb-1">Mục tiêu hôm nay</h3>
+                          <p className={`text-xs font-medium ${isGoalMet ? 'text-green-600 dark:text-green-400' : 'text-slate-500 dark:text-slate-400'}`}>
+                            {isGoalMet ? 'Xuất sắc! Bạn đã hoàn thành mục tiêu.' : 'Hãy hoàn thành mục tiêu nhé!'}
+                          </p>
+                       </div>
+                   </div>
+  
+                   <div className="flex items-end gap-2 mb-5 pl-1">
+                     <div className={`text-5xl font-black leading-none tracking-tighter ${isGoalMet ? 'text-green-600 dark:text-green-400' : 'text-slate-900 dark:text-white'}`}>
+                       {isGoalMet ? stats.studiedToday : remainingCards}
                      </div>
-                     <div>
-                        <h3 className="font-bold text-slate-800 dark:text-white leading-tight text-sm">Mục tiêu hôm nay</h3>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Giữ vững phong độ nhé!</p>
+                     <div className="pb-2 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                       {isGoalMet ? 'thẻ đã học' : 'thẻ cần ôn'}
                      </div>
                    </div>
+  
+                   {/* Progress Bar */}
+                   <div className="mb-6">
+                     <div className="flex justify-between text-[10px] mb-1.5 font-bold">
+                       <span className="text-slate-500 dark:text-slate-400">Tiến độ</span>
+                       <span className={isGoalMet ? 'text-green-500' : 'text-blue-500'}>
+                         {progressPercent}%
+                       </span>
+                     </div>
+                     <div className="h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                       <div
+                         className={`h-full rounded-full transition-all duration-1000 ease-out ${
+                           isGoalMet ? 'bg-green-500' : 'bg-blue-500'
+                         }`}
+                         style={{ width: `${progressPercent}%` }}
+                       />
+                     </div>
+                   </div>
+                   
+                   <button className={`w-full py-3 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 group-hover:gap-3 shadow-lg ${isGoalMet ? 'bg-green-600 text-white hover:bg-green-500 shadow-green-200 dark:shadow-green-900/20' : 'bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 dark:hover:bg-blue-500 shadow-slate-200 dark:shadow-blue-900/20'}`}>
+                     {isGoalMet ? 'Học thêm' : 'Bắt đầu ngay'} <HiArrowPath className="w-4 h-4 group-hover:rotate-180 transition-transform" />
+                   </button>
                  </div>
-
-                 <div className="flex items-end gap-2 mb-4">
-                   <div className="text-5xl font-black text-slate-900 dark:text-white leading-none tracking-tighter">
-                     {Math.max(0, stats.dailyGoal - stats.studiedToday)}
-                   </div>
-                   <div className="pb-1.5 text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
-                     thẻ cần ôn
-                   </div>
-                 </div>
-
-                 {/* Progress Bar */}
-                 <div className="mb-4">
-                   <div className="flex justify-between text-[10px] mb-1.5 font-bold">
-                     <span className="text-slate-500 dark:text-slate-400">Tiến độ</span>
-                     <span className={stats.studiedToday >= stats.dailyGoal ? 'text-green-500' : 'text-blue-500'}>
-                       {Math.round((stats.studiedToday / stats.dailyGoal) * 100)}%
-                     </span>
-                   </div>
-                   <div className="h-2.5 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                     <div
-                       className={`h-full rounded-full transition-all duration-1000 ease-out ${
-                         stats.studiedToday >= stats.dailyGoal ? 'bg-green-500' : 'bg-blue-500'
-                       }`}
-                       style={{ width: `${Math.min(100, (stats.studiedToday / stats.dailyGoal) * 100)}%` }}
-                     />
-                   </div>
-                 </div>
-                 
-                 <button className="w-full py-2.5 bg-slate-900 dark:bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-slate-800 dark:hover:bg-blue-500 transition-all flex items-center justify-center gap-2 group-hover:gap-3 shadow-lg shadow-slate-200 dark:shadow-blue-900/20">
-                   Bắt đầu học ngay <HiArrowPath className="w-3.5 h-3.5 group-hover:rotate-180 transition-transform" />
-                 </button>
                </div>
-             </div>
+               );
+             })()}
 
              {/* 2. Library Shortcut - Compact */}
              <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
@@ -559,16 +587,45 @@ const Profile: React.FC = () => {
                 </button>
              </div>
 
-             {/* 3. Total Memorized Stats - Compact */}
-             <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-5 text-white shadow-lg shadow-purple-500/20 relative overflow-hidden group cursor-pointer" title="Tổng số thẻ đã thuộc">
-                <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl -translate-y-1/2 translate-x-1/2"></div>
-                <div className="relative z-10 flex items-center justify-between">
-                   <div>
-                      <div className="text-2xl font-black mb-0.5">{user?.totalCardsStudied || 0}</div>
-                      <div className="text-[10px] font-bold opacity-80 uppercase tracking-widest">Thẻ đã thuộc</div>
+             {/* 3. Streak & Mastered Stats - Dual Cards */}
+             <div className="grid grid-cols-2 gap-4">
+                {/* Streak Stat */}
+                <div className="bg-gradient-to-br from-orange-400 to-red-500 rounded-xl p-5 text-white shadow-lg shadow-orange-500/20 relative overflow-hidden group cursor-pointer hover:-translate-y-1 transition-transform min-h-[130px]">
+                   {/* Background Watermark */}
+                   <div className="absolute -right-2 -bottom-4 text-white/10 transform -rotate-12 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                       <HiFire className="w-24 h-24" />
                    </div>
-                   <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center backdrop-blur-sm group-hover:scale-110 transition-transform">
-                      <HiCheckCircle className="w-5 h-5" />
+                   
+                   <div className="relative z-10 flex flex-col h-full justify-between">
+                      <div className="flex items-center gap-1.5 bg-black/10 w-fit px-2.5 py-1 rounded-lg backdrop-blur-md border border-white/10">
+                          <HiFire className="w-3.5 h-3.5 text-orange-100" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-orange-50">Streak</span>
+                      </div>
+                      
+                      <div className="mt-4">
+                          <div className="text-4xl font-black tracking-tighter leading-none mb-0.5">{stats.streak || 0}</div>
+                          <div className="text-xs font-medium text-orange-100 opacity-90">ngày liên tiếp</div>
+                      </div>
+                   </div>
+                </div>
+
+                {/* Mastered Stat */}
+                <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-5 text-white shadow-lg shadow-purple-500/20 relative overflow-hidden group cursor-pointer hover:-translate-y-1 transition-transform min-h-[130px]" title="Tổng số thẻ đã thuộc">
+                   {/* Background Watermark */}
+                   <div className="absolute -right-2 -bottom-4 text-white/10 transform -rotate-12 group-hover:scale-110 transition-transform duration-500 pointer-events-none">
+                       <HiCheckCircle className="w-24 h-24" />
+                   </div>
+
+                   <div className="relative z-10 flex flex-col h-full justify-between">
+                      <div className="flex items-center gap-1.5 bg-black/10 w-fit px-2.5 py-1 rounded-lg backdrop-blur-md border border-white/10">
+                          <HiCheckCircle className="w-3.5 h-3.5 text-indigo-100" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-50">Đã thuộc</span>
+                      </div>
+                      
+                      <div className="mt-4">
+                          <div className="text-4xl font-black tracking-tighter leading-none mb-0.5">{user?.totalCardsStudied || 0}</div>
+                          <div className="text-xs font-medium text-indigo-100 opacity-90">thẻ vựng (master)</div>
+                      </div>
                    </div>
                 </div>
              </div>
@@ -578,8 +635,8 @@ const Profile: React.FC = () => {
           <div className="col-span-1 lg:col-span-12 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
              <div className="flex items-center justify-between mb-6">
                <div className="flex items-center gap-2.5">
-                 <div className="p-2 bg-emerald-50 dark:bg-emerald-500/10 rounded-lg">
-                   <HiCalendarDays className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                 <div className="flex items-center justify-center">
+                   <HiClock className="w-6 h-6 text-blue-600 dark:text-blue-500" />
                  </div>
                  <div>
                     <h3 className="text-base font-bold text-slate-900 dark:text-white">Lịch sử chuyên cần</h3>
@@ -594,36 +651,75 @@ const Profile: React.FC = () => {
              </div>
              
              {/* 7-day history - Compact Horizontal Layout */}
-             <div className="relative px-2 sm:px-6 py-1">
-               {/* Connecting Line */}
-               <div className="absolute top-1/2 left-6 right-6 h-0.5 bg-slate-100 dark:bg-slate-700 -z-10 -translate-y-[8px] rounded-full"></div>
-               
-               <div className="flex items-center justify-between">
-                 {weekHistory.map((day, idx) => (
-                   <div key={idx} className="group relative flex flex-col items-center gap-2 cursor-pointer">
-                       {day.studied ? (
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 flex items-center justify-center scale-100 ring-4 ring-white dark:ring-slate-800 transition-transform group-hover:scale-110 z-10">
-                            <HiCheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
-                          </div>
-                       ) : day.isToday ? (
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-slate-800 border-2 border-blue-500 flex items-center justify-center shadow-md shadow-blue-500/20 relative text-blue-500 ring-4 ring-white dark:ring-slate-800 z-10">
-                            <HiBookOpen className="w-5 h-5 sm:w-6 sm:h-6 animate-pulse" />
-                          </div>
-                       ) : (
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-600 flex items-center justify-center text-slate-300 dark:text-slate-500 ring-4 ring-white dark:ring-slate-800 hover:border-slate-300 dark:hover:border-slate-500 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all z-10">
-                            <HiCalendarDays className="w-5 h-5 sm:w-6 sm:h-6" />
-                          </div>
+             {/* 7-day history - Enhanced UI */}
+             {/* 7-day history - Smart Connected UI */}
+             <div className="px-2 sm:px-4 py-4 mt-2 w-full">
+               <div className="flex items-start w-full">
+                 {weekHistory.map((day, idx) => {
+                   const isCompleted = day.studied;
+                   const isToday = day.isToday;
+                   // Check next day status for connecting line
+                   const nextDay = weekHistory[idx + 1];
+                   const isStreakConnected = isCompleted && nextDay?.studied;
+                   const isPotentiallyConnected = isCompleted && nextDay?.isToday && !nextDay.studied;
+                   const isLastItem = idx === weekHistory.length - 1;
+
+                   return (
+                   <div key={idx} className="flex-1 flex flex-col items-center relative group cursor-pointer">
+                       {/* Smart Connecting Line (Right side) - Skip for last item */}
+                       {!isLastItem && (
+                          <div className={`absolute top-5 sm:top-6 left-1/2 w-full h-[3px] -z-0 transition-all duration-500 ${
+                              isStreakConnected 
+                                ? 'bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.6)]' 
+                                : isPotentiallyConnected
+                                  ? 'bg-blue-300/50 dark:bg-blue-500/30 border-t-2 border-dashed border-blue-400 dark:border-blue-500 h-0 my-[1.5px]'
+                                  : 'bg-slate-200 dark:bg-slate-700'
+                          }`}></div>
                        )}
+
+                       {/* Circle Node */}
+                       <div className="relative z-10 transition-transform duration-300 group-hover:scale-110">
+                           {isCompleted ? (
+                              // Completed State
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/40 flex items-center justify-center ring-4 ring-white dark:ring-slate-800">
+                                <HiCheckCircle className="w-6 h-6 sm:w-7 sm:h-7 drop-shadow-sm" />
+                              </div>
+                           ) : isToday ? (
+                              // Today State
+                              <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+                                 <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping"></div>
+                                 <div className="relative w-full h-full rounded-full bg-white dark:bg-slate-800 border-2 border-blue-500 flex items-center justify-center shadow-lg shadow-blue-500/30 ring-4 ring-white dark:ring-slate-800">
+                                   <HiBookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
+                                 </div>
+                                 <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-red-500 rounded-full border-2 border-white dark:border-slate-800 z-20 animate-bounce"></div>
+                              </div>
+                           ) : (
+                              // Missed State
+                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-slate-100 dark:bg-slate-700 border-2 border-slate-400 dark:border-slate-500 flex items-center justify-center text-slate-500 dark:text-slate-300 ring-4 ring-white dark:ring-slate-800 transition-all hover:bg-slate-200 dark:hover:bg-slate-600 hover:border-slate-500 dark:hover:border-slate-400 hover:text-slate-700 dark:hover:text-slate-100">
+                                <HiCalendarDays className="w-5 h-5 sm:w-6 sm:h-6" />
+                              </div>
+                           )}
+                       </div>
                      
-                     <span className={`text-[10px] font-bold uppercase tracking-wider ${day.studied || day.isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}>{day.day}</span>
+                     <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider mt-3 transition-colors ${
+                        isCompleted ? 'text-blue-600 dark:text-blue-400' : 
+                        isToday ? 'text-slate-900 dark:text-white scale-110' : 
+                        'text-slate-400 dark:text-slate-500'
+                     }`}>
+                        {day.day}
+                     </span>
                      
-                     {/* Tooltip */}
-                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 px-2.5 py-1.5 bg-slate-900 text-white text-[10px] font-medium rounded-md opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap pointer-events-none z-20 shadow-lg translate-y-1 group-hover:translate-y-0">
-                       {day.day}: {day.count} thẻ
-                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 border-4 border-transparent border-t-slate-900"></div>
+                     {/* Floating Tooltip */}
+                     <div className="absolute -top-14 left-1/2 -translate-x-1/2 px-3 py-2 bg-slate-900/90 backdrop-blur-sm text-white text-[10px] font-medium rounded-xl opacity-0 group-hover:opacity-100 transition-all whitespace-nowrap pointer-events-none z-50 shadow-xl translate-y-2 group-hover:translate-y-0 border border-white/10">
+                       <div className="font-bold mb-0.5 text-xs text-center">{day.day}</div>
+                       <div className={isCompleted ? 'text-blue-300' : 'text-slate-300'}>
+                         {isCompleted ? 'Đã hoàn thành' : isToday ? 'Cố lên nào!' : 'Chưa học'}
+                       </div>
+                       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 border-4 border-transparent border-t-slate-900/90"></div>
                      </div>
                    </div>
-                 ))}
+                   );
+                 })}
                </div>
              </div>
           </div>
@@ -844,6 +940,16 @@ const Profile: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      {/* Follow List Modal */}
+      {user && (
+        <FollowListModal
+          isOpen={!!activeFollowModal}
+          onClose={() => setActiveFollowModal(null)}
+          userId={user.id}
+          type={activeFollowModal || 'followers'}
+          title={activeFollowModal === 'followers' ? 'Người theo dõi' : 'Đang theo dõi'}
+        />
       )}
     </MainLayout>
   );

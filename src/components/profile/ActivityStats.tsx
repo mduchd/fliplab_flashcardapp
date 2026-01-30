@@ -1,59 +1,69 @@
 
 import React, { useMemo } from 'react';
-import { HiArrowTrendingUp, HiBookOpen, HiChartBar, HiTrophy, HiFire, HiAcademicCap } from 'react-icons/hi2';
+import { HiBookOpen, HiChartBar, HiTrophy, HiFire, HiAcademicCap } from 'react-icons/hi2';
 import { Link } from 'react-router-dom';
 
 interface ActivityStatsProps {
   activityData?: {
     date: string;
     count: number;
+    label?: string;
+    isToday?: boolean; // Accept explicit isToday flag
   }[];
   viewMode?: 'full' | 'chart-only' | 'badges-only';
   noBackground?: boolean;
 }
 
-const subDays = (date: Date, days: number) => {
-  const result = new Date(date);
-  result.setDate(result.getDate() - days);
-  return result;
-};
-
 const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData, viewMode = 'full', noBackground = false }) => {
   const hasRealData = activityData && activityData.length > 0;
-  
-  const { weeklyData, avgPerDay } = useMemo(() => {
-    // ... existing logic ...
-    const today = new Date();
-    const weekly = [];
-    const days = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+  const { weeklyData } = useMemo(() => {
+    if (!activityData || activityData.length === 0) {
+        return { weeklyData: [], avgPerDay: 0 };
+    }
+
+    const weekly: { day: string; count: number; height: number; isToday: boolean }[] = [];
     let weekTotal = 0;
     
-    // Generate clearer "peaks and valleys" data
-    for (let i = 0; i < 7; i++) {
-        const date = subDays(today, 6 - i);
-        // Weekend dip, Mid-week peak logic simulation
-        const dayIndex = date.getDay();
-        let baseCount = 5;
-        if (dayIndex >= 1 && dayIndex <= 4) baseCount = 20 + Math.random() * 15; // Weekdays high
-        if (dayIndex === 0 || dayIndex === 6) baseCount = 5 + Math.random() * 5; // Weekends low
-        
-        const count = Math.floor(baseCount);
+    // Find max value for scaling (at least 20 to avoid huge bars for small numbers)
+    const maxVal = Math.max(20, ...activityData.map(d => d.count || 0));
+    const daysMap = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
+
+    activityData.forEach((item) => {
+        const count = item.count || 0;
         weekTotal += count;
         
+        // Label logic
+        let dayLabel = '';
+        if (item.label) {
+            dayLabel = item.label;
+        } else {
+            const date = new Date(item.date);
+            dayLabel = daysMap[date.getDay()];
+        }
+        
+        // isToday logic: Use prop if available, otherwise fallback to date check
+        let isToday = false;
+        if (item.isToday !== undefined) {
+             isToday = item.isToday;
+        } else {
+             const todayStr = new Date().toISOString().split('T')[0];
+             isToday = item.date.startsWith(todayStr);
+        }
+
         weekly.push({
-        day: days[dayIndex],
-        count,
-        height: Math.max(10, Math.min(100, (count / 40) * 100)),
-        isPeak: count > 25,
-        isToday: i === 6
+            day: dayLabel,
+            count: count,
+            height: Math.max(4, (count / maxVal) * 100), // Scale relative to max
+            isToday: isToday
         });
-    }
+    });
 
     return { 
         weeklyData: weekly, 
         avgPerDay: Math.round(weekTotal / 7)
     };
-  }, [hasRealData]);
+  }, [activityData]);
 
   const EmptyState = () => (
     <div className="flex flex-col items-center justify-center py-8 px-4 text-center">
@@ -79,43 +89,60 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData, viewMode = 
       <div className={containerClasses}>
         <div className={`flex items-center justify-between ${noBackground ? 'mb-2' : 'mb-3'}`}>
           <h3 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
-            <div className={`p-1.5 rounded-md text-blue-600 dark:text-blue-400 ${noBackground ? 'bg-blue-100 dark:bg-blue-500/20' : 'bg-blue-50 dark:bg-blue-500/10'}`}>
-              <HiArrowTrendingUp className="w-3.5 h-3.5" />
-            </div>
+            <HiChartBar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             Hoạt động tuần qua
           </h3>
-          {hasRealData && avgPerDay > 0 && (
-            <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 dark:bg-slate-700/50 rounded-full text-slate-600 dark:text-slate-300">
-              ~{avgPerDay} thẻ/ngày
+          {hasRealData && (
+            <span className="text-[10px] font-bold px-2.5 py-1 bg-slate-100 dark:bg-slate-700/50 rounded-lg text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+              Tổng {weeklyData.reduce((acc, cur) => acc + cur.count, 0)} thẻ
             </span>
           )}
         </div>
 
-        {!hasRealData ? <EmptyState /> : (
-          <div className="flex items-end justify-between h-auto flex-1 gap-2 mt-2 px-1 pb-1">
-            {weeklyData.map((d, i) => (
-              <div key={i} className="flex flex-col items-center flex-1 group h-full justify-end">
-                {/* Tooltip */}
-                <div className="opacity-0 group-hover:opacity-100 absolute -top-6 bg-slate-800 text-white text-[10px] px-1.5 py-0.5 rounded shadow-lg pointer-events-none transition-all z-20 font-bold whitespace-nowrap mb-1">
-                  {d.count}
-                </div>
+        {!hasRealData ? <div className="py-8"><EmptyState /></div> : (
+          <div className="relative h-48 mt-2 select-none w-full">
+            {/* Background Grid Lines - Scale References */}
+            <div className="absolute inset-0 flex flex-col justify-between text-[9px] text-slate-400 dark:text-slate-600 font-bold z-0 pointer-events-none pb-6 pl-1 pr-1">
+               <div className="border-b border-dashed border-slate-100 dark:border-slate-700/50 w-full h-px relative flex items-end justify-end"><span className="-mb-3 bg-white dark:bg-slate-800 px-1 z-10">Max</span></div>
+               <div className="border-b border-dashed border-slate-100 dark:border-slate-700/50 w-full h-px relative flex items-end justify-end"><span className="-mb-3 bg-white dark:bg-slate-800 px-1 z-10">Avg</span></div>
+               <div className="border-b border-slate-100 dark:border-slate-700 w-full h-px box-border"></div>
+            </div>
 
-                {/* Simple Bar */}
-                <div 
-                  className={`w-full max-w-[16px] rounded-t-sm transition-all duration-300 ${
+            {/* Bars Container */}
+            <div className="absolute inset-0 flex items-end justify-between px-2 pt-6 pb-0 z-10 gap-2 sm:gap-3">
+              {weeklyData.map((d, i) => (
+                <div key={i} className="flex flex-col items-center flex-1 h-full justify-end group cursor-pointer relative">
+                  
+                  {/* Floating Tooltip/Value - Always visible for Today, Hover for others */}
+                  <div className={`mb-1.5 text-[10px] font-bold transition-all duration-300 transform ${
                     d.isToday 
-                      ? 'bg-blue-500 dark:bg-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.5)]' 
-                      : 'bg-slate-200 dark:bg-slate-700 hover:bg-blue-300 dark:hover:bg-blue-600/50'
-                  }`}
-                  style={{ height: `${d.height}%` }}
-                ></div>
+                      ? '-translate-y-0 opacity-100 text-blue-600 dark:text-blue-400' 
+                      : 'translate-y-2 opacity-0 group-hover:opacity-100 group-hover:-translate-y-0 text-slate-500 dark:text-slate-300'
+                  }`}>
+                    {d.count}
+                  </div>
 
-                {/* Day Label */}
-                <span className={`text-[9px] font-bold mt-1.5 uppercase tracking-wide ${d.isToday ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400 dark:text-slate-500'}`}>
-                  {d.day}
-                </span>
-              </div>
-            ))}
+                  {/* The Bar - Pure Flat Colors */}
+                  <div 
+                    className={`w-full max-w-[20px] sm:max-w-[28px] rounded-t-md transition-all duration-300 ease-out relative overflow-hidden ${
+                      d.isToday 
+                        ? 'bg-blue-600' 
+                        : 'bg-slate-200 dark:bg-slate-700 group-hover:bg-blue-400 dark:group-hover:bg-blue-600'
+                    }`}
+                    style={{ height: `max(4px, ${d.height}%)` }}
+                  ></div>
+
+                  {/* Day Label */}
+                  <span className={`text-[9px] sm:text-[10px] font-bold mt-2 uppercase tracking-wide transition-colors ${
+                    d.isToday 
+                      ? 'text-blue-600 dark:text-blue-400' 
+                      : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'
+                  }`}>
+                    {d.day}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -171,16 +198,41 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData, viewMode = 
           </div>
         </div>
 
-        {/* Level Stats Info */}
-        <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700/50 mt-auto">
-          <div className="flex items-center justify-between mb-2">
-             <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Cấp độ hiện tại</span>
-             <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400">Lv.5 Học giả</span>
-          </div>
-          <div className="flex items-center gap-2">
-             <div className="text-[9px] font-bold text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-500/20 px-2 py-0.5 rounded-full">+45 XP hôm nay</div>
-             <div className="text-[9px] font-bold text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-500/20 px-2 py-0.5 rounded-full">Còn 160 XP up level</div>
-          </div>
+        {/* Level Stats Info - Enhanced */}
+        <div className="mt-8 pt-8">
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 dark:from-blue-900 dark:to-slate-900 rounded-xl p-6 text-white shadow-lg shadow-slate-900/20 relative overflow-hidden group hover:scale-[1.02] transition-transform cursor-pointer border border-slate-200 dark:border-slate-700/50">
+                {/* Decorative & Glossy Effects */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:rotate-12 duration-500">
+                    <HiAcademicCap className="w-20 h-20" />
+                </div>
+                
+                <div className="flex items-center justify-between mb-3 relative z-10">
+                    <div>
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Cấp độ hiện tại</div>
+                        <div className="text-2xl font-black text-white flex items-center gap-2">
+                           <span className="bg-blue-600 px-2 py-0.5 rounded text-sm align-middle shadow-lg shadow-blue-500/50">Lv.5</span>
+                           Học giả
+                        </div>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">XP</div>
+                        <div className="text-sm font-bold">1,240 <span className="text-slate-500 text-[10px]">/ 1,500</span></div>
+                    </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="h-2.5 bg-black/30 rounded-full overflow-hidden relative z-10 mb-3 border border-white/5">
+                    <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full w-[82%] shadow-[0_0_15px_rgba(59,130,246,0.6)] relative overflow-hidden">
+                        <div className="absolute inset-0 bg-white/20 animate-[shimmer_2s_infinite]"></div>
+                    </div>
+                </div>
+                
+                <div className="flex items-center justify-between text-[10px] font-medium text-slate-400 relative z-10">
+                    <span>Tiếp theo: <b>Chuyên gia</b></span>
+                    <span className="text-blue-400">Còn 260 XP</span>
+                </div>
+            </div>
         </div>
       </div>
   );

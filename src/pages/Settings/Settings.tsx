@@ -13,16 +13,17 @@ import {
   HiTrash as Trash2,
   HiArrowRightOnRectangle as LogOut,
   HiChevronRight as ChevronRight,
-  HiAdjustmentsVertical as Target,
   HiSpeakerWave as Volume2,
   HiSpeakerXMark as VolumeX,
   HiArrowDownTray as Download,
   HiClock as Clock,
-  HiSwatch as Palette,
   HiBolt as Zap,
   HiQuestionMarkCircle as HelpCircle,
   HiEnvelope as Mail,
   HiArrowPath as RefreshCw,
+  HiChatBubbleLeftRight as ChatIcon,
+  HiFlag,
+  HiPaintBrush,
 } from 'react-icons/hi2';
 import { useNavigate } from 'react-router-dom';
 import { useToastContext } from '../../contexts/ToastContext';
@@ -46,36 +47,36 @@ const SettingItem: React.FC<SettingItemProps> = ({
 }) => (
   <div
     onClick={onClick}
-    className={`flex items-center justify-between p-4 rounded-lg transition-all ${
-      onClick ? 'cursor-pointer hover:bg-slate-100 dark:hover:bg-white/5' : ''
-    } ${danger ? 'hover:bg-red-50 dark:hover:bg-red-500/10' : ''}`}
+    className={`flex items-center justify-between p-4 transition-all ${
+      onClick ? 'cursor-pointer hover:bg-slate-100/80 dark:hover:bg-white/10' : ''
+    } ${danger ? 'hover:bg-red-50 dark:hover:bg-red-500/20' : ''}`}
   >
     <div className="flex items-center gap-4">
       <div
-        className={`p-2 rounded-lg ${
+        className={`p-2.5 rounded-xl shadow-sm ${
           danger
-            ? 'bg-red-100 dark:bg-red-500/20 text-red-600 dark:text-red-400'
-            : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400'
+            ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-300'
+            : 'bg-slate-100 dark:bg-slate-700/60 text-slate-700 dark:text-slate-200 ring-1 ring-inset ring-slate-900/5 dark:ring-white/10'
         }`}
       >
         {icon}
       </div>
       <div>
         <p
-          className={`font-medium ${
-            danger ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'
+          className={`font-semibold text-base ${
+            danger ? 'text-red-700 dark:text-red-400' : 'text-slate-900 dark:text-slate-100'
           }`}
         >
           {title}
         </p>
         {description && (
-          <p className="text-sm text-slate-600 dark:text-slate-400">{description}</p>
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mt-0.5">{description}</p>
         )}
       </div>
     </div>
     {action && <div>{action}</div>}
     {onClick && !action && (
-      <ChevronRight size={20} className="text-slate-400" />
+      <ChevronRight size={20} className="text-slate-400 dark:text-slate-500" />
     )}
   </div>
 );
@@ -155,6 +156,17 @@ const Settings: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('settings_autoPlayAudio', String(autoPlayAudio));
   }, [autoPlayAudio]);
+
+  // Chatbot setting
+  const [chatbotEnabled, setChatbotEnabled] = useState(() => {
+    return localStorage.getItem('settings_chatbotEnabled') !== 'false';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('settings_chatbotEnabled', String(chatbotEnabled));
+    // Dispatch event to notify MainLayout immediately
+    window.dispatchEvent(new CustomEvent('chatbotVisibilityChange', { detail: { enabled: chatbotEnabled } }));
+  }, [chatbotEnabled]);
 
   const handleLogout = () => {
     logout();
@@ -250,7 +262,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Target size={18} className="text-blue-500" />
+              <HiFlag size={18} className="text-blue-500" />
               Mục tiêu học tập
             </h2>
           </div>
@@ -264,10 +276,10 @@ const Settings: React.FC = () => {
                 <select
                   value={dailyGoal}
                   onChange={(e) => setDailyGoal(Number(e.target.value))}
-                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 font-medium"
+                  className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 font-medium cursor-pointer"
                 >
                   {dailyGoalOptions.map((goal) => (
-                    <option key={goal} value={goal}>
+                    <option key={goal} value={goal} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                       {goal} thẻ/ngày
                     </option>
                   ))}
@@ -278,10 +290,10 @@ const Settings: React.FC = () => {
                   <button
                     key={goal}
                     onClick={() => setDailyGoal(goal)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all cursor-pointer ${
                       dailyGoal === goal
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/20'
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                        : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/20 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
                     {goal}
@@ -298,9 +310,27 @@ const Settings: React.FC = () => {
                   type="time"
                   value={reminderTime}
                   onChange={(e) => setReminderTime(e.target.value)}
-                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500"
+                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-3 py-1.5 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 dark:[color-scheme:dark] cursor-pointer"
                 />
               }
+            />
+          </div>
+        </div>
+
+        {/* AI Assistant */}
+        <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+          <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
+            <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+              <ChatIcon size={18} className="text-blue-500" />
+              Trợ lý AI
+            </h2>
+          </div>
+          <div className="divide-y divide-slate-100 dark:divide-white/5">
+            <SettingItem
+              icon={<ChatIcon size={20} />}
+              title="Bật Chatbot AI"
+              description="Trợ lý ảo giúp giải đáp thắc mắc và hỗ trợ học tập"
+              action={<ToggleSwitch enabled={chatbotEnabled} onToggle={() => setChatbotEnabled(!chatbotEnabled)} />}
             />
           </div>
         </div>
@@ -309,7 +339,7 @@ const Settings: React.FC = () => {
         <div className="bg-white dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
           <div className="px-4 py-3 border-b border-slate-100 dark:border-white/5">
             <h2 className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-              <Palette size={18} className="text-blue-500" />
+              <HiPaintBrush size={18} className="text-blue-500" />
               Giao diện
             </h2>
           </div>
@@ -328,10 +358,10 @@ const Settings: React.FC = () => {
                 <select
                   value={language}
                   onChange={(e) => setLanguage(e.target.value)}
-                  className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer"
+                  className="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white px-4 py-2 rounded-lg text-sm border-0 focus:ring-2 focus:ring-blue-500 appearance-none cursor-pointer pr-8"
                 >
-                  <option value="vi">Tiếng Việt</option>
-                  <option value="en">English</option>
+                  <option value="vi" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">Tiếng Việt</option>
+                  <option value="en" className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white">English</option>
                 </select>
               }
             />
