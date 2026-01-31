@@ -3,9 +3,9 @@ import mongoose, { Document, Schema, Types } from 'mongoose';
 export interface INotification extends Document {
   recipient: Types.ObjectId; // Người nhận thông báo
   sender: Types.ObjectId;    // Người tạo ra hành động (Admin, User khác)
-  type: 'like_post' | 'comment_post' | 'reply_comment' | 'follow' | 'group_invite' | 'system';
+  type: 'like_post' | 'comment_post' | 'reply_comment' | 'follow' | 'group_invite' | 'system' | 'streak_warning' | 'level_up' | 'daily_goal' | 'share_deck';
   referenceId?: Types.ObjectId; // ID của đối tượng liên quan (PostId, CommentId, GroupId...)
-  referenceModel?: 'Post' | 'Comment' | 'Group' | 'User'; // Tên Model liên quan
+  referenceModel?: 'Post' | 'Comment' | 'Group' | 'User' | 'FlashcardSet'; // Tên Model liên quan
   content?: string; // Nội dung ngắn gọn (tùy chọn)
   isRead: boolean;
   createdAt: Date;
@@ -25,7 +25,7 @@ const notificationSchema = new Schema<INotification>(
     },
     type: {
       type: String,
-      enum: ['like_post', 'comment_post', 'reply_comment', 'follow', 'group_invite', 'system'],
+      enum: ['like_post', 'comment_post', 'reply_comment', 'follow', 'group_invite', 'system', 'streak_warning', 'level_up', 'daily_goal', 'share_deck'],
       required: true,
     },
     referenceId: {
@@ -34,7 +34,7 @@ const notificationSchema = new Schema<INotification>(
     },
     referenceModel: {
       type: String,
-      enum: ['Post', 'Comment', 'Group', 'User'],
+      enum: ['Post', 'Comment', 'Group', 'User', 'FlashcardSet'],
       required: false,
     },
     content: {

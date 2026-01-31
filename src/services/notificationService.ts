@@ -9,9 +9,9 @@ export interface Notification {
     displayName: string;
     avatar?: string;
   };
-  type: 'like_post' | 'comment_post' | 'reply_comment' | 'follow' | 'group_invite' | 'system';
+  type: 'like_post' | 'comment_post' | 'reply_comment' | 'follow' | 'group_invite' | 'system' | 'streak_warning' | 'level_up' | 'daily_goal' | 'share_deck';
   referenceId?: string;
-  referenceModel?: 'Post' | 'Comment' | 'Group' | 'User';
+  referenceModel?: 'Post' | 'Comment' | 'Group' | 'User' | 'FlashcardSet';
   content?: string;
   isRead: boolean;
   createdAt: string;

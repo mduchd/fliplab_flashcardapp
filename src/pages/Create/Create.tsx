@@ -66,7 +66,7 @@ const Create: React.FC = () => {
     }
   }, [id, location.state]);
   const [tags, setTags] = useState('');
-  const [color, setColor] = useState('#3b82f6');
+  const [color, setColor] = useState('#2563eb');
   const [icon, setIcon] = useState('stack');
   const [showAllIcons, setShowAllIcons] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,29 +96,18 @@ const Create: React.FC = () => {
       setTranslatingCardId(null);
     }
   };
-
   const colors = [
-    '#3b82f6', // blue (default)
-    '#64748b', // slate
-    '#6b7280', // gray
-    '#71717a', // zinc
-    '#737373', // neutral
-    '#78716c', // stone
+    '#2563eb', // blue (Primary)
     '#ef4444', // red
     '#f97316', // orange
     '#f59e0b', // amber
-    '#eab308', // yellow
-    '#84cc16', // lime
     '#22c55e', // green
     '#10b981', // emerald
     '#14b8a6', // teal
     '#06b6d4', // cyan
-    '#0ea5e9', // sky
     '#6366f1', // indigo
     '#8b5cf6', // violet
-    '#a855f7', // purple
     '#d946ef', // fuchsia
-    '#ec4899', // pink
     '#f43f5e', // rose
   ];
 
@@ -142,7 +131,7 @@ const Create: React.FC = () => {
         image: c.image || '',
       })));
       setTags(set.tags.join(', '));
-      setColor(set.color || '#3b82f6');
+      setColor(set.color || '#2563eb');
       setIcon(set.icon || 'stack');
     } catch (err) {
       setError('Không thể tải bộ thẻ');
@@ -528,40 +517,59 @@ const Create: React.FC = () => {
 
           {/* Cards */}
           <div className="bg-white dark:bg-white/5 backdrop-blur-sm border border-slate-200 dark:border-white/10 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Danh sách thẻ ({cards.length})</h2>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsPreviewModalOpen(true)}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <HiEye className="w-[18px] h-[18px]" />
-                  Xem trước
-                </button>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                Danh sách thẻ 
+                <span className="px-2.5 py-0.5 bg-slate-100 dark:bg-white/10 rounded-full text-xs font-bold text-slate-500 dark:text-slate-400">
+                  {cards.length}
+                </span>
+              </h2>
+
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Utility Group */}
+                <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/5">
+                  <button
+                    type="button"
+                    onClick={() => setIsImportModalOpen(true)}
+                    className="px-3 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 rounded-lg transition-all flex items-center gap-2 text-sm font-medium cursor-pointer"
+                    title="Nhập từ file"
+                  >
+                    <HiArrowUpTray className="w-4 h-4" />
+                    <span className="hidden sm:inline">Import</span>
+                  </button>
+                  <div className="w-px h-4 bg-slate-300 dark:bg-white/10"></div>
+                  <button
+                    type="button"
+                    onClick={() => setIsPreviewModalOpen(true)}
+                    className="px-3 py-1.5 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-white dark:hover:bg-white/10 rounded-lg transition-all flex items-center gap-2 text-sm font-medium cursor-pointer"
+                    title="Xem trước bộ thẻ"
+                  >
+                    <HiEye className="w-4 h-4" />
+                    <span className="hidden sm:inline">Xem trước</span>
+                  </button>
+                </div>
+
+                {/* Divider */}
+                <div className="hidden sm:block w-px h-6 bg-slate-200 dark:bg-white/10 mx-1"></div>
+
+                {/* Smart Actions */}
                 <button
                   type="button"
                   onClick={() => setIsAIModalOpen(true)}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 hover:shadow-[0_0_20px_rgba(168,85,247,0.6)] transition-all flex items-center gap-2 cursor-pointer font-bold shadow-[0_0_10px_rgba(168,85,247,0.4)] active:scale-95"
+                  className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg hover:shadow-purple-500/30 hover:-translate-y-0.5 transition-all flex items-center gap-2 cursor-pointer font-bold text-sm active:scale-95"
                 >
-                  <HiSparkles className="w-5 h-5 text-white" />
-                  Magic AI
+                  <HiSparkles className="w-4 h-4" />
+                  <span>Magic AI</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setIsImportModalOpen(true)}
-                  className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-600 transition-all flex items-center gap-2 cursor-pointer"
-                >
-                  <HiArrowUpTray className="w-[18px] h-[18px]" />
-                  Import file
-                </button>
+
+                {/* Primary Action */}
                 <button
                   type="button"
                   onClick={addCard}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all flex items-center gap-2 cursor-pointer text-sm font-bold shadow-sm hover:shadow-blue-500/30 active:scale-95"
                 >
-                  <HiPlus className="w-[18px] h-[18px]" />
-                  Thêm thẻ
+                  <HiPlus className="w-4 h-4" />
+                  <span>Thêm thẻ</span>
                 </button>
               </div>
             </div>

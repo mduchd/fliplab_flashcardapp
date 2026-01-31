@@ -280,13 +280,19 @@ const Home: React.FC = () => {
     // Apply sort
     switch (activeFilter) {
       case 'recent':
-        result = result
-          .filter(set => set.lastStudied)
-          .sort((a, b) => {
-            const dateA = a.lastStudied ? new Date(a.lastStudied).getTime() : 0;
-            const dateB = b.lastStudied ? new Date(b.lastStudied).getTime() : 0;
-            return dateB - dateA;
-          });
+        result = result.sort((a, b) => {
+          // Compare based on the latest interaction (Study time vs Creation time)
+          // Use createdAt as fallback if lastStudied is missing
+          const timeA = Math.max(
+            a.lastStudied ? new Date(a.lastStudied).getTime() : 0, 
+            a.createdAt ? new Date(a.createdAt).getTime() : 0
+          );
+          const timeB = Math.max(
+            b.lastStudied ? new Date(b.lastStudied).getTime() : 0, 
+            b.createdAt ? new Date(b.createdAt).getTime() : 0
+          );
+          return timeB - timeA;
+        });
         break;
       case 'alphabetical':
         result = result.sort((a, b) => a.name.localeCompare(b.name, 'vi'));

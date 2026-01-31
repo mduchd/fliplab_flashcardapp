@@ -87,28 +87,19 @@ const ICON_KEYS = Object.keys(ICON_MAP);
 
 // Folder color options
 // Folder color options
+// Folder color options - Curated Vibrant Palette
 const FOLDER_COLORS = [
   { id: 'blue', class: 'bg-blue-500', ring: 'ring-blue-200' },
-  { id: 'slate', class: 'bg-slate-500', ring: 'ring-slate-200' },
-  { id: 'gray', class: 'bg-gray-500', ring: 'ring-gray-200' },
-  { id: 'zinc', class: 'bg-zinc-500', ring: 'ring-zinc-200' },
-  { id: 'neutral', class: 'bg-neutral-500', ring: 'ring-neutral-200' },
-  { id: 'stone', class: 'bg-stone-500', ring: 'ring-stone-200' },
   { id: 'red', class: 'bg-red-500', ring: 'ring-red-200' },
   { id: 'orange', class: 'bg-orange-500', ring: 'ring-orange-200' },
   { id: 'amber', class: 'bg-amber-500', ring: 'ring-amber-200' },
-  { id: 'yellow', class: 'bg-yellow-500', ring: 'ring-yellow-200' },
-  { id: 'lime', class: 'bg-lime-500', ring: 'ring-lime-200' },
   { id: 'green', class: 'bg-green-500', ring: 'ring-green-200' },
   { id: 'emerald', class: 'bg-emerald-500', ring: 'ring-emerald-200' },
   { id: 'teal', class: 'bg-teal-500', ring: 'ring-teal-200' },
   { id: 'cyan', class: 'bg-cyan-500', ring: 'ring-cyan-200' },
-  { id: 'sky', class: 'bg-sky-500', ring: 'ring-sky-200' },
   { id: 'indigo', class: 'bg-indigo-500', ring: 'ring-indigo-200' },
   { id: 'violet', class: 'bg-violet-500', ring: 'ring-violet-200' },
-  { id: 'purple', class: 'bg-purple-500', ring: 'ring-purple-200' },
   { id: 'fuchsia', class: 'bg-fuchsia-500', ring: 'ring-fuchsia-200' },
-  { id: 'pink', class: 'bg-pink-500', ring: 'ring-pink-200' },
   { id: 'rose', class: 'bg-rose-500', ring: 'ring-rose-200' },
 ];
 

@@ -6,7 +6,7 @@ import { useSidebar } from '../../contexts/SidebarContext';
 import { notificationService } from '../../services/notificationService';
 import { 
   HiHome, 
-  HiPlusCircle, 
+  HiSquare2Stack, 
   HiUser, 
   HiCog6Tooth, 
   HiBookOpen, 
@@ -179,7 +179,7 @@ const Sidebar: React.FC = () => {
                 }}
                 className="w-full flex items-center gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-white/5 text-left transition-colors cursor-pointer"
               >
-                <HiPlusCircle className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                <HiSquare2Stack className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-semibold text-slate-900 dark:text-white">Bộ thẻ mới</p>
                   <p className="text-xs text-slate-500 dark:text-slate-400">Tạo bộ flashcard để học</p>
