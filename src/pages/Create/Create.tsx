@@ -60,8 +60,19 @@ const Create: React.FC = () => {
        if (state?.generatedCards) {
           setName(state.deckTopic || `Bộ thẻ về ${state.generatedCards[0]?.term || 'Mới'}`);
           handleAIGenerated(state.generatedCards);
-          // Clear state to prevent reloading on refresh (optional, but good practice)
+          // Clear state to prevent reloading on refresh
           window.history.replaceState({}, document.title);
+       } else {
+          // RESET FORM if simply navigating to /create (Create Mode)
+          setName('');
+          setDescription('');
+          setTags('');
+          setColor('#2563eb');
+          setIcon('stack');
+          setCards([
+            { id: '1', term: '', definition: '', image: '' },
+            { id: '2', term: '', definition: '', image: '' },
+          ]);
        }
     }
   }, [id, location.state]);

@@ -3,6 +3,8 @@ import { AuthRequest } from '../middleware/auth.js';
 import { Streak } from '../models/Streak.js';
 import { DailyGoal } from '../models/DailyGoal.js';
 
+import { StudyLog } from '../models/StudyLog.js';
+
 // @desc    Get user streak stats
 // @route   GET /api/streaks
 // @access  Private
@@ -49,11 +51,30 @@ export const getMyStreak = async (req: AuthRequest, res: Response) => {
         }
     }
 
+    // --- Lấy lịch sử 14 ngày gần nhất từ StudyLog ---
+    const twoWeeksAgo = new Date(today);
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    
+    // Convert to YYYY-MM-DD for string comparison if needed, but Mongo Date query works if stored as Date properly
+    // Our StudyLog stores date as string YYYY-MM-DD
+    const logs = await StudyLog.find({
+        userId,
+        createdAt: { $gte: twoWeeksAgo } // Dùng createdAt hoặc date string để filter
+    }).sort({ date: 1 });
+    
+    // Map logs to simple array
+    const history = logs.map(log => ({
+        date: log.date,
+        count: log.count,
+        metGoal: log.metGoal
+    }));
+
     res.json({
       success: true,
       data: {
         streak,
-        dailyGoal
+        dailyGoal,
+        history // Trả về lịch sử thật
       }
     });
 
@@ -74,6 +95,7 @@ export const syncProgress = async (req: AuthRequest, res: Response) => {
     const now = new Date();
     const today = new Date(now);
     today.setHours(0, 0, 0, 0);
+    const dateString = today.toISOString().split('T')[0];
 
     // 1. Cập nhật Daily Goal
     let dailyGoal = await DailyGoal.findOne({ userId });
@@ -109,7 +131,25 @@ export const syncProgress = async (req: AuthRequest, res: Response) => {
     
     await dailyGoal.save();
 
-    // 2. Cập nhật Streak
+    // 2. Cập nhật StudyLog (Lịch sử chi tiết)
+    let todayLog = await StudyLog.findOne({ userId, date: dateString });
+    if (!todayLog) {
+        todayLog = new StudyLog({
+            userId,
+            date: dateString,
+            count: 0,
+            target: dailyGoal.targetCards,
+            metGoal: false
+        });
+    }
+    
+    todayLog.count += increment;
+    todayLog.target = dailyGoal.targetCards; // Update target if changed
+    todayLog.metGoal = todayLog.count >= todayLog.target;
+    await todayLog.save();
+
+
+    // 3. Cập nhật Streak
     let streak = await Streak.findOne({ userId });
     if (!streak) {
       streak = new Streak({ userId, currentStreak: 0, longestStreak: 0, studyDates: [] });
@@ -117,12 +157,13 @@ export const syncProgress = async (req: AuthRequest, res: Response) => {
 
     const lastDate = streak.lastStudyDate ? new Date(streak.lastStudyDate) : null;
     let isStreakUpdated = false;
+    let isStreakBroken = false;
 
     const lastDateZero = lastDate ? new Date(lastDate) : null;
     if (lastDateZero) lastDateZero.setHours(0, 0, 0, 0);
 
     if (!lastDateZero || lastDateZero.getTime() !== today.getTime()) {
-        // Chưa học hôm nay
+        // Chưa học hôm nay (hoặc lần đầu log trong ngày)
         
         // Check nếu học hôm qua
         const yesterday = new Date(today);
@@ -133,9 +174,9 @@ export const syncProgress = async (req: AuthRequest, res: Response) => {
         } else if (!lastDateZero || lastDateZero.getTime() < yesterday.getTime()) {
             // Mất chuỗi hoặc lần đầu
             streak.currentStreak = 1;
+            isStreakBroken = true;
         }
-        // Nếu đã học hôm nay rồi thì không làm gì (giữ nguyên streak)
-
+        
         // Update longest
         if (streak.currentStreak > streak.longestStreak) {
             streak.longestStreak = streak.currentStreak;
@@ -146,7 +187,7 @@ export const syncProgress = async (req: AuthRequest, res: Response) => {
         streak.lastStudyDate = now;
         isStreakUpdated = true;
     } else {
-        // Đã học hôm nay
+        // Đã học hôm nay -> chỉ update timestamp
         streak.lastStudyDate = now;
     }
 

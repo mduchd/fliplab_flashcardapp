@@ -8,21 +8,29 @@ import {
   HiCamera,
   HiCheckCircle,
   HiArrowPath,
-  HiPlusCircle,
+  HiArrowRight,
   HiXMark,
   HiCloudArrowUp,
   HiClock,
   HiFire,
   HiTrophy,
-  HiFlag
+  HiFlag,
+  HiChartPie,
+  HiFolder,
+  HiRectangleStack,
+  HiDocumentDuplicate,
+  HiShare
 } from 'react-icons/hi2';
 import { HiBookOpen } from 'react-icons/hi';
 import { dailyProgressTracker } from '../../utils/dailyProgressTracker';
+import { folderService } from '../../services/folderService';
 
 import ActivityStats from '../../components/profile/ActivityStats';
+import LevelCard from '../../components/profile/LevelCard';
 import FollowShareActions from '../../components/profile/FollowShareActions';
 import { authService } from '../../services/authService';
 import { flashcardService } from '../../services/flashcardService';
+import { streakService } from '../../services/streakService';
 import { useToastContext } from '../../contexts/ToastContext';
 import { ANIMAL_AVATARS, AVATAR_FRAMES } from '../../constants/avatarConstants';
 import Avatar from '../../components/Avatar';
@@ -58,7 +66,9 @@ const Profile: React.FC = () => {
     streak: dailyProgressTracker.getStreak(),
     studiedToday: dailyProgressTracker.getProgress(),
     dailyGoal: dailyProgressTracker.getDailyGoal(),
-    totalDecks: 0
+    totalDecks: 0,
+    totalCards: 0,
+    totalFolders: 0
   });
 
   // Recent deck for "Continue" feature
@@ -106,39 +116,84 @@ const Profile: React.FC = () => {
     };
   }, []);
 
+  // State for server history logs
+  const [serverHistory, setServerHistory] = useState<{ date: string; count: number }[]>([]);
+  
+  // State for Mastery Stats
+  const [masteryStats, setMasteryStats] = useState<{ new: number; learning: number; mastered: number }>({ new: 0, learning: 0, mastered: 0 });
+
+  // Load Total Decks, Recent Deck & Refresh User Data
   // Load Total Decks, Recent Deck & Refresh User Data
   useEffect(() => {
     const fetchData = async () => {
-      // 1. Fetch Decks
+      // 1. Fetch Decks, Folders & Stats (Parallel)
       try {
-        const response = await flashcardService.getAll();
-        if (response.success && response.data) {
-          const decks = response.data.flashcardSets;
-          setStats(prev => ({
-            ...prev,
-            totalDecks: decks.length
+        const [decksResponse, statsResponse, foldersResponse] = await Promise.all([
+           flashcardService.getAll(),
+           dailyProgressTracker.initStats().then(() => streakService.getMyStats()),
+           folderService.getFolders()
+        ]);
+
+        let totalFolders = 0;
+        if (foldersResponse.success && foldersResponse.data) {
+            totalFolders = foldersResponse.data.folders.length;
+        }
+
+        if (decksResponse.success && decksResponse.data) {
+          const decks = decksResponse.data.flashcardSets;
+
+          // Calculate Master Stats & Total Cards
+          let newCount = 0;
+          let learningCount = 0; // Box 2, 3
+          let masteredCount = 0; // Box 4, 5
+          let totalCards = 0;
+
+          decks.forEach((deck: any) => {
+              if (deck.cards) {
+                  deck.cards.forEach((card: any) => {
+                       totalCards++;
+                       const box = card.box || 0; 
+                       if (box >= 4) masteredCount++;
+                       else if (box >= 2) learningCount++;
+                       else newCount++;
+                  });
+              }
+          });
+
+          // Update Stats with Total Decks and Total Cards
+          setStats(prev => ({ 
+              ...prev, 
+              totalDecks: decks.length,
+              totalFolders: totalFolders,
+              totalCards: totalCards 
           }));
           
-          // Find most recently studied deck
           if (decks.length > 0) {
-            const sortedByStudy = [...decks].sort((a, b) => {
-              if (!a.lastStudied) return 1;
-              if (!b.lastStudied) return -1;
-              return new Date(b.lastStudied).getTime() - new Date(a.lastStudied).getTime();
-            });
-            const recent = sortedByStudy[0];
-            // Calculate "due" cards (simplified: cards in box 1-2)
-            const dueCount = recent.cards?.filter((c: any) => (c.box || 1) <= 2).length || 0;
-            setRecentDeck({
-              id: recent._id,
-              name: recent.name,
-              dueCount: dueCount,
-              totalCards: recent.cards?.length || 0
-            });
+             const sortedByStudy = [...decks].sort((a, b) => {
+               if (!a.lastStudied) return 1;
+               if (!b.lastStudied) return -1;
+               return new Date(b.lastStudied).getTime() - new Date(a.lastStudied).getTime();
+             });
+             const recent = sortedByStudy[0];
+             const dueCount = recent.cards?.filter((c: any) => (c.box || 1) <= 2).length || 0;
+             setRecentDeck({ id: recent._id, name: recent.name, dueCount: dueCount, totalCards: recent.cards?.length || 0 });
+          }
+          
+          if (totalCards > 0) {
+              setMasteryStats({
+                  new: (newCount / totalCards) * 100,
+                  learning: (learningCount / totalCards) * 100,
+                  mastered: (masteredCount / totalCards) * 100
+              });
           }
         }
+
+        if (statsResponse.success && statsResponse.data.history) {
+            setServerHistory(statsResponse.data.history);
+        }
+
       } catch (error) {
-        console.error('Failed to load decks', error);
+        console.error('Failed to load dashboard data', error);
       }
 
       // 2. Refresh User Data
@@ -153,39 +208,16 @@ const Profile: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
-  // 6. Generate 7-day week history
+  // 6. Generate 7-day week history (Using REAL Data)
   useEffect(() => {
     const generateWeekHistory = () => {
       const history: {day: string; studied: boolean; count: number; isToday: boolean; date: string}[] = [];
       
-      // Get today at midnight
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       
-      // Determine if studied today (using stats state)
-      const isStudiedToday = stats.studiedToday >= stats.dailyGoal;
-      
-      // Get last study date from localStorage if available
-      let lastStudyDate: Date | null = null;
-      if (isStudiedToday) {
-        lastStudyDate = new Date(today);
-      } else {
-        // Safe check for streakData
-        const localStreakData = localStorage.getItem('streakData');
-        if (localStreakData) {
-          try {
-            const parsed = JSON.parse(localStreakData);
-            lastStudyDate = new Date(parsed.lastStudiedDate); // Change lastStudyDate to lastStudiedDate per tracker
-            // Normalize to midnight
-            lastStudyDate = new Date(lastStudyDate.getFullYear(), lastStudyDate.getMonth(), lastStudyDate.getDate());
-          } catch (e) {
-            console.error('Error parsing streak data', e);
-          }
-        }
-      }
-
       // Generate last 7 days (reverse order)
       for (let i = 6; i >= 0; i--) {
         const d = new Date(today);
@@ -195,29 +227,17 @@ const Profile: React.FC = () => {
         const dateStr = d.toISOString().split('T')[0];
         const isToday = i === 0;
         
-        // Determine studied status
-        let studied = false;
-        let count = 0;
+        // Find log in server history
+        const log = serverHistory.find(h => h.date === dateStr);
+        let count = log ? log.count : 0;
         
-        // For today: use current progress
+        // For Today: prioritize local stats state for immediate responsiveness (Realtime)
+        // because server history might lag slightly behind debounce
         if (isToday) {
-          count = stats.studiedToday;
-          studied = count >= stats.dailyGoal;
-        } else {
-          // For past days: check based on streak logic (simplified estimation)
-          // Ideally we need a full history log. For now, if we have a streak, we assume past days are studied.
-          // This is a limitation without full calendar history.
-          if (lastStudyDate) {
-             // If this day is within the current streak duration from the last study date
-             if (stats.streak > 0 && d <= lastStudyDate) {
-                const daysFromLastStudy = Math.floor((lastStudyDate.getTime() - d.getTime()) / (1000 * 60 * 60 * 24));
-                if (daysFromLastStudy < stats.streak) {
-                    studied = true;
-                    count = stats.dailyGoal; // Assume goal met
-                }
-             }
-          }
+             count = Math.max(count, stats.studiedToday); 
         }
+
+        const studied = count >= stats.dailyGoal;
         
         history.push({ day: dayName, studied, count, isToday, date: dateStr });
       }
@@ -226,7 +246,7 @@ const Profile: React.FC = () => {
     };
 
     generateWeekHistory();
-  }, [stats.studiedToday, stats.dailyGoal, stats.streak]);
+  }, [stats.studiedToday, stats.dailyGoal, serverHistory]);
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -400,65 +420,77 @@ const Profile: React.FC = () => {
                   </div>
 
                   {/* Name & Identity */}
-                  <div className="text-center mb-6 max-w-2xl w-full">
-                    <h1 className="text-2xl md:text-4xl font-black text-slate-900 dark:text-white mb-2 tracking-tight leading-tight">
+                  <div className="text-center mb-5 max-w-2xl w-full">
+                    <h1 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white mb-1.5 tracking-tight leading-tight">
                        {user?.displayName}
                     </h1>
                     
-                    <div className="flex items-center justify-center gap-2 mb-4">
-                      <span className="text-blue-700 dark:text-blue-300 font-bold bg-blue-50 dark:bg-blue-500/20 px-3 py-1 rounded-lg text-xs md:text-sm flex items-center gap-1.5 transition-colors hover:bg-blue-100 dark:hover:bg-blue-500/30 cursor-pointer border border-blue-100 dark:border-blue-500/20">
-                         @{user?.username} <HiCheckCircle className="w-4 h-4" />
+                    <div className="flex items-center justify-center gap-2 mb-3">
+                      <span className="text-blue-700 dark:text-blue-300 font-bold bg-blue-50 dark:bg-blue-500/20 px-2.5 py-0.5 rounded-md text-xs flex items-center gap-1 transition-colors hover:bg-blue-100 dark:hover:bg-blue-500/30 cursor-pointer border border-blue-100 dark:border-blue-500/20">
+                         @{user?.username} <HiCheckCircle className="w-3.5 h-3.5" />
                       </span>
                     </div>
 
                     {user?.bio && (
-                       <p className="text-slate-700 dark:text-slate-200 text-sm md:text-base font-medium leading-relaxed opacity-100 max-w-lg mx-auto italic">
+                       <p className="text-slate-700 dark:text-slate-200 text-sm font-medium leading-relaxed max-w-lg mx-auto italic">
                          {user.bio}
                        </p>
                     )}
                   </div>
                   
-
-
-
                   {/* Stats Row - Clean, Compact */}
-                  <div className="flex items-center justify-center gap-8 md:gap-16 mb-6 w-full">
+                  <div className="flex items-center justify-center gap-8 md:gap-12 mb-6 w-full">
                      <div 
                         className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() => setActiveFollowModal('followers')}
                      >
-                        <span className="text-2xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followersCount || 0}</span>
-                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Người theo dõi</span>
+                        <span className="text-xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followersCount || 0}</span>
+                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">Người theo dõi</span>
                      </div>
                      
+                     <div className="w-px h-8 bg-slate-200 dark:bg-slate-700"></div>
+
                      <div 
                         className="flex flex-col items-center group cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() => setActiveFollowModal('following')}
                      >
-                        <span className="text-2xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followingCount || 0}</span>
-                        <span className="text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Đang theo dõi</span>
+                        <span className="text-xl font-black text-slate-900 dark:text-white mb-0.5 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{(user as any)?.followingCount || 0}</span>
+                        <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-widest group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">Đang theo dõi</span>
                      </div>
                   </div>
 
-
-
-                  {/* Actions - Compact Pills */}
-                  <div className="flex items-center justify-center gap-3 w-full max-w-sm mb-2">
-                     <button 
-                        onClick={openEditModal} 
-                        className="flex-1 py-2.5 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold rounded-lg hover:bg-slate-800 dark:hover:bg-slate-200 shadow-lg shadow-slate-200/50 dark:shadow-none hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 cursor-pointer text-sm"
-                     >
-                        <HiPencilSquare className="w-4 h-4" /> Chỉnh sửa
-                     </button>
-                     <div className="flex-1">
-                        <FollowShareActions targetUserId={user?.id || ''} currentUserId={user?.id} isOwnProfile={true} variant="secondary" mode="buttons-only" />
-                     </div>
-                  </div>
+                  {/* Actions Buttons */}
+                   <div className="flex items-center justify-center gap-3 w-full max-w-sm mx-auto">
+                      <button 
+                         onClick={openEditModal} 
+                         className="flex-1 py-2 px-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 dark:shadow-slate-900/20 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 group border border-transparent cursor-pointer"
+                      >
+                         <HiPencilSquare className="w-4 h-4 group-hover:rotate-12 transition-transform" /> Chỉnh sửa
+                      </button>
+                      
+                      <button 
+                         onClick={() => {
+                            if (navigator.share) {
+                               navigator.share({
+                                  title: `Hồ sơ của ${user?.displayName}`,
+                                  text: `Xem hồ sơ của ${user?.displayName} trên FlipLab!`,
+                                  url: window.location.href
+                               }).catch(console.error);
+                            } else {
+                               navigator.clipboard.writeText(window.location.href);
+                               toast.success('Đã sao chép liên kết hồ sơ!');
+                            }
+                         }}
+                         className="flex-1 py-2 px-4 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-sm font-bold border border-slate-200 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-600 transition-all flex items-center justify-center gap-2 group hover:-translate-y-0.5 cursor-pointer"
+                      >
+                         <HiShare className="w-4 h-4 group-hover:-rotate-12 transition-transform" /> Chia sẻ
+                      </button>
+                   </div>
                   
                   {/* Join Date - Subtle Footer */}
-                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 w-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                     <HiCalendarDays className="w-3.5 h-3.5 mr-1.5" />
-                     <span>Thành viên từ {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '2024'}</span>
+                  <div className="mt-6 pt-4 border-t border-slate-100 dark:border-white/5 w-full flex items-center justify-center text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">
+                     <HiCalendarDays className="w-4 h-4 mr-1.5 mb-0.5 opacity-80" />
+                     Thành viên từ {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : '19/01/2026'}
                   </div>
                </div>
             </div>
@@ -468,27 +500,47 @@ const Profile: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8">
           
           {/* Left Column: Stats (Chart & Badges) - Unified Card */}
-          <div className="lg:col-span-8 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 flex flex-col gap-4 h-full"> 
-             {/* 1. Activity Chart - Fixed Compact Height */}
-             <div className="h-60">
-               <ActivityStats 
-                 viewMode="chart-only"
-                 noBackground={true}
-                 activityData={weekHistory.map(d => ({
-                    date: d.date,
-                    count: d.count,
-                    label: d.day,
-                    isToday: d.isToday
-                 }))} 
-               />
-             </div>
+          <div className="lg:col-span-8 flex flex-col gap-5 h-full">
+             
+             {/* 🏆 HERO: Level Card - Outside the white card, stands alone */}
+             <LevelCard 
+               currentLevel={5}
+               currentXP={1240}
+               maxXP={1500}
+               levelTitle="Học giả"
+               nextLevelTitle="Chuyên gia"
+               nextLevelRewards={['🎨 Custom Theme', '🏅 Huy hiệu Vàng']}
+             />
 
-             {/* Divider */}
-             <div className="h-px bg-slate-100 dark:bg-slate-700 w-full my-1"></div>
+             {/* Stats Container */}
+             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 flex flex-col gap-4">
+               {/* 1. Statistics Charts Row */}
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 h-72 mb-2">
+                   {/* Left: Activity Bar Chart */}
+                   <ActivityStats 
+                     activityData={weekHistory.map(d => ({
+                        date: d.date,
+                        count: d.count,
+                        label: d.day,
+                        isToday: d.isToday
+                     }))}
+                     viewMode="chart-only" 
+                   />
 
-             {/* 2. Badges & Achievements */}{/* Auto Height */}
-             <div className="h-auto">
-               <ActivityStats viewMode="badges-only" noBackground={true} />
+                   {/* Right: Mastery Doughnut Chart */}
+                   <ActivityStats 
+                      masteryData={masteryStats}
+                      viewMode="mastery-only"
+                   />
+               </div>
+               
+               {/* Divider */}
+               <div className="h-px bg-slate-100 dark:bg-slate-700 w-full my-1"></div>
+
+               {/* 2. Badges & Achievements - Compact Preview */}
+               <div className="h-auto">
+                 <ActivityStats viewMode="badges-only" noBackground={true} />
+               </div>
              </div>
           </div>
 
@@ -555,36 +607,51 @@ const Profile: React.FC = () => {
                );
              })()}
 
-             {/* 2. Library Shortcut - Compact */}
-             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm">
-                <h3 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2 text-sm">
-                   <HiBookOpen className="w-4 h-4 text-purple-500" />
-                   Thư viện bộ thẻ
+             {/* 2. Library Stats - Compact Grid */}
+             <div className="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-5 shadow-sm flex flex-col justify-between" style={{ minHeight: '210px' }}>
+                <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2 text-sm">
+                   <HiChartPie className="w-4 h-4 text-blue-500" />
+                   Thống kê thư viện
                 </h3>
                 
-                {recentDeck ? (
-                   <div className="group/deck cursor-pointer" onClick={() => navigate(`/study/${recentDeck.id}`)}>
-                      <div className="p-2.5 bg-purple-50 dark:bg-purple-500/10 rounded-lg border border-purple-100 dark:border-purple-500/20 hover:border-purple-300 dark:hover:border-purple-400 transition-colors">
-                         <div className="text-[10px] font-bold text-purple-600 dark:text-purple-400 mb-0.5 uppercase tracking-wide">Học gần đây</div>
-                         <div className="text-sm font-bold text-slate-800 dark:text-slate-200 truncate mb-1">{recentDeck.name}</div>
-                         <div className="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
-                            <span className="flex items-center gap-1"><HiClock className="w-3 h-3" /> {recentDeck.dueCount} cần ôn</span>
-                         </div>
-                      </div>
-                   </div>
-                ) : (
-                   <div className="text-center py-4 text-slate-400">
-                      <p className="text-xs mb-2">Chưa có bộ thẻ nào</p>
-                   </div>
-                )}
+                <div className="grid grid-cols-3 gap-3 flex-1 mb-2">
+                     {/* Total Folders */}
+                     <div className="bg-slate-50 dark:bg-slate-700/40 rounded-2xl flex flex-col items-center justify-center p-2 transition-all hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer hover:shadow-sm">
+                        <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-600 shadow-sm flex items-center justify-center mb-1.5">
+                             <HiFolder className="w-5 h-5 text-orange-500" />
+                        </div>
+                        <div className="text-xl font-black text-slate-900 dark:text-white leading-none mb-0.5">{stats.totalFolders || 0}</div>
+                        <div className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Thư mục</div>
+                     </div>
 
-                <button 
-                  onClick={() => navigate('/')}
-                  className="w-full mt-3 py-2 border border-dashed border-slate-300 dark:border-slate-600 rounded-lg text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-300 dark:hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-500/10 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <HiPlusCircle className="w-3.5 h-3.5" />
-                  Tạo bộ thẻ mới
-                </button>
+                     {/* Total Decks */}
+                     <div className="bg-slate-50 dark:bg-slate-700/40 rounded-2xl flex flex-col items-center justify-center p-2 transition-all hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer hover:shadow-sm">
+                        <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-600 shadow-sm flex items-center justify-center mb-1.5">
+                             <HiDocumentDuplicate className="w-5 h-5 text-blue-500" />
+                        </div>
+                        <div className="text-xl font-black text-slate-900 dark:text-white leading-none mb-0.5">{stats.totalDecks}</div>
+                        <div className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Bộ thẻ</div>
+                     </div>
+
+                     {/* Total Cards */}
+                     <div className="bg-slate-50 dark:bg-slate-700/40 rounded-2xl flex flex-col items-center justify-center p-2 transition-all hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer hover:shadow-sm">
+                        <div className="w-9 h-9 rounded-full bg-white dark:bg-slate-600 shadow-sm flex items-center justify-center mb-1.5">
+                             <HiRectangleStack className="w-5 h-5 text-indigo-500" />
+                        </div>
+                        <div className="text-xl font-black text-slate-900 dark:text-white leading-none mb-0.5">{stats.totalCards || 0}</div>
+                        <div className="text-[10px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Tổng thẻ</div>
+                     </div>
+                </div>
+
+                <div className="mt-auto border-t border-slate-100 dark:border-slate-700 border-dashed pt-3">
+                    <button 
+                      onClick={() => navigate('/')}
+                      className="w-full py-2.5 bg-slate-50 dark:bg-slate-700/40 hover:bg-white dark:hover:bg-slate-700 border border-transparent hover:border-slate-200 dark:hover:border-slate-600 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 group shadow-sm cursor-pointer"
+                    >
+                      <span>Xem thư viện thẻ</span>
+                      <HiArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                </div>
              </div>
 
              {/* 3. Streak & Mastered Stats - Dual Cards */}

@@ -19,6 +19,7 @@ export interface DailyGoalData {
 export interface StreakResponse {
   streak: StreakData;
   dailyGoal: DailyGoalData;
+  history?: { date: string; count: number; metGoal: boolean }[];
 }
 
 export const streakService = {
