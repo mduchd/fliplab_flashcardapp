@@ -17,15 +17,34 @@ import {
   HiBriefcase,
   HiGlobeAlt,
   HiFolder,
-  HiPhoto,
+
   HiPuzzlePiece,
   HiSwatch,
-  HiXCircle
+  HiXCircle,
+  HiXMark,
+  HiEnvelope,
+  HiShieldCheck
 } from 'react-icons/hi2';
 import { PiGameControllerFill } from 'react-icons/pi';
 import { BADGES } from '../../constants/badgeConstants';
 
 const LandingPage: React.FC = () => {
+  const [activeModal, setActiveModal] = React.useState<'privacy' | 'contact' | null>(null);
+  const [contactForm, setContactForm] = React.useState({ name: '', email: '', message: '' });
+
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    alert('Cảm ơn bạn đã liên hệ. Chúng tôi sẽ phản hồi sớm nhất có thể!');
+    setActiveModal(null);
+    setContactForm({ name: '', email: '', message: '' });
+  };
   return (
     <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500/30 font-sans">
       {/* 
@@ -84,16 +103,15 @@ const LandingPage: React.FC = () => {
 
           {/* Headline */}
           <h1 className="text-5xl md:text-7xl font-black tracking-tight mb-8 leading-tight animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-            Học nhanh hơn. <br />
+            Biến kiến thức <br />
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-blue-400 to-cyan-400">
-              Nhớ lâu hơn.
+              thành phản xạ.
             </span>
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
-            Nền tảng Flashcard thông minh giúp bạn chinh phục mọi kỳ thi. 
-            Tự động tạo thẻ từ tài liệu, ôn tập với thuật toán ngắt quãng (Spaced Repetition) và theo dõi tiến độ mỗi ngày.
+          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200 font-medium">
+            Hệ thống Flashcard AI lặp lại ngắt quãng giúp bạn ghi nhớ mọi kiến thức (Ngoại ngữ, Y khoa, Sử địa, Luật...) vĩnh viễn chỉ với 15 phút mỗi ngày.
           </p>
 
           {/* CTA Buttons */}
@@ -114,9 +132,10 @@ const LandingPage: React.FC = () => {
           </div>
 
           {/* Mock Dashboard Screenshot - RECREATED BASED ON REAL UI */}
-          <div className="mt-20 relative animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500">
-            <div className="absolute -inset-1 bg-gradient-to-b from-indigo-500/20 to-transparent rounded-2xl blur-xl"></div>
-            <div className="relative rounded-2xl border border-white/10 bg-[#0B1120] shadow-2xl overflow-hidden aspect-[16/10] md:aspect-video group select-none text-left">
+          {/* Mock Dashboard Screenshot - RECREATED BASED ON REAL UI */}
+          <div className="mt-20 relative animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-500 mb-32 md:mb-48 group">
+            <div className="absolute -inset-4 bg-gradient-to-b from-indigo-500/30 via-purple-500/10 to-transparent rounded-[2rem] blur-2xl opacity-75 group-hover:opacity-100 transition-opacity duration-700"></div>
+            <div className="relative rounded-2xl border border-white/10 bg-[#0B1120] shadow-2xl overflow-hidden aspect-[16/10] md:aspect-video group select-none text-left transform md:scale-110 md:group-hover:scale-[1.15] transition-transform duration-700">
               
               {/* Dashboard Content */}
               <div className="p-6 flex flex-col h-full gap-6">
@@ -211,8 +230,38 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+
+            
+          </div>
       </header>
+
+      {/* 
+        ========================================
+        SOCIAL PROOF (Stats & Partners)
+        ======================================== 
+      */}
+      <section className="py-12 border-y border-white/5 bg-slate-900/30">
+          <div className="max-w-7xl mx-auto px-6">
+             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/5">
+                <div className="p-4">
+                   <div className="text-3xl md:text-4xl font-black text-white mb-1">10,000+</div>
+                   <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Người học</div>
+                </div>
+                <div className="p-4">
+                   <div className="text-3xl md:text-4xl font-black text-white mb-1">500k+</div>
+                   <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Thẻ đã tạo</div>
+                </div>
+                <div className="p-4">
+                   <div className="text-3xl md:text-4xl font-black text-white mb-1">4.8/5</div>
+                   <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Đánh giá</div>
+                </div>
+                <div className="p-4">
+                   <div className="text-3xl md:text-4xl font-black text-white mb-1">Top 1</div>
+                   <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">Giáo dục</div>
+                </div>
+             </div>
+          </div>
+      </section>
 
       {/* 
         ========================================
@@ -227,28 +276,28 @@ const LandingPage: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-8 hover:bg-slate-900 transition-colors group">
-                <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mb-6 group-hover:bg-red-500/20 transition-colors">
-                  <HiExclamationTriangle className="w-8 h-8 text-red-500" />
+            <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 hover:bg-slate-900 transition-colors group hover:-translate-y-1 duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-red-500/20 shadow-[0_0_20px_rgba(239,68,68,0.3)] flex items-center justify-center mb-6 text-red-400 group-hover:scale-110 transition-transform">
+                  <HiExclamationTriangle className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Quá tải kiến thức</h3>
-                <p className="text-slate-400 leading-relaxed">Có quá nhiều thứ phải nhớ nhưng không biết bắt đầu từ đâu, dẫn đến căng thẳng.</p>
+                <h3 className="text-xl font-bold text-white mb-2">Quá tải kiến thức</h3>
+                <p className="text-slate-300 leading-relaxed font-medium">Học nhiều nhưng không nhớ. Cảm giác bị "ngợp" vì lượng thông tin khổng lồ cần nạp mỗi ngày.</p>
             </div>
 
-            <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-8 hover:bg-slate-900 transition-colors group">
-                <div className="w-16 h-16 rounded-2xl bg-orange-500/10 flex items-center justify-center mb-6 group-hover:bg-orange-500/20 transition-colors">
-                  <HiClock className="w-8 h-8 text-orange-500" />
+            <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 hover:bg-slate-900 transition-colors group hover:-translate-y-1 duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-orange-500/20 shadow-[0_0_20px_rgba(249,115,22,0.3)] flex items-center justify-center mb-6 text-orange-400 group-hover:scale-110 transition-transform">
+                  <HiClock className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Học trước quên sau</h3>
-                <p className="text-slate-400 leading-relaxed">Dành hàng giờ để học nhưng kiến thức "bay màu" chỉ sau vài ngày không ôn tập.</p>
+                <h3 className="text-xl font-bold text-white mb-2">Ôn mãi vẫn quên</h3>
+                <p className="text-slate-300 leading-relaxed font-medium">Kiến thức trôi tuột ngay sau khi học. Tốn công sức mà hiệu quả không thấy đâu.</p>
             </div>
 
-            <div className="bg-slate-900/50 border border-white/5 rounded-2xl p-8 hover:bg-slate-900 transition-colors group">
-                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center mb-6 group-hover:bg-blue-500/20 transition-colors">
-                  <HiPencilSquare className="w-8 h-8 text-blue-500" />
+            <div className="bg-slate-900/40 border border-white/5 rounded-3xl p-8 hover:bg-slate-900 transition-colors group hover:-translate-y-1 duration-300">
+                <div className="w-16 h-16 rounded-2xl bg-blue-500/20 shadow-[0_0_20px_rgba(59,130,246,0.3)] flex items-center justify-center mb-6 text-blue-400 group-hover:scale-110 transition-transform">
+                  <HiPencilSquare className="w-8 h-8" />
                 </div>
-                <h3 className="text-xl font-bold text-white mb-3">Soạn bài tốn thời gian</h3>
-                <p className="text-slate-400 leading-relaxed">Mất cả buổi tối chỉ để chép flashcard thủ công thay vì tập trung học kiến thức.</p>
+                <h3 className="text-xl font-bold text-white mb-2">Tốn công vô ích</h3>
+                <p className="text-slate-300 leading-relaxed font-medium">Mất hàng giờ hì hục chép Flashcard thủ công thay vì tập trung vào việc ghi nhớ.</p>
             </div>
           </div>
         </div>
@@ -259,7 +308,7 @@ const LandingPage: React.FC = () => {
         FEATURES
         ======================================== 
       */}
-      <section className="py-32 relative overflow-hidden">
+      <section className="py-32 relative overflow-hidden" id="features">
         {/* Decorative Grid */}
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5"></div>
         
@@ -275,6 +324,12 @@ const LandingPage: React.FC = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* ROW 1: Study Modes (2 cols) + AI Tutor (1 col) */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 pb-4">
+               <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <span className="w-8 h-1 bg-indigo-500 rounded-full"></span>
+                  Học tập hiệu quả
+               </h3>
+            </div>
             
             {/* Feature 1: Diverse Study Modes */}
             <div className="col-span-1 lg:col-span-2 bg-[#0B1120] border border-white/10 rounded-3xl p-8 relative overflow-hidden group hover:border-indigo-500/50 transition-colors">
@@ -318,9 +373,9 @@ const LandingPage: React.FC = () => {
                         <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 border border-white/5 hover:bg-slate-700 transition-colors">
                            <HiPencilSquare className="w-4 h-4" />
                         </div>
-                        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">Thuật ngữ</div>
-                        <div className="text-4xl md:text-5xl font-black text-white mb-2">pay attention</div>
-                        <div className="text-xs text-slate-500 italic mt-2 animate-pulse">Nhấn để lật thẻ</div>
+                        <div className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-2">Sự kiện lịch sử</div>
+                        <div className="text-3xl md:text-4xl font-black text-center px-4 text-white mb-2">Chiến thắng<br/>Điện Biên Phủ</div>
+                        <div className="text-xs text-slate-500 italic mt-2 animate-pulse">Nhấn để xem diễn biến</div>
                      </div>
 
                      {/* Controls */}
@@ -374,7 +429,7 @@ const LandingPage: React.FC = () => {
                   {/* Chat Content */}
                   <div className="p-4 space-y-3">
                      <div className="bg-slate-700/50 rounded-2xl rounded-tl-sm p-3 text-xs text-slate-200 leading-relaxed border border-white/5">
-                        Xin chào! Mình là trợ lý AI của FlipLab. Mình có thể giúp gì cho việc học của bạn hôm nay?
+                        Xin chào! Mình là trợ lý AI của FlipLab. <span className="inline-flex gap-1 items-center align-bottom ml-1"><span className="w-1 h-1 bg-white rounded-full animate-bounce"></span><span className="w-1 h-1 bg-white rounded-full animate-bounce delay-100"></span><span className="w-1 h-1 bg-white rounded-full animate-bounce delay-200"></span></span>
                      </div>
                      {/* Suggestion Chips */}
                      <div className="grid grid-cols-2 gap-2">
@@ -391,6 +446,12 @@ const LandingPage: React.FC = () => {
             </div>
 
             {/* ROW 2: Customization Group - Folder + Deck + Profile */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 pb-4 pt-8">
+               <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <span className="w-8 h-1 bg-blue-500 rounded-full"></span>
+                  Cá nhân hóa
+               </h3>
+            </div>
 
             {/* Feature 3: Folder Customization */}
             <div className="bg-slate-900 border border-white/10 rounded-3xl p-6 group hover:border-blue-500/50 transition-colors relative overflow-hidden flex flex-col">
@@ -508,6 +569,14 @@ const LandingPage: React.FC = () => {
 
             {/* ROW 3: Tools Group - Translation + Quiz */}
 
+            {/* ROW 3: Tools Group - Translation + Quiz */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 pb-4 pt-8">
+               <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <span className="w-8 h-1 bg-cyan-500 rounded-full"></span>
+                  Công cụ thông minh
+               </h3>
+            </div>
+
             {/* Feature 6: Smart Translation */}
             <div className="bg-slate-900 border border-white/10 rounded-3xl p-6 group hover:border-cyan-500/50 transition-colors relative overflow-hidden flex flex-col">
                <div className="mb-6">
@@ -612,6 +681,14 @@ const LandingPage: React.FC = () => {
 
             {/* ROW 4: Community (Full width) */}
 
+            {/* ROW 4: Community (Full width) */}
+            <div className="col-span-1 md:col-span-2 lg:col-span-3 pb-4 pt-8">
+               <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                  <span className="w-8 h-1 bg-green-500 rounded-full"></span>
+                  Cộng đồng & Kết nối
+               </h3>
+            </div>
+
             {/* Feature 8: Study Groups & Community */}
             <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-slate-900 border border-white/10 rounded-3xl p-8 flex flex-col items-center relative overflow-hidden group">
                <div className="w-full relative z-10 flex flex-col md:flex-row gap-8 items-start">
@@ -702,7 +779,7 @@ const LandingPage: React.FC = () => {
             Học mà chơi, <br className="md:hidden" /> chơi mà điểm cao
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto mb-16 text-lg">
-            FlipLab biến việc học nhàm chán thành cuộc phiêu lưu thú vị. Tích lũy XP, thăng hạng và thu thập huy hiệu độc quyền.
+            Mỗi hành động học đều được ghi nhận. Level & huy hiệu giúp bạn nhìn thấy sự tiến bộ mỗi ngày. <span className="text-yellow-400 font-bold">Phần thưởng:</span> Mở khóa Theme độc quyền, Khung Avatar VIP và hơn thế nữa.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -758,34 +835,83 @@ const LandingPage: React.FC = () => {
         WHO IS FLIPLAB FOR?
         ======================================== 
       */}
-      <section className="py-24 max-w-7xl mx-auto px-6">
+      <section className="py-24 max-w-7xl mx-auto px-6" id="about">
         <h2 className="text-3xl font-bold mb-12 text-center">Dành cho mọi người học</h2>
         <div className="grid md:grid-cols-3 gap-8">
-           <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 text-center hover:bg-slate-800 transition-colors group">
-              <div className="w-16 h-16 mx-auto bg-blue-600/20 rounded-full flex items-center justify-center mb-6 text-blue-500 group-hover:scale-110 transition-transform">
+           <div className="p-8 rounded-3xl bg-slate-900/50 border border-white/10 text-center hover:bg-slate-800 transition-all hover:-translate-y-2 duration-300 group">
+              <div className="w-16 h-16 mx-auto bg-blue-600/20 rounded-full flex items-center justify-center mb-6 text-blue-500 group-hover:scale-110 transition-transform ring-4 ring-blue-500/10">
                 <HiAcademicCap className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Học sinh & Sinh viên</h3>
-              <p className="text-slate-400 text-sm">Ôn thi THPTQG, Đại học, chứng chỉ ngoại ngữ (IELTS, TOEIC) hiệu quả.</p>
+              <h3 className="text-xl font-bold mb-3 text-white">Học sinh & Sinh viên</h3>
+              <p className="text-slate-300 text-sm font-medium leading-relaxed">"Ôn thi cấp tốc, nhớ công thức Toán/Lý và hàng nghìn từ vựng tiếng Anh nhanh chóng."</p>
            </div>
            
-           <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 text-center hover:bg-slate-800 transition-colors group">
-              <div className="w-16 h-16 mx-auto bg-pink-600/20 rounded-full flex items-center justify-center mb-6 text-pink-500 group-hover:scale-110 transition-transform">
+           <div className="p-8 rounded-3xl bg-slate-900/50 border border-white/10 text-center hover:bg-slate-800 transition-all hover:-translate-y-2 duration-300 group">
+              <div className="w-16 h-16 mx-auto bg-pink-600/20 rounded-full flex items-center justify-center mb-6 text-pink-500 group-hover:scale-110 transition-transform ring-4 ring-pink-500/10">
                 <HiBriefcase className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Người đi làm</h3>
-              <p className="text-slate-400 text-sm">Học từ vựng chuyên ngành, nâng cao kỹ năng mềm trong thời gian rảnh.</p>
+              <h3 className="text-xl font-bold mb-3 text-white">Người đi làm</h3>
+              <p className="text-slate-300 text-sm font-medium leading-relaxed">"Học từ vựng chuyên ngành chỉ với 5 phút rảnh rỗi. Nâng cao nghiệp vụ mà không tốn thời gian."</p>
            </div>
            
-           <div className="p-8 rounded-3xl bg-slate-900 border border-white/10 text-center hover:bg-slate-800 transition-colors group">
-              <div className="w-16 h-16 mx-auto bg-teal-600/20 rounded-full flex items-center justify-center mb-6 text-teal-500 group-hover:scale-110 transition-transform">
+           <div className="p-8 rounded-3xl bg-slate-900/50 border border-white/10 text-center hover:bg-slate-800 transition-all hover:-translate-y-2 duration-300 group">
+              <div className="w-16 h-16 mx-auto bg-teal-600/20 rounded-full flex items-center justify-center mb-6 text-teal-500 group-hover:scale-110 transition-transform ring-4 ring-teal-500/10">
                  <HiGlobeAlt className="w-8 h-8" />
               </div>
-              <h3 className="text-xl font-bold mb-2">Người tự học</h3>
-              <p className="text-slate-400 text-sm">Khám phá kiến thức mới mỗi ngày, từ lịch sử, địa lý đến coding.</p>
+              <h3 className="text-xl font-bold mb-3 text-white">Người tự học</h3>
+              <p className="text-slate-300 text-sm font-medium leading-relaxed">"Lộ trình cá nhân hóa, tự chủ thời gian. Master kỹ năng mới mà không cần giáo viên kèm cặp."</p>
            </div>
         </div>
       </section>
+
+      {/* 
+        ========================================
+        TESTIMONIALS
+        ======================================== 
+      */}
+       <section className="py-24 bg-slate-900 border-y border-white/5">
+          <div className="max-w-7xl mx-auto px-6">
+             <h2 className="text-3xl font-bold text-center mb-16">Người học nói gì về FlipLab?</h2>
+             <div className="grid md:grid-cols-3 gap-8">
+                {/* 1 */}
+                <div className="bg-slate-950 p-8 rounded-2xl border border-white/5 relative hover:-translate-y-1 transition-transform duration-300">
+                   <div className="absolute -top-4 left-8 text-6xl text-indigo-500 opacity-20 font-serif">"</div>
+                   <p className="text-slate-300 mb-6 italic text-sm leading-relaxed">"Mình đã tăng từ 5.0 lên 7.0 IELTS Reading chỉ sau 2 tháng dùng FlipLab để học từ vựng chuyên ngành. AI giải thích cực dễ hiểu."</p>
+                   <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-indigo-600 font-bold flex items-center justify-center text-white shadow-lg shadow-indigo-500/30">H</div>
+                      <div>
+                         <div className="font-bold text-white text-sm">Hoàng Nam</div>
+                         <div className="text-xs text-slate-500">Sinh viên ĐH Bách Khoa</div>
+                      </div>
+                   </div>
+                </div>
+                {/* 2 */}
+                <div className="bg-slate-950 p-8 rounded-2xl border border-white/5 relative hover:-translate-y-1 transition-transform duration-300">
+                   <div className="absolute -top-4 left-8 text-6xl text-indigo-500 opacity-20 font-serif">"</div>
+                   <p className="text-slate-300 mb-6 italic text-sm leading-relaxed">"Mình học Y nên lượng kiến thức Giải phẫu cực khủng khiếp. FlipLab giúp mình nhớ vị trí 206 xương và các dây thần kinh chỉ trong 1 tuần. Cứu tinh thực sự!"</p>
+                   <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-pink-600 font-bold flex items-center justify-center text-white shadow-lg shadow-pink-500/30">M</div>
+                      <div>
+                         <div className="font-bold text-white text-sm">Minh Thư</div>
+                         <div className="text-xs text-slate-500">Sinh viên Y Đa Khoa</div>
+                      </div>
+                   </div>
+                </div>
+                {/* 3 */}
+                <div className="bg-slate-950 p-8 rounded-2xl border border-white/5 relative hover:-translate-y-1 transition-transform duration-300">
+                   <div className="absolute -top-4 left-8 text-6xl text-indigo-500 opacity-20 font-serif">"</div>
+                   <p className="text-slate-300 mb-6 italic text-sm leading-relaxed">"Ôn thi THPT Quốc gia môn Sử, Địa nhẹ nhàng hẳn. Mình copy văn bản sách giáo khoa vào, AI tự tạo câu hỏi trắc nghiệm để ôn tập. Quá tiện."</p>
+                   <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-green-600 font-bold flex items-center justify-center text-white shadow-lg shadow-green-500/30">G</div>
+                      <div>
+                         <div className="font-bold text-white text-sm">Gia Hưng</div>
+                         <div className="text-xs text-slate-500">Học sinh lớp 12</div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </section>
 
       {/* 
         ========================================
@@ -796,10 +922,10 @@ const LandingPage: React.FC = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-900/20 pointer-events-none"></div>
         <div className="relative z-10 max-w-3xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-black mb-6">
-            Sẵn sàng bứt phá điểm số?
+            Bắt đầu học đúng cách từ hôm nay
           </h2>
           <p className="text-xl text-slate-300 mb-10">
-            Tham gia cùng hàng nghìn người học khác trên FlipLab ngay hôm nay. Hoàn toàn miễn phí để bắt đầu.
+            Tham gia cùng hàng nghìn người học khác trên FlipLab. Hoàn toàn miễn phí.
           </p>
           <Link 
             to="/register" 
@@ -807,8 +933,8 @@ const LandingPage: React.FC = () => {
           >
             Tạo tài khoản miễn phí <HiArrowRight />
           </Link>
-          <p className="mt-6 text-sm text-slate-500">
-            Không cần thẻ tín dụng. Đăng ký trong 30 giây.
+          <p className="mt-6 text-sm text-slate-500 flex items-center justify-center gap-2">
+            <HiCheckCircle className="text-green-500" /> Không cần thẻ tín dụng. Không rủi ro.
           </p>
         </div>
       </section>
@@ -828,10 +954,10 @@ const LandingPage: React.FC = () => {
            </div>
 
            <div className="flex gap-8 text-sm text-slate-400">
-              <a href="#" className="hover:text-white transition-colors">Về chúng tôi</a>
-              <a href="#" className="hover:text-white transition-colors">Tính năng</a>
-              <a href="#" className="hover:text-white transition-colors">Bảo mật</a>
-              <a href="#" className="hover:text-white transition-colors">Liên hệ</a>
+              <Link to="/about" className="hover:text-white transition-colors">Về chúng tôi</Link>
+              <button onClick={() => scrollToSection('features')} className="hover:text-white transition-colors">Tính năng</button>
+              <button onClick={() => setActiveModal('privacy')} className="hover:text-white transition-colors">Bảo mật</button>
+              <button onClick={() => setActiveModal('contact')} className="hover:text-white transition-colors">Liên hệ</button>
            </div>
 
            <div className="text-xs text-slate-500">
@@ -839,6 +965,98 @@ const LandingPage: React.FC = () => {
            </div>
         </div>
       </footer>
+      {/* 
+        ========================================
+        MODALS
+        ======================================== 
+      */}
+      {activeModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setActiveModal(null)}></div>
+          <div className="relative bg-slate-900 border border-white/10 rounded-2xl p-8 max-w-2xl w-full text-left shadow-2xl animate-in fade-in zoom-in duration-200 lg:p-10">
+             {/* Close Button */}
+             <button onClick={() => setActiveModal(null)} className="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-full p-2 transition-colors z-10 cursor-pointer">
+               <HiXMark className="w-6 h-6" />
+             </button>
+
+             {activeModal === 'privacy' ? (
+                <>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                      <HiShieldCheck className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">Chính sách bảo mật</h3>
+                  </div>
+                  <div className="prose prose-invert prose-sm max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <p className="text-slate-300">Cập nhật lần cuối: 01/02/2026</p>
+                    <h4 className="text-white font-bold mt-4 mb-2">1. Thu thập thông tin</h4>
+                    <p className="text-slate-400">Chúng tôi chỉ thu thập các thông tin cần thiết để cung cấp dịch vụ tốt nhất cho bạn, bao gồm: tên hiển thị, địa chỉ email, và dữ liệu học tập (bộ thẻ, tiến độ).</p>
+                    
+                    <h4 className="text-white font-bold mt-4 mb-2">2. Sử dụng thông tin</h4>
+                    <p className="text-slate-400">Thông tin của bạn được sử dụng để cá nhân hóa trải nghiệm học tập, đồng bộ dữ liệu giữa các thiết bị và cải thiện chất lượng của FlipLab.</p>
+
+                    <h4 className="text-white font-bold mt-4 mb-2">3. Bảo mật dữ liệu</h4>
+                    <p className="text-slate-400">Mọi dữ liệu cá nhân đều được mã hóa và lưu trữ an toàn. Chúng tôi cam kết không chia sẻ thông tin của bạn với bất kỳ bên thứ ba nào mà không có sự đồng ý.</p>
+
+                    <h4 className="text-white font-bold mt-4 mb-2">4. Quyền của bạn</h4>
+                    <p className="text-slate-400">Bạn có quyền yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân của mình bất cứ lúc nào thông qua phần cài đặt tài khoản.</p>
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-white/10 flex justify-end">
+                    <button onClick={() => setActiveModal(null)} className="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-bold transition-colors">Đã hiểu</button>
+                  </div>
+                </>
+             ) : (
+                <>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400">
+                      <HiEnvelope className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-2xl font-bold text-white">Liên hệ hỗ trợ</h3>
+                  </div>
+                  <form onSubmit={handleContactSubmit} className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-1">Họ tên</label>
+                      <input 
+                        type="text" 
+                        required
+                        className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                        placeholder="Nhập tên của bạn"
+                        value={contactForm.name}
+                        onChange={e => setContactForm({...contactForm, name: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-1">Email</label>
+                      <input 
+                        type="email" 
+                        required
+                        className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors"
+                        placeholder="email@example.com"
+                        value={contactForm.email}
+                        onChange={e => setContactForm({...contactForm, email: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-bold text-slate-300 mb-1">Nội dung</label>
+                      <textarea 
+                        required
+                        rows={4}
+                        className="w-full bg-slate-950 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 transition-colors resize-none"
+                        placeholder="Bạn cần hỗ trợ gì?"
+                        value={contactForm.message}
+                        onChange={e => setContactForm({...contactForm, message: e.target.value})}
+                      ></textarea>
+                    </div>
+                    <div className="pt-4 flex justify-end gap-3">
+                      <button type="button" onClick={() => setActiveModal(null)} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition-colors">Hủy</button>
+                      <button type="submit" className="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-colors shadow-lg shadow-indigo-500/20">Gửi tin nhắn</button>
+                    </div>
+                  </form>
+                </>
+             )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

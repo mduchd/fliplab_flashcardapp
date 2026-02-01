@@ -22,6 +22,7 @@ import StudentQuizHistory from './pages/Quiz/StudentQuizHistory';
 import Notifications from './pages/Notifications/Notifications';
 import BadgeNotificationDemo from './pages/BadgeNotificationDemo';
 import LandingPage from './pages/LandingPage/LandingPage';
+import AboutPage from './pages/About/AboutPage';
 
 // Components
 import ProtectedRoute from './components/layout/ProtectedRoute';
@@ -214,6 +215,9 @@ const AppRoutes: React.FC = () => {
           </PublicRoute>
         }
       />
+
+      {/* About Page - Accessible to everyone */}
+      <Route path="/about" element={<AboutPage />} />
 
       {/* Badge Notification Demo */}
       <Route
