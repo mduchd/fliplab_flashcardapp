@@ -1,8 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { HiChartBar, HiAcademicCap, HiTrophy, HiBookOpen } from 'react-icons/hi2';
+import { PiSealCheckFill } from 'react-icons/pi';
 import { Link } from 'react-router-dom';
-import { BADGES } from '../../constants/badgeConstants';
+import { BADGES, checkBadgeUnlocked } from '../../constants/badgeConstants';
 import BadgeListModal from './BadgeListModal';
+import BadgeCustomizationModal from './BadgeCustomizationModal';
 
 interface ActivityStatsProps {
   activityData?: {
@@ -18,29 +20,73 @@ interface ActivityStatsProps {
   };
   viewMode?: 'full' | 'chart-only' | 'badges-only' | 'mastery-only';
   noBackground?: boolean;
+  userStats?: any; // Add userStats prop
 }
 
-const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData, masteryData, viewMode = 'full', noBackground = false }) => {
+const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData, masteryData, viewMode = 'full', noBackground = false, userStats }) => {
   const [showBadgesModal, setShowBadgesModal] = useState(false);
+  const [showCustomizationModal, setShowCustomizationModal] = useState(false);
+  const [pinnedBadgeIds, setPinnedBadgeIds] = useState<string[]>([]);
+  
   const hasRealData = activityData && activityData.length > 0;
 
-  // Mock User Stats for Badge Calculation (Demo purpose)
-  // In real implementation, this should come from props
-  const mockUserStats = {
-      streak: 5,
-      masteredCards: masteryData?.mastered ? Math.round((masteryData.mastered / 100) * 50) : 12, // Approx 12 cards if 24% of 50
-      totalFolders: 2,
-      createdDecks: 3,
-      totalReviews: 120,
-      followingCount: 5,
-      followersCount: 12,
+  // Load pinned badges from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('pinnedBadges');
+    if (saved) {
+      try {
+        setPinnedBadgeIds(JSON.parse(saved));
+      } catch (e) {
+        console.error('Error loading pinned badges:', e);
+      }
+    }
+  }, []);
+
+  // Save pinned badges to localStorage
+  const handleSavePinnedBadges = (badgeIds: string[]) => {
+    setPinnedBadgeIds(badgeIds);
+    localStorage.setItem('pinnedBadges', JSON.stringify(badgeIds));
+  };
+
+  // Mock User Stats for Badge Calculation (Demo purpose) if userStats not provided
+  const currentUserStats = userStats || {
+      // STREAK - Unlock ALL including Diamond (30 days) + new Bất Tử badge locked
+      streak: 35,
+      
+      // MASTERY - Unlock ALL including Diamond (500 cards) + new Toàn Tri badge unlocked!
+      masteredCards: 600,
+      
+      // CREATION - Unlock most creation badges
+      totalFolders: 3,
+      createdDecks: 12,
       hasImported: true,
-      hasShared: false,
-      aiGeneratedDecks: 1,
-      quizzesTaken: 1,
-      perfectQuizzes: 0,
-      translationCount: 15,
-      hasAvatar: true
+      
+      // STUDY - Unlock Bronze, Silver, and Gold review badges
+      totalReviews: 550,
+      hasStudiedLate: true,  // Night Owl
+      hasStudiedEarly: true, // Early Bird
+      
+      // SOCIAL - Unlock more social badges
+      followingCount: 15,
+      followersCount: 12,  // Unlock Influencer (needs 10)
+      hasShared: true,
+      createdGroups: 2,  // Unlock Community Leader
+      
+      // AI - Unlock more AI badges
+      aiGeneratedDecks: 12,
+      aiChatCount: 8,  // Unlock AI Friend (needs 5)
+      
+      // QUIZ - Unlock Quiz badges + new ones
+      quizzesTaken: 25, // Unlock Cao Thủ (needs 20)
+      perfectQuizzes: 2,  // Unlock Quiz Sniper
+      
+      // UTILITY - Unlock most utility badges + new Chuyên Gia
+      translationCount: 25,
+      hasAvatar: true,
+      searchCount: 50,
+      hasExportedData: true,  // Unlock Data Hoarder
+      hasCustomizedSettings: true,
+      featuresUsed: 12  // Unlock Chuyên Gia (needs 10)
   };
 
   const { weeklyData } = useMemo(() => {
@@ -236,59 +282,159 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData, masteryData
 
   const BadgesSection = (
       <div className={noBackground ? "flex flex-col h-full" : "bg-white dark:bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-slate-200 dark:border-white/10 shadow-sm flex flex-col h-full"}>
-        <div className={`flex items-center justify-between ${noBackground ? 'mb-3' : 'mb-5'}`}>
+        <div className={`flex items-center justify-between ${noBackground ? 'mb-3' : 'mb-3'}`}>
           <h3 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-2 text-sm">
             <div className={`p-1.5 rounded-md text-yellow-600 dark:text-yellow-400 ${noBackground ? 'bg-yellow-100 dark:bg-yellow-500/20' : 'bg-yellow-50 dark:bg-yellow-500/10'}`}>
               <HiTrophy className="w-3.5 h-3.5" />
             </div>
             Huy hiệu & Thành tích
           </h3>
-          <span 
-            className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-            onClick={() => setShowBadgesModal(true)}
-          >
-            Xem tất cả
-          </span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowCustomizationModal(true)}
+              className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer transition-colors"
+            >
+              Tùy chỉnh
+            </button>
+            <span 
+              className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              onClick={() => setShowBadgesModal(true)}
+            >
+              Xem tất cả
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-3 mb-5">
-          {BADGES.filter(b => ['STREAK_3', 'MASTER_10', 'CREATOR_1', 'QUIZ_TAKER'].includes(b.id)).map((badge, index) => {
-              const Icon = badge.icon;
-              // Mock status: First 2 unlocked for demo
-              const isUnlocked = index < 2; 
+        <div className="grid grid-cols-5 gap-3 py-1">
+          {(() => {
+            // Get all unlocked badges
+            const unlockedBadges = BADGES.filter(badge => checkBadgeUnlocked(badge, currentUserStats));
+            
+            // Determine which badges to display
+            let badgesToShow: typeof BADGES;
+            if (pinnedBadgeIds.length > 0) {
+              // Show pinned badges (filter to only show unlocked ones)
+              badgesToShow = pinnedBadgeIds
+                .map(id => BADGES.find(b => b.id === id))
+                .filter((badge): badge is typeof BADGES[0] => 
+                  badge !== undefined && checkBadgeUnlocked(badge, currentUserStats)
+                );
+            } else {
+              // Default: show first 5 unlocked badges
+              badgesToShow = unlockedBadges.slice(0, 5);
+            }
 
-              // Simplified Tier Colors for Stats Widget with variable border width
+            return badgesToShow.map((badge) => {
+              const Icon = badge.icon;
+              const isUnlocked = checkBadgeUnlocked(badge, currentUserStats);
+
+              // Full Tier Styling matching BadgeListModal - Enhanced for compact view
               const tierStyles = {
-                BRONZE: 'border-[3px] border-orange-600/50 text-orange-600',
-                SILVER: 'border-[3px] border-slate-400/60 text-slate-500',
-                GOLD: 'border-[4px] border-yellow-500 text-yellow-600 shadow-sm shadow-yellow-500/20',
-                DIAMOND: 'border-[4px] border-cyan-400 text-cyan-500 shadow-sm shadow-cyan-400/20'
+                BRONZE: {
+                  border: 'border-[6px] border-orange-700/50',
+                  bg: isUnlocked 
+                    ? 'bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-800/40' 
+                    : 'bg-slate-100 dark:bg-slate-800/50',
+                  icon: isUnlocked ? 'text-orange-700 dark:text-orange-400' : 'text-slate-300',
+                  shadow: isUnlocked ? 'shadow-md shadow-orange-500/30' : '',
+                  hover: isUnlocked ? 'group-hover:shadow-xl group-hover:shadow-orange-500/40 group-hover:-translate-y-1' : ''
+                },
+                SILVER: {
+                  border: 'border-[6px] border-slate-400/70',
+                  bg: isUnlocked 
+                    ? 'bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-600 dark:to-slate-500' 
+                    : 'bg-slate-100 dark:bg-slate-800/50',
+                  icon: isUnlocked ? 'text-slate-600 dark:text-slate-100' : 'text-slate-300',
+                  shadow: isUnlocked ? 'shadow-lg shadow-slate-400/40 dark:shadow-slate-900/60' : '',
+                  hover: isUnlocked ? 'group-hover:shadow-xl group-hover:shadow-slate-400/60 group-hover:-translate-y-1' : ''
+                },
+                GOLD: {
+                  border: 'border-[6px] border-yellow-500/80',
+                  bg: isUnlocked 
+                    ? 'bg-gradient-to-br from-yellow-100 to-yellow-300 dark:from-yellow-900/40 dark:to-yellow-700/40' 
+                    : 'bg-slate-100 dark:bg-slate-800/50',
+                  icon: isUnlocked ? 'text-yellow-700 dark:text-yellow-400' : 'text-slate-300',
+                  shadow: isUnlocked ? 'shadow-[0_4px_20px_rgba(234,179,8,0.5)]' : '',
+                  hover: isUnlocked ? 'group-hover:shadow-[0_6px_30px_rgba(234,179,8,0.7)] group-hover:-translate-y-1 group-hover:scale-105' : ''
+                },
+                DIAMOND: {
+                  border: 'border-[6px] border-cyan-400/80',
+                  bg: isUnlocked 
+                    ? 'bg-gradient-to-br from-cyan-100 to-blue-200 dark:from-cyan-900/40 dark:to-blue-800/40' 
+                    : 'bg-slate-100 dark:bg-slate-800/50',
+                  icon: isUnlocked ? 'text-cyan-600 dark:text-cyan-300' : 'text-slate-300',
+                  shadow: isUnlocked ? 'shadow-[0_4px_25px_rgba(34,211,238,0.6)]' : '',
+                  hover: isUnlocked ? 'group-hover:shadow-[0_6px_35px_rgba(34,211,238,0.8)] group-hover:-translate-y-1 group-hover:scale-105' : ''
+                }
               };
-              const style = isUnlocked ? (tierStyles[badge.tier] || tierStyles.BRONZE) : 'border-[3px] border-slate-200 text-slate-300';
+              
+              const style = tierStyles[badge.tier] || tierStyles.BRONZE;
 
               return (
                 <div 
                   key={badge.id} 
                   onClick={() => setShowBadgesModal(true)}
-                  className="flex flex-col items-center gap-3 cursor-pointer group"
+                  className="flex flex-col items-center gap-2 cursor-pointer group"
                   title={badge.name}
                 >
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-transform group-hover:scale-110 ${style} ${isUnlocked ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50 grayscale'}`}>
-                     <Icon className="w-8 h-8" />
+                  <div className="relative">
+                    <div className={`
+                      w-16 h-16 rounded-full flex items-center justify-center 
+                      transition-all duration-300
+                      ${style.border} 
+                      ${style.bg} 
+                      ${style.shadow}
+                      ${style.hover}
+                      ${!isUnlocked ? 'grayscale opacity-60' : ''}
+                    `}>
+                       <Icon className={`w-8 h-8 ${style.icon}`} />
+                    </div>
+                    
+                    {/* Progress Badge for Locked */}
+                    {!isUnlocked && (
+                      <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-1.5 py-0.5 bg-slate-200/90 dark:bg-slate-700/90 backdrop-blur-sm rounded-full border border-slate-300 dark:border-slate-600 shadow-sm z-10">
+                        <span className="text-[8px] font-extrabold text-slate-500 dark:text-slate-400">
+                          0/{badge.threshold}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  <span className={`text-[10px] font-bold uppercase truncate max-w-full ${isUnlocked ? 'text-slate-600 dark:text-slate-400' : 'text-slate-300'}`}>
+                  
+                  <span className={`text-[10px] font-bold uppercase truncate max-w-full transition-colors ${isUnlocked ? 'text-slate-600 dark:text-slate-400' : 'text-slate-400 dark:text-slate-600'}`}>
                     {badge.name}
                   </span>
+                  
+                  {/* Tier Badge Icon below name */}
+                  {isUnlocked ? (
+                    <div className="transition-transform group-hover:scale-125">
+                      <PiSealCheckFill className={`w-4 h-4 ${
+                        badge.tier === 'BRONZE' ? 'text-orange-600 dark:text-orange-500' :
+                        badge.tier === 'SILVER' ? 'text-slate-400 dark:text-slate-300' :
+                        badge.tier === 'GOLD' ? 'text-yellow-500 dark:text-yellow-400' :
+                        'text-cyan-400 dark:text-cyan-300'
+                      } drop-shadow-sm`} />
+                    </div>
+                  ) : (
+                    <div className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                  )}
                 </div>
-              );
-          })}
+                )
+            });
+          })()}
         </div>
         
-        {/* Render Modal */}
+        {/* Render Modals */}
         <BadgeListModal 
             isOpen={showBadgesModal} 
             onClose={() => setShowBadgesModal(false)} 
-            userStats={mockUserStats}
+            userStats={currentUserStats}
+        />
+        <BadgeCustomizationModal
+            isOpen={showCustomizationModal}
+            onClose={() => setShowCustomizationModal(false)}
+            userStats={currentUserStats}
+            pinnedBadgeIds={pinnedBadgeIds}
+            onSave={handleSavePinnedBadges}
         />
       </div>
   );
@@ -298,16 +444,23 @@ const ActivityStats: React.FC<ActivityStatsProps> = ({ activityData, masteryData
   if (viewMode === 'badges-only') return BadgesSection;
 
   return (
-    <div className="flex flex-col gap-6 h-full">
-      {ChartSection}
-      {MasterySection}
-      {BadgesSection}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 h-full">
+      {/* Activity Chart */}
+      <div className="w-full h-72 md:h-auto">
+        {ChartSection}
+      </div>
+      
+      {/* Mastery Ring */}
+      <div className="w-full h-72 md:h-auto">
+         {MasterySection}
+      </div>
+
+       {/* Badges Section - Full Width */}
+       <div className="col-span-1 md:col-span-2 mt-2">
+         {BadgesSection}
+       </div>
     </div>
   );
 };
 
 export default ActivityStats;
-
-
-
-

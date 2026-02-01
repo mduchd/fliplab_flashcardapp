@@ -74,12 +74,12 @@ const BadgeListModal: React.FC<BadgeListModalProps> = ({ isOpen, onClose, userSt
       let current = 0;
       switch(badge.category) {
           case 'STREAK': current = stats.streak || 0; break;
-          case 'MASTERY': current = stats.masteredCount || stats.totalMastered || 0; break;
-          case 'CREATION': current = stats.createdSets || stats.createdCount || 0; break;
-          case 'STUDY': current = stats.studiedCount || stats.totalReview || 0; break;
-          case 'SOCIAL': current = stats.followers || 0; break;
-          case 'QUIZ': current = stats.quizTaken || 0; break;
-          case 'AI': current = stats.aiSetsGenerated || 0; break;
+          case 'MASTERY': current = stats.masteredCards || 0; break;
+          case 'CREATION': current = stats.createdDecks || 0; break;
+          case 'STUDY': current = stats.totalReviews || 0; break;
+          case 'SOCIAL': current = stats.followersCount || stats.followingCount || 0; break;
+          case 'QUIZ': current = stats.quizzesTaken || 0; break;
+          case 'AI': current = stats.aiGeneratedDecks || 0; break;
           default: current = 0;
       }
 
@@ -195,40 +195,40 @@ const BadgeListModal: React.FC<BadgeListModalProps> = ({ isOpen, onClose, userSt
                        
                        const currentProgress = isUnlocked ? badge.threshold : getBadgeProgress(badge, userStats);
 
-                       const tierVisuals = {
-                         BRONZE: { 
-                             style: 'border-orange-700/40 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 text-orange-700 dark:text-orange-400',
-                             borderWidth: 'border-[6px]',
-                             glow: '',
-                             scale: 'scale-100',
-                             sparkle: <PiSparkleFill className="text-orange-300 w-4 h-4 drop-shadow-sm opacity-80" />, 
-                             icon: <PiSealCheckFill className="text-orange-600 drop-shadow-sm" /> 
-                         },
-                         SILVER: { 
-                             style: 'border-slate-300 bg-gradient-to-br from-white to-slate-200 dark:from-slate-600 dark:to-slate-500 text-slate-600 dark:text-slate-100',
-                             borderWidth: 'border-[6px]',
-                             glow: 'shadow-lg shadow-slate-300/50 dark:shadow-slate-900/50 ring-1 ring-white/50 inset',
-                             scale: 'scale-100',
-                             sparkle: <PiSparkleFill className="text-slate-300 w-5 h-5 drop-shadow-md animate-pulse" />, 
-                             icon: <PiSealCheckFill className="text-slate-400 drop-shadow-sm" />
-                         },
-                         GOLD: { 
-                             style: 'border-yellow-500 bg-gradient-to-br from-yellow-50 to-yellow-200 dark:from-yellow-900/30 dark:to-yellow-700/30 text-yellow-700 dark:text-yellow-400',
-                             borderWidth: 'border-[6px]',
-                             glow: 'shadow-[0_0_25px_rgba(234,179,8,0.5)] ring-2 ring-yellow-500/20',
-                             scale: 'scale-110', 
-                             sparkle: <PiSparkleFill className="text-yellow-400 w-7 h-7 drop-shadow-lg animate-bounce-slow" />, 
-                             icon: <PiSealCheckFill className="text-yellow-500 drop-shadow-md" />
-                         },
-                         DIAMOND: { 
-                             style: 'border-cyan-400 bg-gradient-to-br from-cyan-50 to-blue-100 dark:from-cyan-900/30 dark:to-blue-800/30 text-cyan-600 dark:text-cyan-300 animate-pulse-slow',
-                             borderWidth: 'border-[6px]',
-                             glow: 'shadow-[0_0_30px_rgba(34,211,238,0.6)] ring-4 ring-cyan-400/20',
-                             scale: 'scale-115', 
-                             sparkle: <PiSketchLogoFill className="text-cyan-200 w-6 h-6 drop-shadow-xl animate-spin-slow" />, 
-                             icon: <PiSketchLogoFill className="text-cyan-400 drop-shadow-md" />
-                         }
-                       };
+                        const tierVisuals = {
+                          BRONZE: { 
+                              style: 'border-orange-700/50 bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/40 dark:to-orange-800/40 text-orange-700 dark:text-orange-400',
+                              borderWidth: 'border-[6px]',
+                              glow: 'shadow-md shadow-orange-500/30',
+                              scale: 'scale-100',
+                              sparkle: <PiSparkleFill className="text-orange-300 w-4 h-4 drop-shadow-sm opacity-80" />, 
+                              icon: <PiSealCheckFill className="text-orange-600 drop-shadow-sm" /> 
+                          },
+                          SILVER: { 
+                              style: 'border-slate-400/70 bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-600 dark:to-slate-500 text-slate-600 dark:text-slate-100',
+                              borderWidth: 'border-[6px]',
+                              glow: 'shadow-lg shadow-slate-400/40 dark:shadow-slate-900/60 ring-1 ring-white/50 inset',
+                              scale: 'scale-100',
+                              sparkle: <PiSparkleFill className="text-slate-300 w-5 h-5 drop-shadow-md animate-pulse" />, 
+                              icon: <PiSealCheckFill className="text-slate-400 drop-shadow-sm" />
+                          },
+                          GOLD: { 
+                              style: 'border-yellow-500/80 bg-gradient-to-br from-yellow-100 to-yellow-300 dark:from-yellow-900/40 dark:to-yellow-700/40 text-yellow-700 dark:text-yellow-400',
+                              borderWidth: 'border-[6px]',
+                              glow: 'shadow-[0_4px_25px_rgba(234,179,8,0.5)] ring-2 ring-yellow-500/20',
+                              scale: 'scale-110', 
+                              sparkle: <PiSparkleFill className="text-yellow-400 w-7 h-7 drop-shadow-lg animate-bounce-slow" />, 
+                              icon: <PiSealCheckFill className="text-yellow-500 drop-shadow-md" />
+                          },
+                          DIAMOND: { 
+                              style: 'border-cyan-400/80 bg-gradient-to-br from-cyan-100 to-blue-200 dark:from-cyan-900/40 dark:to-blue-800/40 text-cyan-600 dark:text-cyan-300 animate-pulse-slow',
+                              borderWidth: 'border-[6px]',
+                              glow: 'shadow-[0_4px_30px_rgba(34,211,238,0.6)] ring-4 ring-cyan-400/20',
+                              scale: 'scale-115', 
+                              sparkle: <PiSketchLogoFill className="text-cyan-200 w-6 h-6 drop-shadow-xl animate-spin-slow" />, 
+                              icon: <PiSketchLogoFill className="text-cyan-400 drop-shadow-md" />
+                          }
+                        };
 
                        const currentTier = tierVisuals[badge.tier] || tierVisuals.BRONZE;
 

@@ -20,9 +20,12 @@ import TakeQuiz from './pages/Quiz/TakeQuiz';
 import QuizResults from './pages/Quiz/QuizResults';
 import StudentQuizHistory from './pages/Quiz/StudentQuizHistory';
 import Notifications from './pages/Notifications/Notifications';
+import BadgeNotificationDemo from './pages/BadgeNotificationDemo';
+import LandingPage from './pages/LandingPage/LandingPage';
 
 // Components
 import ProtectedRoute from './components/layout/ProtectedRoute';
+import BadgeNotificationManager from './components/notifications/BadgeNotificationManager';
 
 // Public route wrapper - redirects to home if already logged in
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -201,6 +204,26 @@ const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         }
       />
+      
+      {/* Public Landing Page */}
+      <Route
+        path="/intro"
+        element={
+          <PublicRoute>
+            <LandingPage />
+          </PublicRoute>
+        }
+      />
+
+      {/* Badge Notification Demo */}
+      <Route
+        path="/badge-demo"
+        element={
+          <ProtectedRoute>
+            <BadgeNotificationDemo />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -220,6 +243,8 @@ const App: React.FC = () => {
           <SidebarProvider>
             <ToastProvider>
               <AppRoutes />
+              {/* Badge Notification Manager - Global */}
+              <BadgeNotificationManager />
             </ToastProvider>
           </SidebarProvider>
         </ThemeProvider>
